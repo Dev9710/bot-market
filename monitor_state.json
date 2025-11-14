@@ -1,0 +1,4200 @@
+{
+  "last_volumes": {
+    "XRP": {
+      "m1": 1749492.8187300002,
+      "m5": 8747464.09365,
+      "m15": 26242392.280950002
+    },
+    "XLM": {
+      "m1": 170848.1593,
+      "m5": 854240.7964999999,
+      "m15": 2562722.3895
+    },
+    "HBAR": {
+      "m1": 319679.33718,
+      "m5": 1598396.6859,
+      "m15": 4795190.0577
+    },
+    "FLR": {
+      "m1": 0.0,
+      "m5": 0.0,
+      "m15": 0.0
+    },
+    "TEL": {
+      "m1": 0.0,
+      "m5": 408.14000000000004,
+      "m15": 0.0
+    },
+    "XMR": {
+      "m1": 11683.9971,
+      "m5": 58419.9855,
+      "m15": 175259.9565
+    },
+    "BTC": {
+      "m1": 20091304.2103345,
+      "m5": 100456521.05167249,
+      "m15": 301369563.1550175
+    },
+    "ETH": {
+      "m1": 21936985.029120002,
+      "m5": 109684925.1456,
+      "m15": 329054775.4368
+    },
+    "EIGEN": {
+      "m1": 2946.2924399999997,
+      "m5": 14731.462199999998,
+      "m15": 44194.3866
+    }
+  },
+  "last_alerts": {
+    "XRP_whale_trade": "2025-11-14T14:32:14.842792",
+    "BTC_whale_trade": "2025-11-14T14:32:58.698217",
+    "ETH_whale_trade": "2025-11-14T14:33:00.435002",
+    "XLM_whale_trade": "2025-11-14T14:32:48.248465",
+    "XLM_spike_5m": "2025-11-14T14:32:48.248465",
+    "XLM_spike_15m": "2025-11-14T14:32:48.248465",
+    "HBAR_whale_trade": "2025-11-14T14:32:18.449855",
+    "HBAR_spike_5m": "2025-11-14T14:32:49.888775",
+    "HBAR_spike_15m": "2025-11-14T14:32:49.888775",
+    "TEL_spike_5m": "2025-11-14T14:27:42.177424",
+    "ETH_spike_5m": "2025-11-14T14:32:28.589995",
+    "ETH_spike_15m": "2025-11-14T14:32:28.589995",
+    "BTC_spike_5m": "2025-11-14T14:32:26.951132",
+    "BTC_spike_15m": "2025-11-14T14:32:58.698217",
+    "EIGEN_spike_5m": "2025-11-14T14:33:49.007977",
+    "EIGEN_spike_15m": "2025-11-14T14:33:49.007977",
+    "XRP_spike_5m": "2025-11-14T14:32:46.588906",
+    "XRP_spike_15m": "2025-11-14T14:32:46.588906",
+    "EIGEN_whale_trade": "2025-11-14T14:33:49.007977",
+    "global_usds": "2025-11-14T13:34:54.996648",
+    "global_weth": "2025-11-14T14:33:25.458054",
+    "global_kucoin-shares": "2025-11-14T14:36:29.753809",
+    "global_cosmos": "2025-11-14T13:34:54.996648",
+    "global_kinetic-staked-hype": "2025-11-14T14:32:10.801360",
+    "global_wbnb": "2025-11-14T14:36:29.753809",
+    "global_kaspa": "2025-11-14T13:34:54.996648",
+    "global_global-dollar": "2025-11-14T14:36:29.753809",
+    "global_dash": "2025-11-14T14:32:10.801360",
+    "global_virtual-protocol": "2025-11-14T14:36:29.753809",
+    "global_starknet": "2025-11-14T14:36:29.753809",
+    "global_bridged-usdc-polygon-pos-bridge": "2025-11-14T14:33:25.459302",
+    "global_usual-usd": "2025-11-14T14:36:29.753809",
+    "global_decred": "2025-11-14T13:34:54.997647",
+    "global_sun-token": "2025-11-14T14:36:29.753809",
+    "global_gala": "2025-11-14T14:32:10.802370",
+    "global_jasmycoin": "2025-11-14T14:32:10.802370",
+    "global_binance-peg-dogecoin": "2025-11-14T14:32:10.802370",
+    "global_bitcoin-avalanche-bridged-btc-b": "2025-11-14T14:32:10.802370",
+    "global_zksync": "2025-11-14T14:36:29.753809",
+    "global_astherus-staked-bnb": "2025-11-14T14:32:10.802370",
+    "global_humanity": "2025-11-14T14:32:10.802370",
+    "global_euro-coin": "2025-11-14T14:36:29.753809",
+    "global_compounding-open-dollar": "2025-11-14T14:33:26.356462",
+    "global_reallink": "2025-11-14T14:32:11.542126",
+    "global_kaito": "2025-11-14T13:34:55.633556",
+    "global_kinetiq-earn-vault": "2025-11-14T13:36:25.249403",
+    "global_uchain-2": "2025-11-14T13:34:55.633556",
+    "global_oasis-network": "2025-11-14T14:32:11.542126",
+    "global_theo-short-duration-us-treasury-fund": "2025-11-14T14:32:11.547268",
+    "global_giggle-fund": "2025-11-14T14:33:26.356462",
+    "global_flare-bridged-xrp-flare": "2025-11-14T14:32:11.547268",
+    "global_aleo": "2025-11-14T14:32:11.547268",
+    "global_keeta": "2025-11-14T14:36:31.091146",
+    "global_sui-bridged-wbtc-sui": "2025-11-14T13:34:55.633556",
+    "global_frax-usd": "2025-11-14T14:33:26.356462",
+    "global_quantum-resistant-ledger": "2025-11-14T13:34:55.633556",
+    "global_safe": "2025-11-14T14:36:31.091146",
+    "global_unibase": "2025-11-14T13:34:55.633556",
+    "global_cronos-bridged-usdt-cronos": "2025-11-14T14:32:11.547268",
+    "global_stargate-bridged-usdc": "2025-11-14T14:33:26.356462",
+    "global_polymesh": "2025-11-14T14:32:11.547268",
+    "global_moo-deng": "2025-11-14T14:36:32.418057",
+    "global_peaq-2": "2025-11-14T14:32:12.232151",
+    "global_illuvium": "2025-11-14T14:32:12.232151",
+    "global_amnis-aptos": "2025-11-14T14:32:12.232151",
+    "global_band-protocol": "2025-11-14T14:36:32.418057",
+    "global_yield-guild-games": "2025-11-14T14:32:12.232151",
+    "global_stepn": "2025-11-14T14:32:12.232151",
+    "global_audiera": "2025-11-14T14:33:27.172120",
+    "global_lisk": "2025-11-14T14:36:32.420654",
+    "global_tokenbot-2": "2025-11-14T13:46:14.438011",
+    "global_bora": "2025-11-14T14:32:12.232151",
+    "global_woo-network": "2025-11-14T14:36:32.420654",
+    "global_secret": "2025-11-14T13:34:56.287726",
+    "global_iexec-rlc": "2025-11-14T14:36:32.421167",
+    "global_quantixai": "2025-11-14T13:34:56.287726",
+    "global_terra-luna-2": "2025-11-14T14:32:12.232151",
+    "global_alchemy-pay": "2025-11-14T14:32:12.232151",
+    "global_dia-data": "2025-11-14T14:36:32.421167",
+    "global_ocean-protocol": "2025-11-14T14:33:27.172120",
+    "global_seda-2": "2025-11-14T14:32:12.232151",
+    "global_pythia": "2025-11-14T14:32:12.241219",
+    "global_ergo": "2025-11-14T14:32:12.241219",
+    "global_storx": "2025-11-14T14:36:32.421709",
+    "global_freysa-ai": "2025-11-14T14:36:32.421709",
+    "global_pha": "2025-11-14T14:32:12.911926",
+    "global_sapien-2": "2025-11-14T13:34:57.062578",
+    "global_binance-peg-dai": "2025-11-14T14:36:33.853212",
+    "global_stbl": "2025-11-14T13:34:57.062578",
+    "global_ekubo-protocol": "2025-11-14T14:32:12.916420",
+    "global_amiko": "2025-11-14T14:32:12.916420",
+    "global_wax": "2025-11-14T14:32:12.916420",
+    "global_aura-on-sol": "2025-11-14T14:32:12.916420",
+    "global_pepecoin-network": "2025-11-14T13:34:57.062578",
+    "global_baby-shark-universe": "2025-11-14T14:32:12.916420",
+    "global_celo-dollar": "2025-11-14T13:34:57.062578",
+    "global_moonriver": "2025-11-14T14:36:33.853212",
+    "global_bifrost": "2025-11-14T14:36:33.853212",
+    "global_quark-chain": "2025-11-14T13:34:57.062578",
+    "global_rujira": "2025-11-14T14:36:33.853212",
+    "global_bouncebit": "2025-11-14T14:32:12.916420",
+    "global_gogopool-ggavax": "2025-11-14T13:34:57.062578",
+    "global_ai-rig-complex": "2025-11-14T14:32:12.916420",
+    "global_victoria-vr": "2025-11-14T13:34:57.063587",
+    "global_adshares": "2025-11-14T14:32:12.916420",
+    "global_georgeplaysclashroyale": "2025-11-14T14:32:12.916420",
+    "global_reactive-network": "2025-11-14T14:32:12.916420",
+    "global_zerobase": "2025-11-14T13:34:57.063587",
+    "global_elastos": "2025-11-14T14:32:12.917550",
+    "global_pocket-network": "2025-11-14T14:32:12.917450",
+    "global_l2-standard-bridged-usdt-base": "2025-11-14T13:34:57.063587",
+    "global_soneium-bridged-usdc-soneium": "2025-11-14T14:36:33.853212",
+    "global_cardano": "2025-11-14T14:33:25.458054",
+    "global_binance-bridged-usdt-bnb-smart-chain": "2025-11-14T14:32:10.795257",
+    "global_usdt0": "2025-11-14T14:33:25.458054",
+    "global_canton-network": "2025-11-14T14:32:10.801275",
+    "global_falcon-finance": "2025-11-14T14:36:29.753809",
+    "global_arbitrum": "2025-11-14T14:32:10.801360",
+    "global_binance-bridged-usdc-bnb-smart-chain": "2025-11-14T14:33:25.458054",
+    "global_ripple-usd": "2025-11-14T14:33:25.458054",
+    "global_optimism": "2025-11-14T14:32:10.801360",
+    "global_l2-standard-bridged-weth-base": "2025-11-14T14:36:29.753809",
+    "global_tbtc": "2025-11-14T14:32:10.802370",
+    "global_mantle-bridged-usdt-mantle": "2025-11-14T14:36:29.753809",
+    "global_sonic-3": "2025-11-14T14:36:29.753809",
+    "global_true-usd": "2025-11-14T14:36:29.753809",
+    "global_conflux-token": "2025-11-14T14:32:10.802370",
+    "global_theta-token": "2025-11-14T14:32:10.802370",
+    "global_arbitrum-bridged-wrapped-eeth": "2025-11-14T14:32:10.802370",
+    "global_dexe": "2025-11-14T14:36:29.753809",
+    "global_mantle-restaked-eth": "2025-11-14T14:36:29.753809",
+    "global_wormhole": "2025-11-14T14:32:10.802370",
+    "global_vision-3": "2025-11-14T14:32:10.802370",
+    "global_jito-governance-token": "2025-11-14T14:36:31.091146",
+    "global_undeads-games": "2025-11-14T13:46:13.544271",
+    "global_based-brett": "2025-11-14T14:32:11.542126",
+    "global_sahara-ai": "2025-11-14T14:32:11.542126",
+    "global_universal-btc": "2025-11-14T14:32:11.542126",
+    "global_linea": "2025-11-14T14:32:11.542126",
+    "global_movement": "2025-11-14T14:32:11.542126",
+    "global_nervos-network": "2025-11-14T14:32:11.542126",
+    "global_agora-dollar": "2025-11-14T14:33:26.356462",
+    "global_build-on": "2025-11-14T14:32:11.547268",
+    "global_nano": "2025-11-14T14:32:11.542126",
+    "global_shuffle-2": "2025-11-14T14:32:11.547268",
+    "global_sushi": "2025-11-14T14:36:31.091146",
+    "global_coinex-token": "2025-11-14T13:36:25.250387",
+    "global_plume": "2025-11-14T14:36:31.091146",
+    "global_zetachain": "2025-11-14T14:32:11.547268",
+    "global_blur": "2025-11-14T13:36:25.250387",
+    "global_stp-network": "2025-11-14T14:36:31.091146",
+    "global_siacoin": "2025-11-14T14:36:31.091146",
+    "global_mantra-dao": "2025-11-14T14:36:31.091146",
+    "global_centrifuge-2": "2025-11-14T14:33:27.172120",
+    "global_icon": "2025-11-14T14:32:12.232151",
+    "global_babylon": "2025-11-14T14:32:12.232151",
+    "global_apro": "2025-11-14T14:32:12.232151",
+    "global_syndicate-3": "2025-11-14T14:33:27.172120",
+    "global_bancor": "2025-11-14T14:36:32.421167",
+    "global_openledger-2": "2025-11-14T13:36:26.214953",
+    "global_aevo-exchange": "2025-11-14T14:36:32.421167",
+    "global_yzy": "2025-11-14T14:32:12.232151",
+    "global_delysium": "2025-11-14T13:36:26.214953",
+    "global_liquity": "2025-11-14T14:33:27.173927",
+    "global_bridged-wrapped-bitcoin-starkgate": "2025-11-14T14:36:32.421709",
+    "global_goatseus-maximus": "2025-11-14T14:36:33.853212",
+    "global_sophon": "2025-11-14T14:32:12.916420",
+    "global_stakestone": "2025-11-14T14:32:12.916420",
+    "global_avalon-2": "2025-11-14T14:32:12.916420",
+    "global_velodrome-finance": "2025-11-14T14:32:12.916420",
+    "global_devve": "2025-11-14T14:32:12.916420",
+    "global_mango-network": "2025-11-14T14:32:12.916420",
+    "global_game-by-virtuals": "2025-11-14T13:36:27.160510",
+    "global_renzo": "2025-11-14T13:36:27.160510",
+    "global_bugscoin": "2025-11-14T14:32:12.916420",
+    "global_luck-3": "2025-11-14T14:32:12.916420",
+    "global_zksync-bridged-usdc-zksync": "2025-11-14T14:36:33.853212",
+    "TEL_prix_baisse": "2025-11-14T13:39:01.374162",
+    "global_usd-coin": "2025-11-14T14:33:25.458054",
+    "global_the-open-network": "2025-11-14T14:36:29.753809",
+    "global_usd1-wlfi": "2025-11-14T14:33:25.458054",
+    "global_wrapped-solana": "2025-11-14T14:32:10.801360",
+    "global_first-digital-usd": "2025-11-14T14:33:25.459071",
+    "global_polygon-pos-bridged-dai-polygon-pos": "2025-11-14T14:36:29.753809",
+    "global_usdai": "2025-11-14T14:32:10.802370",
+    "global_stader-ethx": "2025-11-14T14:32:10.802370",
+    "global_usdd": "2025-11-14T13:46:12.525283",
+    "global_sweth": "2025-11-14T14:32:10.802370",
+    "global_usx": "2025-11-14T13:46:12.525283",
+    "global_drift-staked-sol": "2025-11-14T14:36:31.091146",
+    "global_railgun": "2025-11-14T14:32:11.542126",
+    "global_cronos-bridged-usdc-cronos": "2025-11-14T14:36:31.091146",
+    "global_ai-companions": "2025-11-14T14:33:26.356462",
+    "global_snek": "2025-11-14T14:32:11.547268",
+    "global_resolv-rlp": "2025-11-14T14:32:11.547268",
+    "global_pay-coin": "2025-11-14T14:32:12.232151",
+    "global_l2-standard-bridged-weth-optimism": "2025-11-14T14:32:12.232151",
+    "global_hyperbeat-usdt": "2025-11-14T14:32:12.232151",
+    "global_chromaway": "2025-11-14T13:46:14.438411",
+    "global_audius": "2025-11-14T14:36:32.421709",
+    "global_yooldo-games": "2025-11-14T14:33:27.172120",
+    "global_aegis-yusd": "2025-11-14T14:32:12.915966",
+    "global_usd-coin-avalanche-bridged-usdc-e": "2025-11-14T13:46:15.525441",
+    "global_nomina": "2025-11-14T14:36:33.853212",
+    "global_helio-protocol-hay": "2025-11-14T14:36:33.853212",
+    "global_gamebuild": "2025-11-14T14:36:33.853212",
+    "global_troll-2": "2025-11-14T14:32:12.916420",
+    "global_researchcoin": "2025-11-14T14:32:12.916420",
+    "global_ageur": "2025-11-14T13:46:15.531600",
+    "global_benqi": "2025-11-14T13:46:15.531600",
+    "EIGEN_prix_baisse": "2025-11-14T13:51:56.999754",
+    "global_bitcoin": "2025-11-14T14:32:10.795257",
+    "global_ethereum": "2025-11-14T14:36:29.753809",
+    "global_tether": "2025-11-14T14:32:10.795257",
+    "global_ripple": "2025-11-14T14:32:10.795257",
+    "global_binancecoin": "2025-11-14T14:33:25.458054",
+    "global_solana": "2025-11-14T14:32:10.795257",
+    "global_tron": "2025-11-14T14:36:29.753809",
+    "global_dogecoin": "2025-11-14T14:32:10.795257",
+    "global_figure-heloc": "2025-11-14T14:32:10.795257",
+    "global_wrapped-steth": "2025-11-14T14:32:10.795257",
+    "global_wrapped-bitcoin": "2025-11-14T14:36:29.753809",
+    "global_whitebit": "2025-11-14T14:33:25.458054",
+    "global_wrapped-beacon-eth": "2025-11-14T14:32:10.795257",
+    "global_hyperliquid": "2025-11-14T14:32:10.795257",
+    "global_chainlink": "2025-11-14T14:32:10.795257",
+    "global_zcash": "2025-11-14T14:36:29.753809",
+    "global_leo-token": "2025-11-14T14:32:10.795257",
+    "global_wrapped-eeth": "2025-11-14T14:32:10.795257",
+    "global_ethena-usde": "2025-11-14T14:33:25.458054",
+    "global_litecoin": "2025-11-14T14:32:10.795257",
+    "global_hedera-hashgraph": "2025-11-14T14:32:10.795257",
+    "global_avalanche-2": "2025-11-14T14:32:10.795257",
+    "global_sui": "2025-11-14T14:32:10.795257",
+    "global_polkadot": "2025-11-14T14:32:10.795257",
+    "global_crypto-com-chain": "2025-11-14T14:32:10.795257",
+    "global_memecore": "2025-11-14T14:32:10.801275",
+    "global_world-liberty-financial": "2025-11-14T14:36:29.753809",
+    "global_mantle": "2025-11-14T14:32:10.801360",
+    "global_paypal-usd": "2025-11-14T14:33:25.458054",
+    "global_bittensor": "2025-11-14T14:32:10.801360",
+    "global_near": "2025-11-14T14:32:10.801360",
+    "global_internet-computer": "2025-11-14T14:36:29.753809",
+    "global_aave": "2025-11-14T14:32:10.801360",
+    "global_c1usd": "2025-11-14T14:32:10.801360",
+    "global_okb": "2025-11-14T14:32:10.801360",
+    "global_aster-2": "2025-11-14T14:32:10.801360",
+    "global_aptos": "2025-11-14T14:32:10.801360",
+    "global_tether-gold": "2025-11-14T14:36:29.753809",
+    "global_pump-fun": "2025-11-14T14:36:29.753809",
+    "global_jito-staked-sol": "2025-11-14T14:32:10.801360",
+    "global_jupiter-perpetuals-liquidity-provider-token": "2025-11-14T14:32:10.801360",
+    "global_binance-peg-weth": "2025-11-14T14:32:10.801360",
+    "global_ondo-finance": "2025-11-14T14:36:29.753809",
+    "global_pi-network": "2025-11-14T14:32:10.801360",
+    "global_polygon-ecosystem-token": "2025-11-14T14:32:10.801360",
+    "global_worldcoin-wld": "2025-11-14T14:36:29.753809",
+    "global_filecoin": "2025-11-14T14:36:29.753809",
+    "global_official-trump": "2025-11-14T14:32:10.801360",
+    "global_algorand": "2025-11-14T14:32:10.801360",
+    "global_rocket-pool-eth": "2025-11-14T14:33:25.458054",
+    "global_pax-gold": "2025-11-14T14:32:10.801360",
+    "global_vechain": "2025-11-14T14:32:10.801360",
+    "global_syrupusdt": "2025-11-14T14:32:10.801360",
+    "global_bfusd": "2025-11-14T14:36:29.753809",
+    "global_binance-staked-sol": "2025-11-14T14:32:10.801360",
+    "global_gatechain-token": "2025-11-14T14:32:10.801360",
+    "global_ignition-fbtc": "2025-11-14T14:32:10.801360",
+    "global_flare-networks": "2025-11-14T14:32:10.801360",
+    "global_render-token": "2025-11-14T14:32:10.801360",
+    "global_morpho": "2025-11-14T14:32:10.801360",
+    "global_liquid-staked-ethereum": "2025-11-14T14:32:10.801360",
+    "global_story-2": "2025-11-14T14:36:29.753809",
+    "global_sei-network": "2025-11-14T14:32:10.801360",
+    "global_solv-btc": "2025-11-14T14:32:10.801360",
+    "global_renzo-restaked-eth": "2025-11-14T14:36:29.753809",
+    "global_xdce-crowd-sale": "2025-11-14T14:32:10.801360",
+    "global_jupiter-exchange-solana": "2025-11-14T14:32:10.801360",
+    "global_pudgy-penguins": "2025-11-14T14:32:10.801360",
+    "global_pancakeswap-token": "2025-11-14T14:32:10.801360",
+    "global_mantle-staked-ether": "2025-11-14T14:36:29.753809",
+    "global_arbitrum-bridged-wbtc-arbitrum-one": "2025-11-14T14:36:29.753809",
+    "global_aerodrome-finance": "2025-11-14T14:36:29.753809",
+    "global_fasttoken": "2025-11-14T14:32:10.801360",
+    "global_injective-protocol": "2025-11-14T14:32:10.802370",
+    "global_ondo-us-dollar-yield": "2025-11-14T14:32:10.802370",
+    "global_lido-dao": "2025-11-14T14:32:10.802370",
+    "global_blockstack": "2025-11-14T14:32:10.802370",
+    "global_newton-project": "2025-11-14T14:33:25.459071",
+    "global_the-graph": "2025-11-14T14:32:10.802370",
+    "global_curve-dao-token": "2025-11-14T14:32:10.802370",
+    "global_soon-2": "2025-11-14T14:36:29.753809",
+    "global_msol": "2025-11-14T14:32:10.802370",
+    "global_iota": "2025-11-14T14:32:10.802370",
+    "global_doublezero": "2025-11-14T14:36:29.753809",
+    "global_arbitrum-bridged-weth-arbitrum-one": "2025-11-14T14:36:29.753809",
+    "global_pyth-network": "2025-11-14T14:32:10.802370",
+    "global_syrup": "2025-11-14T14:32:10.802370",
+    "global_ether-fi": "2025-11-14T14:32:10.802370",
+    "global_kaia": "2025-11-14T14:32:10.802370",
+    "global_spx6900": "2025-11-14T14:36:29.753809",
+    "global_ethereum-name-service": "2025-11-14T14:32:10.802370",
+    "global_the-sandbox": "2025-11-14T14:32:10.802370",
+    "global_trust-wallet-token": "2025-11-14T14:32:10.802370",
+    "global_telcoin": "2025-11-14T14:33:25.459302",
+    "global_bitcoin-cash-sv": "2025-11-14T14:36:29.753809",
+    "global_helium": "2025-11-14T14:36:29.753809",
+    "global_gho": "2025-11-14T14:36:29.753809",
+    "global_coinbase-wrapped-staked-eth": "2025-11-14T14:32:10.802370",
+    "global_dogwifcoin": "2025-11-14T14:32:10.802370",
+    "global_flow": "2025-11-14T14:32:10.802370",
+    "global_usdb": "2025-11-14T14:32:10.802370",
+    "global_wrapped-hype": "2025-11-14T14:32:10.802370",
+    "global_decentraland": "2025-11-14T14:32:10.802370",
+    "global_vaulta": "2025-11-14T14:32:10.802370",
+    "global_benqi-liquid-staked-avax": "2025-11-14T14:36:29.753809",
+    "global_pendle": "2025-11-14T14:36:29.753809",
+    "global_mimblewimblecoin": "2025-11-14T14:32:10.802370",
+    "global_raydium": "2025-11-14T14:32:10.802370",
+    "global_just": "2025-11-14T14:36:29.753809",
+    "global_ultima": "2025-11-14T14:33:25.459302",
+    "global_olympus": "2025-11-14T14:32:10.802370",
+    "global_polygon-pos-bridged-weth-polygon-pos": "2025-11-14T14:32:10.802370",
+    "global_neo": "2025-11-14T14:32:10.802370",
+    "global_ribbita-by-virtuals": "2025-11-14T14:32:10.802370",
+    "global_apecoin": "2025-11-14T14:32:10.802370",
+    "global_frax-ether": "2025-11-14T14:32:10.802370",
+    "global_compound-governance-token": "2025-11-14T14:36:29.753809",
+    "global_binance-peg-busd": "2025-11-14T14:32:10.802370",
+    "global_unit-bitcoin": "2025-11-14T14:32:10.802370",
+    "global_chiliz": "2025-11-14T14:32:10.802370",
+    "global_kinesis-gold": "2025-11-14T14:32:10.802370",
+    "global_falcon-finance-ff": "2025-11-14T14:32:10.802370",
+    "global_gnosis": "2025-11-14T14:33:25.459302",
+    "global_eigenlayer": "2025-11-14T14:32:10.802370",
+    "global_walrus-2": "2025-11-14T14:32:10.802370",
+    "global_zebec-network": "2025-11-14T14:32:10.802370",
+    "global_arweave": "2025-11-14T14:36:29.753809",
+    "global_frax": "2025-11-14T14:36:29.753809",
+    "global_swissborg": "2025-11-14T14:33:25.459302",
+    "global_zero-gravity": "2025-11-14T14:32:10.802370",
+    "global_wrapped-ether-mantle-bridge": "2025-11-14T14:36:29.753809",
+    "global_treehouse-eth": "2025-11-14T14:32:10.802370",
+    "global_thorchain": "2025-11-14T14:36:29.753809",
+    "global_satoshi-stablecoin": "2025-11-14T14:32:10.802370",
+    "global_elrond-erd-2": "2025-11-14T14:32:11.542126",
+    "global_dydx-chain": "2025-11-14T14:36:31.091146",
+    "global_fartcoin": "2025-11-14T14:32:11.542126",
+    "global_havven": "2025-11-14T14:32:11.542126",
+    "global_golem": "2025-11-14T14:36:31.091146",
+    "global_mocaverse": "2025-11-14T14:32:11.542126",
+    "global_crvusd": "2025-11-14T14:36:31.091146",
+    "global_loaded-lions": "2025-11-14T14:32:11.542126",
+    "global_reserve-rights-token": "2025-11-14T14:36:31.091146",
+    "global_ibc-bridged-usdc": "2025-11-14T14:33:26.356462",
+    "global_polygon-bridged-wbtc-polygon-pos": "2025-11-14T14:33:26.356462",
+    "global_chain-2": "2025-11-14T14:32:11.542126",
+    "global_zencash": "2025-11-14T14:36:31.091146",
+    "global_reserve-protocol-eth-plus": "2025-11-14T14:32:11.542126",
+    "global_amp-token": "2025-11-14T14:32:11.542126",
+    "global_beam-2": "2025-11-14T14:36:31.091146",
+    "global_berachain-bera": "2025-11-14T14:32:11.542126",
+    "global_ronin": "2025-11-14T14:32:11.542126",
+    "global_kinesis-silver": "2025-11-14T14:32:11.542126",
+    "global_creditcoin-2": "2025-11-14T14:32:11.542126",
+    "global_toshi": "2025-11-14T14:36:31.091146",
+    "global_coredaoorg": "2025-11-14T14:32:11.542126",
+    "global_ecoreal-estate": "2025-11-14T14:32:11.542126",
+    "global_resolv-wstusr": "2025-11-14T14:32:11.542126",
+    "global_kraken-wrapped-btc": "2025-11-14T14:32:11.542126",
+    "global_lombard-protocol": "2025-11-14T14:36:31.091146",
+    "global_prometeus": "2025-11-14T14:32:11.542126",
+    "global_aioz-network": "2025-11-14T14:32:11.542126",
+    "global_superfarm": "2025-11-14T14:36:31.091146",
+    "global_sosovalue": "2025-11-14T14:32:11.542126",
+    "global_layerzero": "2025-11-14T14:32:11.542126",
+    "global_astherus-usdf": "2025-11-14T14:32:11.542126",
+    "global_akash-network": "2025-11-14T14:32:11.542126",
+    "global_four": "2025-11-14T14:36:31.091146",
+    "global_origin-ether": "2025-11-14T14:36:31.091146",
+    "global_arkham": "2025-11-14T14:32:11.542126",
+    "global_binance-peg-sol": "2025-11-14T14:36:31.091146",
+    "global_convex-finance": "2025-11-14T14:32:11.542126",
+    "global_gas": "2025-11-14T14:32:11.542126",
+    "global_0x": "2025-11-14T14:32:11.542126",
+    "global_theta-fuel": "2025-11-14T14:36:31.091146",
+    "global_wrapped-aave-ethereum-usdc": "2025-11-14T14:32:11.542126",
+    "global_gusd": "2025-11-14T14:32:11.542126",
+    "global_susdai": "2025-11-14T14:33:26.356462",
+    "global_bridged-usd-coin-starkgate": "2025-11-14T14:36:31.091146",
+    "global_deep": "2025-11-14T14:32:11.542126",
+    "global_ravencoin": "2025-11-14T14:32:11.542126",
+    "global_useless-3": "2025-11-14T14:32:11.542126",
+    "global_conscious-token": "2025-11-14T14:32:11.542126",
+    "global_bianrensheng": "2025-11-14T14:33:26.356462",
+    "global_zilliqa": "2025-11-14T14:32:11.547268",
+    "global_non-playable-coin": "2025-11-14T14:32:11.547268",
+    "global_ether-fi-staked-btc": "2025-11-14T14:36:31.091146",
+    "global_phantom-staked-sol": "2025-11-14T14:32:11.547268",
+    "global_mag7-ssi": "2025-11-14T14:33:26.356462",
+    "global_stargate-finance": "2025-11-14T14:32:11.547268",
+    "global_grass": "2025-11-14T14:32:11.547268",
+    "global_turbo": "2025-11-14T14:32:11.547268",
+    "global_wrapped-aave-ethereum-usdt": "2025-11-14T14:32:11.547268",
+    "global_cat-in-a-dogs-world": "2025-11-14T14:32:11.547268",
+    "global_celo": "2025-11-14T14:32:11.547268",
+    "global_melania-meme": "2025-11-14T14:32:11.547268",
+    "global_bitkub-coin": "2025-11-14T14:32:11.547268",
+    "global_ozone-chain": "2025-11-14T14:32:11.547268",
+    "global_proton": "2025-11-14T14:32:11.547268",
+    "global_bio-protocol": "2025-11-14T14:32:11.547268",
+    "global_infrared-bera": "2025-11-14T14:32:11.547268",
+    "global_chia": "2025-11-14T14:32:11.547268",
+    "global_drift-protocol": "2025-11-14T14:32:11.547268",
+    "global_anzen-usdz": "2025-11-14T14:32:11.547268",
+    "global_unit-pump": "2025-11-14T14:32:11.547268",
+    "global_velo": "2025-11-14T14:32:11.547268",
+    "global_astar": "2025-11-14T14:32:11.547268",
+    "global_metal-blockchain": "2025-11-14T14:32:11.547268",
+    "global_usda-3": "2025-11-14T14:32:11.547268",
+    "global_aia": "2025-11-14T14:32:11.547268",
+    "global_rollbit-coin": "2025-11-14T14:36:31.091146",
+    "global_vethor-token": "2025-11-14T14:32:11.547268",
+    "global_cow-protocol": "2025-11-14T14:32:11.547268",
+    "global_onyc": "2025-11-14T14:32:11.547268",
+    "global_apex-token-2": "2025-11-14T14:36:31.091146",
+    "global_verge": "2025-11-14T14:32:11.547268",
+    "global_peanut-the-squirrel": "2025-11-14T14:36:31.091146",
+    "global_zignaly": "2025-11-14T14:32:11.547268",
+    "global_pirate-chain": "2025-11-14T14:36:31.091146",
+    "global_tdccp": "2025-11-14T14:32:11.547268",
+    "global_vicicoin": "2025-11-14T14:32:11.547268",
+    "global_debridge": "2025-11-14T14:32:11.547268",
+    "global_ordinals": "2025-11-14T14:32:11.547268",
+    "global_aelf": "2025-11-14T14:36:31.091146",
+    "global_cash-4": "2025-11-14T14:32:11.547268",
+    "global_frax-share": "2025-11-14T14:32:11.547268",
+    "global_skale": "2025-11-14T14:32:11.547268",
+    "global_euler": "2025-11-14T14:32:11.547268",
+    "global_yu": "2025-11-14T14:32:11.547268",
+    "global_gmx": "2025-11-14T14:32:11.547268",
+    "global_chutes": "2025-11-14T14:33:26.356462",
+    "global_hashkey-ecopoints": "2025-11-14T14:32:11.547268",
+    "global_novem-pro": "2025-11-14T14:32:11.547268",
+    "global_request-network": "2025-11-14T14:32:11.547268",
+    "global_vaultbridge-bridged-wbtc-katana": "2025-11-14T14:32:11.547268",
+    "global_numeraire": "2025-11-14T14:33:26.356462",
+    "global_coti": "2025-11-14T14:32:12.232151",
+    "global_memecoin-2": "2025-11-14T14:32:12.232151",
+    "global_vana": "2025-11-14T14:33:27.172120",
+    "global_ethereum-pow-iou": "2025-11-14T14:32:12.232151",
+    "global_uma": "2025-11-14T14:33:27.172120",
+    "global_unit-plasma": "2025-11-14T14:32:12.232151",
+    "global_xyo-network": "2025-11-14T14:32:12.232151",
+    "global_anoma": "2025-11-14T14:36:32.418057",
+    "global_payfi-strategy-token-usdc": "2025-11-14T14:36:32.418057",
+    "global_wrapped-centrifuge": "2025-11-14T14:32:12.232151",
+    "global_stargate-bridged-weth": "2025-11-14T14:36:32.418057",
+    "global_world-mobile-token": "2025-11-14T14:32:12.232151",
+    "global_api3": "2025-11-14T14:36:32.418057",
+    "global_orca": "2025-11-14T14:32:12.232151",
+    "global_societe-generale-forge-eurcv": "2025-11-14T14:32:12.232151",
+    "global_solo-coin": "2025-11-14T14:32:12.232151",
+    "global_harmony": "2025-11-14T14:32:12.232151",
+    "global_felix-feusd": "2025-11-14T14:33:27.172120",
+    "global_enjincoin": "2025-11-14T14:32:12.232151",
+    "global_osmosis": "2025-11-14T14:32:12.232151",
+    "global_ontology": "2025-11-14T14:32:12.232151",
+    "global_f-x-protocol-fxusd": "2025-11-14T14:36:32.418057",
+    "global_alchemist-ai": "2025-11-14T14:36:32.418057",
+    "global_altlayer": "2025-11-14T14:32:12.232151",
+    "global_onfa": "2025-11-14T14:32:12.232151",
+    "global_bridged-wrapped-ether-starkgate": "2025-11-14T14:32:12.232151",
+    "global_vaultbridge-bridged-eth-katana": "2025-11-14T14:32:12.232151",
+    "global_pundi-x-2": "2025-11-14T14:32:12.232151",
+    "global_jelly-my-jelly": "2025-11-14T14:36:32.418057",
+    "global_venus": "2025-11-14T14:36:32.418057",
+    "global_spark-2": "2025-11-14T14:32:12.232151",
+    "global_lucidum": "2025-11-14T14:32:12.232151",
+    "global_rocket-pool": "2025-11-14T14:36:32.418057",
+    "global_status": "2025-11-14T14:32:12.232151",
+    "global_saros-finance": "2025-11-14T14:32:12.232151",
+    "global_binance-peg-zcash-token": "2025-11-14T14:33:27.172120",
+    "global_waves": "2025-11-14T14:36:32.418057",
+    "global_constellation-labs": "2025-11-14T14:32:12.232151",
+    "global_magic-eden": "2025-11-14T14:32:12.232151",
+    "global_tellor": "2025-11-14T14:32:12.232151",
+    "global_usd-coin-ethereum-bridged": "2025-11-14T14:32:12.232151",
+    "global_matrixdock-gold": "2025-11-14T14:32:12.232151",
+    "global_burnedfi": "2025-11-14T14:33:27.172120",
+    "global_ventuals-vhype": "2025-11-14T14:32:12.232151",
+    "global_bitlight": "2025-11-14T14:32:12.232151",
+    "global_ridges-ai": "2025-11-14T14:32:12.232151",
+    "global_neiro-3": "2025-11-14T14:32:12.232151",
+    "global_metis-token": "2025-11-14T14:36:32.420654",
+    "global_okzoo": "2025-11-14T14:32:12.232151",
+    "global_metaplex": "2025-11-14T14:32:12.232151",
+    "global_ore": "2025-11-14T14:32:12.232151",
+    "global_paxos-standard": "2025-11-14T14:36:32.420654",
+    "global_tagger": "2025-11-14T14:32:12.232151",
+    "global_ark": "2025-11-14T14:32:12.232151",
+    "global_celium": "2025-11-14T14:32:12.232151",
+    "global_iostoken": "2025-11-14T14:32:12.232151",
+    "global_apriori": "2025-11-14T14:32:12.232151",
+    "global_siren-2": "2025-11-14T14:36:32.420654",
+    "global_sui-bridged-ether-sui": "2025-11-14T14:32:12.232151",
+    "global_aixbt": "2025-11-14T14:32:12.232151",
+    "global_biconomy": "2025-11-14T14:32:12.232151",
+    "global_hive": "2025-11-14T14:32:12.232151",
+    "global_dialectic-usd-vault": "2025-11-14T14:32:12.232151",
+    "global_binance-usd": "2025-11-14T14:32:12.232151",
+    "global_constitutiondao": "2025-11-14T14:36:32.421167",
+    "global_manta-network": "2025-11-14T14:32:12.232151",
+    "global_blast": "2025-11-14T14:32:12.232151",
+    "global_aurora-near": "2025-11-14T14:33:27.172120",
+    "global_degen-base": "2025-11-14T14:36:32.421167",
+    "global_zedxion": "2025-11-14T14:32:12.232151",
+    "global_stratis": "2025-11-14T14:32:12.232151",
+    "global_lista": "2025-11-14T14:33:27.172120",
+    "global_stronghold-token": "2025-11-14T14:32:12.232151",
+    "global_world-assets": "2025-11-14T14:36:32.421167",
+    "global_orbs": "2025-11-14T14:32:12.232151",
+    "global_zcoin": "2025-11-14T14:32:12.232151",
+    "global_big-time": "2025-11-14T14:33:27.172120",
+    "global_tornado-cash": "2025-11-14T14:32:12.232151",
+    "global_ronin-bridged-weth-ronin": "2025-11-14T14:36:32.421167",
+    "global_comedian": "2025-11-14T14:36:32.421167",
+    "global_overtake": "2025-11-14T14:32:12.232151",
+    "global_subsquid": "2025-11-14T14:32:12.232151",
+    "global_safecoin": "2025-11-14T14:32:12.232151",
+    "global_power-ledger": "2025-11-14T14:33:27.172120",
+    "global_portal-to-bitcoin": "2025-11-14T14:32:12.232151",
+    "global_somnia": "2025-11-14T14:36:32.421167",
+    "global_definitive": "2025-11-14T14:32:12.232151",
+    "global_allora": "2025-11-14T14:36:32.421167",
+    "global_bonfida": "2025-11-14T14:32:12.232151",
+    "global_sign-global": "2025-11-14T14:32:12.232151",
+    "global_spell-token": "2025-11-14T14:32:12.232151",
+    "global_b3": "2025-11-14T14:36:32.421167",
+    "global_mindwavedao": "2025-11-14T14:32:12.232151",
+    "global_kyber-network-crystal": "2025-11-14T14:36:32.421167",
+    "global_songbird": "2025-11-14T14:36:32.421709",
+    "global_cronos-bridged-wbtc-cronos": "2025-11-14T14:32:12.232151",
+    "global_balancer": "2025-11-14T14:32:12.232151",
+    "global_everipedia": "2025-11-14T14:36:32.421709",
+    "global_usd": "2025-11-14T14:32:12.232151",
+    "global_energy-web-token": "2025-11-14T14:32:12.241219",
+    "global_mythos": "2025-11-14T14:32:12.241219",
+    "global_carv": "2025-11-14T14:32:12.241219",
+    "global_orderly-network": "2025-11-14T14:32:12.241219",
+    "global_4-2": "2025-11-14T14:32:12.241219",
+    "global_liquity-bold-2": "2025-11-14T14:33:27.172120",
+    "global_clearpool": "2025-11-14T14:33:27.173927",
+    "global_hivemapper": "2025-11-14T14:32:12.241219",
+    "global_venice-token": "2025-11-14T14:32:12.241219",
+    "global_targon": "2025-11-14T14:32:12.241219",
+    "global_nillion": "2025-11-14T14:32:12.241219",
+    "global_ecomi": "2025-11-14T14:32:12.241219",
+    "global_solayer": "2025-11-14T14:32:12.241219",
+    "global_ong": "2025-11-14T14:32:12.241219",
+    "global_vaultbridge-bridged-usdc-katana": "2025-11-14T14:32:12.241219",
+    "global_sanctum-2": "2025-11-14T14:32:12.241219",
+    "global_auction": "2025-11-14T14:36:32.421709",
+    "global_cyberconnect": "2025-11-14T14:32:12.911926",
+    "global_harrypotterobamasonic10in": "2025-11-14T14:32:12.911926",
+    "global_civic": "2025-11-14T14:32:12.911926",
+    "global_huma-finance": "2025-11-14T14:36:33.853212",
+    "global_gigachad-2": "2025-11-14T14:32:12.911926",
+    "global_bridged-tether-linea": "2025-11-14T14:36:33.853212",
+    "global_marlin": "2025-11-14T14:36:33.853212",
+    "global_socean-staked-sol": "2025-11-14T14:32:12.911926",
+    "global_law-blocks": "2025-11-14T14:32:12.911926",
+    "global_moonwell-artemis": "2025-11-14T14:32:12.911926",
+    "global_steem": "2025-11-14T14:32:12.911926",
+    "global_lava-network": "2025-11-14T14:36:33.853212",
+    "global_marinade": "2025-11-14T14:32:12.911926",
+    "global_coinbase-wrapped-xrp": "2025-11-14T14:32:12.911926",
+    "global_supra": "2025-11-14T14:32:12.915966",
+    "global_rif-token": "2025-11-14T14:32:12.915966",
+    "global_g-token": "2025-11-14T14:32:12.915966",
+    "global_flock-2": "2025-11-14T14:32:12.915966",
+    "global_taiko": "2025-11-14T14:36:33.853212",
+    "global_iagon": "2025-11-14T14:36:33.853212",
+    "global_chain-key-bitcoin": "2025-11-14T14:32:12.916420",
+    "global_metal": "2025-11-14T14:32:12.916420",
+    "global_cobak-token": "2025-11-14T14:32:12.916420",
+    "global_solayer-staked-sol": "2025-11-14T14:32:12.916420",
+    "global_cookie": "2025-11-14T14:32:12.916420",
+    "global_gains-network": "2025-11-14T14:32:12.916420",
+    "global_oobit-2": "2025-11-14T14:32:12.916420",
+    "global_anime": "2025-11-14T14:32:12.916420",
+    "global_sonic-svm": "2025-11-14T14:32:12.916420",
+    "global_arcblock": "2025-11-14T14:32:12.916420",
+    "global_magic": "2025-11-14T14:32:12.916420",
+    "global_the-grays-currency": "2025-11-14T14:36:33.853212",
+    "global_nym": "2025-11-14T14:32:12.916420",
+    "global_glidr": "2025-11-14T14:36:33.853212",
+    "global_mira-3": "2025-11-14T14:36:33.853212",
+    "global_smooth-love-potion": "2025-11-14T14:32:12.916420",
+    "global_liquity-usd": "2025-11-14T14:32:12.916420",
+    "global_dent": "2025-11-14T14:32:12.916420",
+    "global_yield-basis": "2025-11-14T14:32:12.916420",
+    "global_corn-3": "2025-11-14T14:32:12.916420",
+    "global_xai-blockchain": "2025-11-14T14:32:12.916420",
+    "global_cartesi": "2025-11-14T14:32:12.916420",
+    "global_destra-network": "2025-11-14T14:32:12.916420",
+    "global_mantle-bridged-usdc-mantle": "2025-11-14T14:36:33.853212",
+    "global_wmatic": "2025-11-14T14:32:12.916420",
+    "global_fractal-bitcoin": "2025-11-14T14:32:12.916420",
+    "global_avalanche-old-bridged-wbtc-avalanche": "2025-11-14T14:32:12.916420",
+    "global_looped-hype": "2025-11-14T14:36:33.853212",
+    "global_joe": "2025-11-14T14:36:33.853212",
+    "global_aergo": "2025-11-14T14:32:12.916420",
+    "global_bridged-usd-coin-optimism": "2025-11-14T14:36:33.853212",
+    "global_medibloc": "2025-11-14T14:32:12.916420",
+    "global_holoworld": "2025-11-14T14:36:33.853212",
+    "global_savings-crvusd": "2025-11-14T14:32:12.916420",
+    "global_bsquared-network": "2025-11-14T14:32:12.916420",
+    "global_unipoly": "2025-11-14T14:32:12.916420",
+    "global_synfutures": "2025-11-14T14:36:33.853212",
+    "global_darkstar": "2025-11-14T14:32:12.916420",
+    "global_dymension": "2025-11-14T14:32:12.916420",
+    "global_proprietary-trading-network": "2025-11-14T14:32:12.916420",
+    "global_electroneum": "2025-11-14T14:32:12.916420",
+    "global_xtusd": "2025-11-14T14:32:12.916420",
+    "global_moonbeam": "2025-11-14T14:36:33.853212",
+    "global_pippin": "2025-11-14T14:32:12.916420",
+    "global_vine": "2025-11-14T14:32:12.916420",
+    "global_deapcoin": "2025-11-14T14:32:12.916420",
+    "global_chex-token": "2025-11-14T14:32:12.916420",
+    "global_xtcom-token": "2025-11-14T14:32:12.916420",
+    "global_avail": "2025-11-14T14:32:12.916420",
+    "global_solidus-aitech": "2025-11-14T14:32:12.916420",
+    "global_tesla-xstock": "2025-11-14T14:36:33.853212",
+    "global_hyperlane": "2025-11-14T14:36:33.853212",
+    "global_airtor-protocol": "2025-11-14T14:32:12.916420",
+    "global_meet48": "2025-11-14T14:32:12.916420",
+    "global_hunt-token": "2025-11-14T14:32:12.916420",
+    "global_autonolas": "2025-11-14T14:32:12.916420",
+    "global_binance-peg-avalanche": "2025-11-14T14:36:33.853212",
+    "global_zeus-netwok-zbtc": "2025-11-14T14:36:33.853212",
+    "global_dupe": "2025-11-14T14:32:12.916420",
+    "global_honey-3": "2025-11-14T14:32:12.917450",
+    "global_sceptre-staked-flr": "2025-11-14T14:32:12.917450",
+    "global_celer-network": "2025-11-14T14:32:12.917450",
+    "global_ika": "2025-11-14T14:32:12.917450",
+    "global_tradoor": "2025-11-14T14:32:12.917450",
+    "global_ssv-network": "2025-11-14T14:32:12.917550",
+    "global_alethea-artificial-liquid-intelligence-token": "2025-11-14T14:36:33.853212",
+    "global_ruby-coin": "2025-11-14T14:32:12.917550",
+    "global_adventure-gold": "2025-11-14T14:36:33.853212",
+    "global_monero": "2025-11-14T14:33:25.458054",
+    "global_coinbase-wrapped-btc": "2025-11-14T14:33:25.458054",
+    "global_dai": "2025-11-14T14:36:29.753809",
+    "global_syrupusdc": "2025-11-14T14:33:25.458054",
+    "global_instadapp": "2025-11-14T14:36:29.753809",
+    "global_basic-attention-token": "2025-11-14T14:36:29.753809",
+    "global_resolv-usr": "2025-11-14T14:33:26.356462",
+    "global_livepeer": "2025-11-14T14:36:31.091146",
+    "global_bybit-staked-sol": "2025-11-14T14:33:26.356462",
+    "global_gmt-token": "2025-11-14T14:33:26.356462",
+    "global_casper-network": "2025-11-14T14:33:26.356462",
+    "global_bridged-usd-coin-linea": "2025-11-14T14:36:31.091146",
+    "global_zelcash": "2025-11-14T14:33:27.172120",
+    "global_elizaos": "2025-11-14T14:33:27.172120",
+    "global_swftcoin": "2025-11-14T14:33:27.172120",
+    "global_avici": "2025-11-14T14:36:32.421167",
+    "global_zentry": "2025-11-14T14:33:27.172120",
+    "global_staked-ether": "2025-11-14T14:36:29.753809",
+    "global_uniswap": "2025-11-14T14:36:29.753809",
+    "global_ethereum-classic": "2025-11-14T14:36:29.753809",
+    "global_ethena": "2025-11-14T14:36:29.753809",
+    "global_usdtb": "2025-11-14T14:36:29.753809",
+    "global_sky": "2025-11-14T14:36:29.753809",
+    "global_immutable-x": "2025-11-14T14:36:29.753809",
+    "global_jupiter-staked-sol": "2025-11-14T14:36:29.753809",
+    "global_gteth": "2025-11-14T14:36:29.753809",
+    "global_zora": "2025-11-14T14:36:31.091146",
+    "global_wrapped-avax": "2025-11-14T14:36:31.091146",
+    "global_staked-frax-ether": "2025-11-14T14:36:31.091146",
+    "global_btse-token": "2025-11-14T14:36:31.091146",
+    "global_mina-protocol": "2025-11-14T14:36:31.091146",
+    "global_yearn-finance": "2025-11-14T14:36:31.091146",
+    "global_dog-go-to-the-moon-rune": "2025-11-14T14:36:31.091146",
+    "global_river": "2025-11-14T14:36:31.091146",
+    "global_threshold-network-token": "2025-11-14T14:36:31.091146",
+    "global_recall": "2025-11-14T14:36:31.091146",
+    "global_gems-vip": "2025-11-14T14:36:31.091146",
+    "global_lcx": "2025-11-14T14:36:32.418057",
+    "global_bridged-wrapped-steth-gnosis": "2025-11-14T14:36:32.418057",
+    "global_notcoin": "2025-11-14T14:36:32.418057",
+    "global_og-fan-token": "2025-11-14T14:36:32.418057",
+    "global_bim-2": "2025-11-14T14:36:32.420654",
+    "global_ardor": "2025-11-14T14:36:32.420654",
+    "global_purr-2": "2025-11-14T14:36:32.420654",
+    "global_book-of-meme": "2025-11-14T14:36:32.420654",
+    "global_xpin-network": "2025-11-14T14:36:32.421709",
+    "global_ai16z": "2025-11-14T14:36:32.421709",
+    "global_unifai-network": "2025-11-14T14:36:32.421709",
+    "global_auki-labs": "2025-11-14T14:36:33.853212",
+    "global_dkargo": "2025-11-14T14:36:33.853212",
+    "global_chaingpt": "2025-11-14T14:36:33.853212",
+    "global_wilder-world": "2025-11-14T14:36:33.853212",
+    "global_doodles": "2025-11-14T14:36:33.853212",
+    "global_limitless-3": "2025-11-14T14:36:33.853212",
+    "global_ao-computer": "2025-11-14T14:36:33.853212",
+    "global_cetus-protocol": "2025-11-14T14:36:33.853212",
+    "global_goldfinch": "2025-11-14T14:36:33.853212",
+    "global_puffer-finance": "2025-11-14T14:36:33.853212",
+    "global_tether-gold-tokens": "2025-11-14T14:36:33.853212",
+    "global_beets-staked-sonic": "2025-11-14T14:36:33.853212",
+    "global_top": "2025-11-14T16:09:59.072619",
+    "global_top10": "2025-11-14T15:33:28.201953+00:00"
+  },
+  "baseline": {
+    "XRP": {
+      "avg1m": 5459595.654166667,
+      "avg5m": 27297978.270833332,
+      "vol24": 7861817742.0
+    },
+    "XLM": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "HBAR": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "FLR": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "TEL": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "XMR": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "ETH": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "EIGEN": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    },
+    "BTC": {
+      "avg1m": 0.0,
+      "avg5m": 0.0,
+      "vol24": 0.0
+    }
+  },
+  "last_prices": {
+    "XRP": 2.26,
+    "XLM": 0.262165,
+    "HBAR": 0.15702,
+    "FLR": 0.01402815,
+    "TEL": 0.00494873,
+    "XMR": 391.76,
+    "ETH": 3120.41,
+    "EIGEN": 0.699946,
+    "BTC": 95073.0
+  },
+  "last_mc": {
+    "XRP": 136040035944.0,
+    "XLM": 8407337528.0,
+    "HBAR": 6669453276.0,
+    "FLR": 1100450515.0,
+    "TEL": 470156684.0,
+    "XMR": 7227632921.0,
+    "ETH": 377641935129.0,
+    "EIGEN": 308549316.0,
+    "BTC": 1899948694842.0
+  },
+  "global_volume": {
+    "bitcoin": {
+      "vol24": 129911435071.0,
+      "ts": "2025-11-14T16:13:07.825981"
+    },
+    "ethereum": {
+      "vol24": 55220245875.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "tether": {
+      "vol24": 177608060266.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "ripple": {
+      "vol24": 7801536748.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "binancecoin": {
+      "vol24": 3347545640.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "solana": {
+      "vol24": 10190617465.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "usd-coin": {
+      "vol24": 15629657485.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "tron": {
+      "vol24": 1288525777.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "staked-ether": {
+      "vol24": 110178967.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "dogecoin": {
+      "vol24": 3404071691.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "cardano": {
+      "vol24": 1275148452.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "figure-heloc": {
+      "vol24": 53168073.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "wrapped-steth": {
+      "vol24": 36930144.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "wrapped-bitcoin": {
+      "vol24": 681644329.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "whitebit": {
+      "vol24": 202114296.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "wrapped-beacon-eth": {
+      "vol24": 24126321.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "hyperliquid": {
+      "vol24": 620936244.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "chainlink": {
+      "vol24": 1331735741.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "bitcoin-cash": {
+      "vol24": 397265176.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "zcash": {
+      "vol24": 2297747595.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "usds": {
+      "vol24": 26576072.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "binance-bridged-usdt-bnb-smart-chain": {
+      "vol24": 2124178680.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "leo-token": {
+      "vol24": 1111157.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "stellar": {
+      "vol24": 344437792.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "weth": {
+      "vol24": 682115226.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "ethena-usde": {
+      "vol24": 337032081.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "wrapped-eeth": {
+      "vol24": 23702111.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "litecoin": {
+      "vol24": 1173088741.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "monero": {
+      "vol24": 220716857.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "coinbase-wrapped-btc": {
+      "vol24": 952444569.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "hedera-hashgraph": {
+      "vol24": 462076825.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "avalanche-2": {
+      "vol24": 756967229.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "sui": {
+      "vol24": 2044915502.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "the-open-network": {
+      "vol24": 226511312.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "polkadot": {
+      "vol24": 381772512.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "dai": {
+      "vol24": 162961280.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "ethena-staked-usde": {
+      "vol24": 45605504.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "uniswap": {
+      "vol24": 982395208.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "crypto-com-chain": {
+      "vol24": 40695643.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "usdt0": {
+      "vol24": 314841445.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "canton-network": {
+      "vol24": 39478286.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "world-liberty-financial": {
+      "vol24": 214425757.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "memecore": {
+      "vol24": 26290083.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "susds": {
+      "vol24": 30775076.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "mantle": {
+      "vol24": 139455228.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "paypal-usd": {
+      "vol24": 249553455.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "internet-computer": {
+      "vol24": 445981384.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "near": {
+      "vol24": 491555603.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "bittensor": {
+      "vol24": 322605199.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "usd1-wlfi": {
+      "vol24": 647940704.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "aave": {
+      "vol24": 709425518.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "bitget-token": {
+      "vol24": 92084561.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "c1usd": {
+      "vol24": 450413.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "okb": {
+      "vol24": 81530261.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "ethereum-classic": {
+      "vol24": 114594273.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "aptos": {
+      "vol24": 423530677.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "aster-2": {
+      "vol24": 821492357.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "tether-gold": {
+      "vol24": 385604268.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "ethena": {
+      "vol24": 326664134.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "falcon-finance": {
+      "vol24": 5582895.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "pump-fun": {
+      "vol24": 335647487.0,
+      "ts": "2025-11-14T16:13:07.826497"
+    },
+    "jito-staked-sol": {
+      "vol24": 54480447.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "jupiter-perpetuals-liquidity-provider-token": {
+      "vol24": 78283416.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "binance-peg-weth": {
+      "vol24": 156357827.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "ondo-finance": {
+      "vol24": 120643360.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "wrapped-solana": {
+      "vol24": 1242370789.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "pi-network": {
+      "vol24": 32879929.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "polygon-ecosystem-token": {
+      "vol24": 145377005.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "worldcoin-wld": {
+      "vol24": 183143319.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "kucoin-shares": {
+      "vol24": 10694309.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "usdtb": {
+      "vol24": 3784010.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "filecoin": {
+      "vol24": 442888212.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "official-trump": {
+      "vol24": 670686527.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "algorand": {
+      "vol24": 105599254.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "pax-gold": {
+      "vol24": 347586546.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "cosmos": {
+      "vol24": 101114247.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "rocket-pool-eth": {
+      "vol24": 8798819.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "syrupusdt": {
+      "vol24": 754564.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "vechain": {
+      "vol24": 45913257.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "bfusd": {
+      "vol24": 37075430.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "arbitrum": {
+      "vol24": 278850533.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "binance-bridged-usdc-bnb-smart-chain": {
+      "vol24": 375151224.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "gatechain-token": {
+      "vol24": 9572462.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "binance-staked-sol": {
+      "vol24": 4936256.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "quant-network": {
+      "vol24": 78373946.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "kinetic-staked-hype": {
+      "vol24": 50330101.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "wbnb": {
+      "vol24": 924055658.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "syrupusdc": {
+      "vol24": 22773023.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "kaspa": {
+      "vol24": 58911413.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "sky": {
+      "vol24": 22001659.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "ignition-fbtc": {
+      "vol24": 950485.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "global-dollar": {
+      "vol24": 70374805.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "render-token": {
+      "vol24": 120487727.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "flare-networks": {
+      "vol24": 10540540.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "lombard-staked-btc": {
+      "vol24": 12437430.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "ripple-usd": {
+      "vol24": 213583869.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "story-2": {
+      "vol24": 67740999.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "liquid-staked-ethereum": {
+      "vol24": 279095.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "morpho": {
+      "vol24": 45322308.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "sei-network": {
+      "vol24": 150377044.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "nexo": {
+      "vol24": 21792288.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "first-digital-usd": {
+      "vol24": 3130704764.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "solv-btc": {
+      "vol24": 886126.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "renzo-restaked-eth": {
+      "vol24": 942502.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "xdce-crowd-sale": {
+      "vol24": 47505960.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "jupiter-exchange-solana": {
+      "vol24": 58721811.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "dash": {
+      "vol24": 352407327.0,
+      "ts": "2025-11-14T16:13:07.828034"
+    },
+    "pudgy-penguins": {
+      "vol24": 218719058.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "virtual-protocol": {
+      "vol24": 253270643.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "pancakeswap-token": {
+      "vol24": 130594306.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "mantle-staked-ether": {
+      "vol24": 7024124.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "arbitrum-bridged-wbtc-arbitrum-one": {
+      "vol24": 356055000.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "rain": {
+      "vol24": 6429803.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "fasttoken": {
+      "vol24": 2721424.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "celestia": {
+      "vol24": 109611397.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "immutable-x": {
+      "vol24": 39656569.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "aerodrome-finance": {
+      "vol24": 112473024.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "fetch-ai": {
+      "vol24": 149695088.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "optimism": {
+      "vol24": 165509666.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "ondo-us-dollar-yield": {
+      "vol24": 5679598.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "injective-protocol": {
+      "vol24": 142226707.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "starknet": {
+      "vol24": 477866047.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "stakewise-v3-oseth": {
+      "vol24": 372801.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "lido-dao": {
+      "vol24": 95256090.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "blockstack": {
+      "vol24": 25486563.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "jupiter-staked-sol": {
+      "vol24": 8900517.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "newton-project": {
+      "vol24": 21828580.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "beldex": {
+      "vol24": 11824246.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "the-graph": {
+      "vol24": 34760025.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "curve-dao-token": {
+      "vol24": 191042714.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "polygon-pos-bridged-dai-polygon-pos": {
+      "vol24": 67288192.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "tezos": {
+      "vol24": 28338618.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "bridged-usdc-polygon-pos-bridge": {
+      "vol24": 38492895.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "l2-standard-bridged-weth-base": {
+      "vol24": 1303245356.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "usdai": {
+      "vol24": 6055340.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "tbtc": {
+      "vol24": 57148787.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "soon-2": {
+      "vol24": 39234621.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "msol": {
+      "vol24": 13913767.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "usual-usd": {
+      "vol24": 16961950.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "iota": {
+      "vol24": 18400649.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "doublezero": {
+      "vol24": 36304834.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "arbitrum-bridged-weth-arbitrum-one": {
+      "vol24": 677952985.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "syrup": {
+      "vol24": 77176814.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "pyth-network": {
+      "vol24": 37724759.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "ether-fi": {
+      "vol24": 117389292.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "kaia": {
+      "vol24": 39237299.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "mantle-bridged-usdt-mantle": {
+      "vol24": 4304030.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "sonic-3": {
+      "vol24": 84240982.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "true-usd": {
+      "vol24": 12786214.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "decred": {
+      "vol24": 19266340.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "ethereum-name-service": {
+      "vol24": 60346609.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "spx6900": {
+      "vol24": 48423642.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "telcoin": {
+      "vol24": 24348879.0,
+      "ts": "2025-11-14T16:13:07.829079"
+    },
+    "the-sandbox": {
+      "vol24": 74160015.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "stader-ethx": {
+      "vol24": 592974.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "gteth": {
+      "vol24": 999797.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "trust-wallet-token": {
+      "vol24": 33697091.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "bitcoin-cash-sv": {
+      "vol24": 20231732.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "conflux-token": {
+      "vol24": 48278852.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "gho": {
+      "vol24": 19831873.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "helium": {
+      "vol24": 17414093.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "plasma": {
+      "vol24": 162211877.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "usdd": {
+      "vol24": 8903376.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "sun-token": {
+      "vol24": 39165615.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "dogwifcoin": {
+      "vol24": 202884139.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "myx-finance": {
+      "vol24": 35036176.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "theta-token": {
+      "vol24": 25085711.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "gala": {
+      "vol24": 100537967.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "jasmycoin": {
+      "vol24": 48710116.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "flow": {
+      "vol24": 10677826.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "coinbase-wrapped-staked-eth": {
+      "vol24": 8785583.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "sweth": {
+      "vol24": 318618.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "binance-peg-dogecoin": {
+      "vol24": 1752687.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "usdb": {
+      "vol24": 1233263.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "bitcoin-avalanche-bridged-btc-b": {
+      "vol24": 52271736.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "wrapped-hype": {
+      "vol24": 232314917.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "decentraland": {
+      "vol24": 37593136.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "vaulta": {
+      "vol24": 68214716.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "benqi-liquid-staked-avax": {
+      "vol24": 2144569.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "pendle": {
+      "vol24": 70061673.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "mimblewimblecoin": {
+      "vol24": 157703.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "merlin-chain": {
+      "vol24": 35971541.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "raydium": {
+      "vol24": 67267638.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "just": {
+      "vol24": 30868570.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "arbitrum-bridged-wrapped-eeth": {
+      "vol24": 434134.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "ultima": {
+      "vol24": 18451477.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "olympus": {
+      "vol24": 866106.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "zksync": {
+      "vol24": 107140843.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "polygon-pos-bridged-weth-polygon-pos": {
+      "vol24": 33210209.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "dexe": {
+      "vol24": 7495893.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "neo": {
+      "vol24": 27432444.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "astherus-staked-bnb": {
+      "vol24": 653087.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "concordium": {
+      "vol24": 1286180.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "aethir": {
+      "vol24": 41440563.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "apecoin": {
+      "vol24": 53316749.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "kinesis-gold": {
+      "vol24": 22884118.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "binance-peg-busd": {
+      "vol24": 8862882.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "frax-ether": {
+      "vol24": 1867870.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "unit-bitcoin": {
+      "vol24": 17214972.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "compound-governance-token": {
+      "vol24": 36932969.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "chiliz": {
+      "vol24": 44653337.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "gnosis": {
+      "vol24": 11774429.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "humanity": {
+      "vol24": 32125349.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "eigenlayer": {
+      "vol24": 86072977.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "mantle-restaked-eth": {
+      "vol24": 22518949.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "euro-coin": {
+      "vol24": 53935305.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "ribbita-by-virtuals": {
+      "vol24": 15240194.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "falcon-finance-ff": {
+      "vol24": 92946518.0,
+      "ts": "2025-11-14T16:13:07.830055"
+    },
+    "walrus-2": {
+      "vol24": 23958246.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "zebec-network": {
+      "vol24": 23630129.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "arweave": {
+      "vol24": 71513926.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "usx": {
+      "vol24": 27621167.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "frax": {
+      "vol24": 8621583.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "instadapp": {
+      "vol24": 5921945.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "ethena-staked-ena": {
+      "vol24": 1803087.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "origintrail": {
+      "vol24": 7217267.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "wormhole": {
+      "vol24": 56496286.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "1inch": {
+      "vol24": 30406731.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "swissborg": {
+      "vol24": 3829095.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "vision-3": {
+      "vol24": 5594580.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "zero-gravity": {
+      "vol24": 38349418.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "basic-attention-token": {
+      "vol24": 41022465.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "thorchain": {
+      "vol24": 78378793.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "treehouse-eth": {
+      "vol24": 242173.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "wrapped-ether-mantle-bridge": {
+      "vol24": 11369802.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "elrond-erd-2": {
+      "vol24": 16467617.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "fartcoin": {
+      "vol24": 145067820.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "dydx-chain": {
+      "vol24": 48122917.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "havven": {
+      "vol24": 38170658.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "golem": {
+      "vol24": 35430945.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "zora": {
+      "vol24": 70273245.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "jito-governance-token": {
+      "vol24": 38407753.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "savings-dai": {
+      "vol24": 121761.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "mocaverse": {
+      "vol24": 15852098.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "wemix-token": {
+      "vol24": 3901730.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "crvusd": {
+      "vol24": 132628869.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "loaded-lions": {
+      "vol24": 1120307.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "undeads-games": {
+      "vol24": 1523327.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "ibc-bridged-usdc": {
+      "vol24": 614178.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "zano": {
+      "vol24": 3090185.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "reserve-rights-token": {
+      "vol24": 32429474.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "drift-staked-sol": {
+      "vol24": 763947.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "polygon-bridged-wbtc-polygon-pos": {
+      "vol24": 18462305.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "atomone": {
+      "vol24": 495069.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "wrapped-avax": {
+      "vol24": 202275980.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "zencash": {
+      "vol24": 134955355.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "resolv-usr": {
+      "vol24": 5501641.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "meteora": {
+      "vol24": 318328582.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "livepeer": {
+      "vol24": 25729061.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "chain-2": {
+      "vol24": 18949639.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "axie-infinity": {
+      "vol24": 26979780.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "bybit-staked-sol": {
+      "vol24": 1817754.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "reserve-protocol-eth-plus": {
+      "vol24": 1430258.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "amp-token": {
+      "vol24": 9540099.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "compounding-open-dollar": {
+      "vol24": 131025.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "staked-frax-ether": {
+      "vol24": 152868.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "btse-token": {
+      "vol24": 3998650.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "reallink": {
+      "vol24": 26106597.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "beam-2": {
+      "vol24": 16352700.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "kinesis-silver": {
+      "vol24": 878036.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "legacy-token": {
+      "vol24": 4426627.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "mx-token": {
+      "vol24": 36522741.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "based-brett": {
+      "vol24": 42075286.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "berachain-bera": {
+      "vol24": 29779574.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "ronin": {
+      "vol24": 5455099.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "creditcoin-2": {
+      "vol24": 17300895.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "standx-dusd": {
+      "vol24": 16814692.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "kamino": {
+      "vol24": 24992890.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "kaito": {
+      "vol24": 19787947.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "qtum": {
+      "vol24": 19122807.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "ecoreal-estate": {
+      "vol24": 194855.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "sahara-ai": {
+      "vol24": 24305105.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "railgun": {
+      "vol24": 4083657.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "coredaoorg": {
+      "vol24": 30980590.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "toshi": {
+      "vol24": 29343203.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "cronos-bridged-usdc-cronos": {
+      "vol24": 3100085.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "resolv-wstusr": {
+      "vol24": 1882669.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "universal-btc": {
+      "vol24": 490229.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "kraken-wrapped-btc": {
+      "vol24": 1334947.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "kusama": {
+      "vol24": 12325694.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "lombard-protocol": {
+      "vol24": 24349159.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "linea": {
+      "vol24": 126620760.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "prometeus": {
+      "vol24": 4832901.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "aioz-network": {
+      "vol24": 16279780.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "bitmart-token": {
+      "vol24": 5770076.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "mina-protocol": {
+      "vol24": 44208888.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "sosovalue": {
+      "vol24": 10894175.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "superfarm": {
+      "vol24": 12900535.0,
+      "ts": "2025-11-14T16:13:08.757675"
+    },
+    "slash-vision-labs": {
+      "vol24": 459178.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "layerzero": {
+      "vol24": 60472482.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "astherus-usdf": {
+      "vol24": 828615.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "safepal": {
+      "vol24": 3128169.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "kinetiq-earn-vault": {
+      "vol24": 4092589.0,
+      "ts": "2025-11-14T16:07:45.811691"
+    },
+    "bnb48-club-token": {
+      "vol24": 15818751.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "ai-companions": {
+      "vol24": 6285656.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "akash-network": {
+      "vol24": 11781767.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "four": {
+      "vol24": 23484185.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "kava": {
+      "vol24": 47478938.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "yearn-finance": {
+      "vol24": 21467105.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "eos": {
+      "vol24": 441105.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "uchain-2": {
+      "vol24": 7601856.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "arkham": {
+      "vol24": 45425339.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "axelar": {
+      "vol24": 15041130.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "convex-finance": {
+      "vol24": 12643631.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "origin-ether": {
+      "vol24": 1521977.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "gas": {
+      "vol24": 5597822.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "shuffle-2": {
+      "vol24": 2006046.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "0x": {
+      "vol24": 22771094.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "binance-peg-sol": {
+      "vol24": 11118641.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "theta-fuel": {
+      "vol24": 2582946.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "gusd": {
+      "vol24": 19834900.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "movement": {
+      "vol24": 16898361.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "susdai": {
+      "vol24": 2467388.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "bridged-usd-coin-starkgate": {
+      "vol24": 27990662.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "deep": {
+      "vol24": 24011319.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "digibyte": {
+      "vol24": 5675745.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "useless-3": {
+      "vol24": 48452681.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "ravencoin": {
+      "vol24": 11924572.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "wrapped-aave-ethereum-usdc": {
+      "vol24": 3926575.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "nervos-network": {
+      "vol24": 7664596.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "oasis-network": {
+      "vol24": 12041495.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "gmt-token": {
+      "vol24": 4035971.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "theo-short-duration-us-treasury-fund": {
+      "vol24": 2482960.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "dog-go-to-the-moon-rune": {
+      "vol24": 10193019.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "conscious-token": {
+      "vol24": 932101.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "giggle-fund": {
+      "vol24": 127737123.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "flare-bridged-xrp-flare": {
+      "vol24": 8887226.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "agora-dollar": {
+      "vol24": 32972736.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "nano": {
+      "vol24": 12021953.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "build-on": {
+      "vol24": 10742773.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "bianrensheng": {
+      "vol24": 24055005.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "zilliqa": {
+      "vol24": 15574983.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "venom": {
+      "vol24": 183967.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "wefi": {
+      "vol24": 5291420.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "non-playable-coin": {
+      "vol24": 17857452.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "chainopera-ai": {
+      "vol24": 31171192.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "ether-fi-staked-btc": {
+      "vol24": 643624.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "phantom-staked-sol": {
+      "vol24": 1698923.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "dola-usd": {
+      "vol24": 820182.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "aleo": {
+      "vol24": 7038605.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "river": {
+      "vol24": 20409256.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "keeta": {
+      "vol24": 8491729.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "mag7-ssi": {
+      "vol24": 4602247.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "stargate-finance": {
+      "vol24": 8132981.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "kite-2": {
+      "vol24": 112048208.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "avantis": {
+      "vol24": 151828642.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "threshold-network-token": {
+      "vol24": 4869736.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "grass": {
+      "vol24": 39192555.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "sushi": {
+      "vol24": 39131986.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "snek": {
+      "vol24": 10644646.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "coinex-token": {
+      "vol24": 150429.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "turbo": {
+      "vol24": 36767971.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "wrapped-aave-ethereum-usdt": {
+      "vol24": 8647998.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "celo": {
+      "vol24": 20415435.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "cat-in-a-dogs-world": {
+      "vol24": 35422049.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "wrapped-aave-ethereum-weth": {
+      "vol24": 301468.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "melania-meme": {
+      "vol24": 17856114.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "bitkub-coin": {
+      "vol24": 548479.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "meta-2-2": {
+      "vol24": 5733582.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "ozone-chain": {
+      "vol24": 221932.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "proton": {
+      "vol24": 3094704.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "bio-protocol": {
+      "vol24": 32038754.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "infrared-bera": {
+      "vol24": 280754.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "chia": {
+      "vol24": 11565046.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "sui-bridged-wbtc-sui": {
+      "vol24": 15595407.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "anzen-usdz": {
+      "vol24": 124500.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "drift-protocol": {
+      "vol24": 28287275.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "metal-blockchain": {
+      "vol24": 1238889.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "unit-pump": {
+      "vol24": 8220388.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "astar": {
+      "vol24": 7185726.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "velo": {
+      "vol24": 28034759.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "usda-3": {
+      "vol24": 15591462.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "rollbit-coin": {
+      "vol24": 825363.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "midas-mhyper": {
+      "vol24": 125705.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "frax-usd": {
+      "vol24": 9185356.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "aia": {
+      "vol24": 23939219.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "quantum-resistant-ledger": {
+      "vol24": 147327.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "safe": {
+      "vol24": 17931505.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "plume": {
+      "vol24": 71557368.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "popcat": {
+      "vol24": 56138825.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "zetachain": {
+      "vol24": 16758884.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "blur": {
+      "vol24": 11909244.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "stp-network": {
+      "vol24": 3610761.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "vethor-token": {
+      "vol24": 2663738.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "cow-protocol": {
+      "vol24": 23045387.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "onyc": {
+      "vol24": 2250450.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "unibase": {
+      "vol24": 21060436.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "holotoken": {
+      "vol24": 6124017.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "pirate-chain": {
+      "vol24": 701698.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "peanut-the-squirrel": {
+      "vol24": 34290425.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "siacoin": {
+      "vol24": 6492269.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "verge": {
+      "vol24": 17513349.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "zignaly": {
+      "vol24": 2390747.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "apex-token-2": {
+      "vol24": 7953600.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "savings-xdai": {
+      "vol24": 15569807.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "edu-coin": {
+      "vol24": 30385752.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "succinct": {
+      "vol24": 32062800.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "avalanche-bridged-weth-avalanche": {
+      "vol24": 41829699.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "vicicoin": {
+      "vol24": 265221.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "tdccp": {
+      "vol24": 371630.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "debridge": {
+      "vol24": 18516774.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "resolv-rlp": {
+      "vol24": 329229.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "aelf": {
+      "vol24": 4230224.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "mantra-dao": {
+      "vol24": 51467010.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "recall": {
+      "vol24": 17759655.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "ordinals": {
+      "vol24": 42980505.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "alchemist-ai": {
+      "vol24": 75481217.0,
+      "ts": "2025-11-14T16:13:08.757812"
+    },
+    "iotex": {
+      "vol24": 8693150.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "cash-4": {
+      "vol24": 9066877.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "frax-share": {
+      "vol24": 12183408.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "euler": {
+      "vol24": 9683773.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "skale": {
+      "vol24": 21897872.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "gems-vip": {
+      "vol24": 1040145.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "yu": {
+      "vol24": 157301.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "hashkey-ecopoints": {
+      "vol24": 1553406.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "gmx": {
+      "vol24": 12678632.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "casper-network": {
+      "vol24": 4051785.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "nexpace": {
+      "vol24": 28014682.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "novem-pro": {
+      "vol24": 315860.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "bridged-usd-coin-linea": {
+      "vol24": 22698280.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "request-network": {
+      "vol24": 4116870.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "chutes": {
+      "vol24": 3312585.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "ankr": {
+      "vol24": 14197591.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "cronos-bridged-usdt-cronos": {
+      "vol24": 324723.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "centrifuge-2": {
+      "vol24": 3995685.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "stargate-bridged-usdc": {
+      "vol24": 32159482.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "polymesh": {
+      "vol24": 9842339.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "vaultbridge-bridged-wbtc-katana": {
+      "vol24": 7063229.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "lcx": {
+      "vol24": 854012.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "coti": {
+      "vol24": 21506969.0,
+      "ts": "2025-11-14T16:13:08.758323"
+    },
+    "numeraire": {
+      "vol24": 29258418.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "redstone-oracles": {
+      "vol24": 14715814.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "memecoin-2": {
+      "vol24": 27029548.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "vana": {
+      "vol24": 14948689.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "ethereum-pow-iou": {
+      "vol24": 12580092.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "unit-plasma": {
+      "vol24": 4761275.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "anoma": {
+      "vol24": 32085720.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "uma": {
+      "vol24": 11836804.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "moo-deng": {
+      "vol24": 32365642.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "xyo-network": {
+      "vol24": 22595807.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "payfi-strategy-token-usdc": {
+      "vol24": 2405082.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "wrapped-centrifuge": {
+      "vol24": 134704.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "niza-global-2": {
+      "vol24": 1449817.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "icon": {
+      "vol24": 3660671.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "peaq-2": {
+      "vol24": 5701665.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "bitdca": {
+      "vol24": 694862.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "illuvium": {
+      "vol24": 13312308.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "lagrange": {
+      "vol24": 19208341.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "loopring": {
+      "vol24": 12406983.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "avant-usd": {
+      "vol24": 470687.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "api3": {
+      "vol24": 14476553.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "world-mobile-token": {
+      "vol24": 14623386.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "societe-generale-forge-eurcv": {
+      "vol24": 94573908.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "orca": {
+      "vol24": 14397417.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "gama-token": {
+      "vol24": 322704.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "solo-coin": {
+      "vol24": 7038145.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "babylon": {
+      "vol24": 20193191.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "stargate-bridged-weth": {
+      "vol24": 21561732.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "momentum-3": {
+      "vol24": 184886069.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "pay-coin": {
+      "vol24": 364892.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "coca": {
+      "vol24": 371168.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "harmony": {
+      "vol24": 6691600.0,
+      "ts": "2025-11-14T16:13:09.981343"
+    },
+    "felix-feusd": {
+      "vol24": 3908665.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "apro": {
+      "vol24": 5586352.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "enjincoin": {
+      "vol24": 7345829.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "l2-standard-bridged-weth-optimism": {
+      "vol24": 44345393.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "gohome": {
+      "vol24": 3479957.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "osmosis": {
+      "vol24": 9596083.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "amnis-aptos": {
+      "vol24": 142148.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "mask-network": {
+      "vol24": 24915816.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "f-x-protocol-fxusd": {
+      "vol24": 11095317.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "ontology": {
+      "vol24": 9903888.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "altlayer": {
+      "vol24": 20093906.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "fx-usd-saving": {
+      "vol24": 130484.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "folks": {
+      "vol24": 18721633.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "avant-staked-usd": {
+      "vol24": 227616.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "bridged-wrapped-steth-gnosis": {
+      "vol24": 17354444.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "band-protocol": {
+      "vol24": 10868161.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "onfa": {
+      "vol24": 1877239.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "notcoin": {
+      "vol24": 19794893.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "vaultbridge-bridged-eth-katana": {
+      "vol24": 25465431.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "pundi-x-2": {
+      "vol24": 4554021.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "bridged-wrapped-ether-starkgate": {
+      "vol24": 18682007.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "yield-guild-games": {
+      "vol24": 26962620.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "venus": {
+      "vol24": 6679264.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "jelly-my-jelly": {
+      "vol24": 25019846.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "tellor": {
+      "vol24": 169536288.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "fulcrom": {
+      "vol24": 122960.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "binance-peg-zcash-token": {
+      "vol24": 35427709.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "apex-4": {
+      "vol24": 100036.0,
+      "ts": "2025-11-14T13:36:23.189324"
+    },
+    "swipe": {
+      "vol24": 3912857.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "saros-finance": {
+      "vol24": 10631157.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "lucidum": {
+      "vol24": 389386.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "spark-2": {
+      "vol24": 32025146.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "rocket-pool": {
+      "vol24": 6769360.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "og-fan-token": {
+      "vol24": 13878135.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "constellation-labs": {
+      "vol24": 1740399.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "stepn": {
+      "vol24": 22909306.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "swarm-network": {
+      "vol24": 9235845.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "status": {
+      "vol24": 9295618.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "waves": {
+      "vol24": 16760479.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "hyperbeat-usdt": {
+      "vol24": 773597.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "magic-eden": {
+      "vol24": 25476716.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "audiera": {
+      "vol24": 57869158.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "usd-coin-ethereum-bridged": {
+      "vol24": 28981896.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "matrixdock-gold": {
+      "vol24": 997088.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "io": {
+      "vol24": 24928454.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "burnedfi": {
+      "vol24": 486247.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "bitlight": {
+      "vol24": 5903889.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "zelcash": {
+      "vol24": 10906397.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "lisk": {
+      "vol24": 60641418.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ventuals-vhype": {
+      "vol24": 294053.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "tokenbot-2": {
+      "vol24": 26176946.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "ridges-ai": {
+      "vol24": 4864984.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "geodnet": {
+      "vol24": 699302.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "metis-token": {
+      "vol24": 12841089.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "mbg-by-multibank-group": {
+      "vol24": 3675056.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "neiro-3": {
+      "vol24": 59554671.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "elizaos": {
+      "vol24": 7922060.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "home": {
+      "vol24": 12172102.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "syndicate-3": {
+      "vol24": 9648554.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ore": {
+      "vol24": 15449202.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "bim-2": {
+      "vol24": 353945.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "bora": {
+      "vol24": 407834.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "metaplex": {
+      "vol24": 10386254.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "okzoo": {
+      "vol24": 4170470.0,
+      "ts": "2025-11-14T16:13:09.982344"
+    },
+    "apriori": {
+      "vol24": 16863471.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ardor": {
+      "vol24": 5789608.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "paxos-standard": {
+      "vol24": 23622576.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "siren-2": {
+      "vol24": 8131653.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ark": {
+      "vol24": 2586474.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "staked-hype": {
+      "vol24": 319778.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "woo-network": {
+      "vol24": 8411863.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "iostoken": {
+      "vol24": 6984087.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "celium": {
+      "vol24": 5433164.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "aixbt": {
+      "vol24": 21382782.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "dialectic-usd-vault": {
+      "vol24": 149443.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "secret": {
+      "vol24": 5912415.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "book-of-meme": {
+      "vol24": 45032485.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "chromaway": {
+      "vol24": 8345334.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "tagger": {
+      "vol24": 4599162.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "marsmi": {
+      "vol24": 148695.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "hive": {
+      "vol24": 2515130.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "sui-bridged-ether-sui": {
+      "vol24": 7092415.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "iexec-rlc": {
+      "vol24": 8594345.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "quantixai": {
+      "vol24": 6464607.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "binance-usd": {
+      "vol24": 248339.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "purr-2": {
+      "vol24": 2346078.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "biconomy": {
+      "vol24": 5826961.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "constitutiondao": {
+      "vol24": 27762311.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "terra-luna-2": {
+      "vol24": 32457240.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "blast": {
+      "vol24": 7903802.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "coreum": {
+      "vol24": 253606.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "manta-network": {
+      "vol24": 39295285.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "degen-base": {
+      "vol24": 11076774.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "zedxion": {
+      "vol24": 279439.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "stratis": {
+      "vol24": 2453792.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "lista": {
+      "vol24": 20852517.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "world-assets": {
+      "vol24": 520393.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "stronghold-token": {
+      "vol24": 1225552.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "bancor": {
+      "vol24": 290446.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "orbs": {
+      "vol24": 8074357.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "openledger-2": {
+      "vol24": 18177541.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "alchemy-pay": {
+      "vol24": 11233654.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "zcoin": {
+      "vol24": 1002200.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "escoin-token": {
+      "vol24": 482469.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "subsquid": {
+      "vol24": 17053197.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "tornado-cash": {
+      "vol24": 285779.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "resupply-usd": {
+      "vol24": 3656265.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "yooldo-games": {
+      "vol24": 36081503.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "comedian": {
+      "vol24": 15685074.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "big-time": {
+      "vol24": 12623329.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "aurora-near": {
+      "vol24": 6892588.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "portal-to-bitcoin": {
+      "vol24": 8781236.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ronin-bridged-weth-ronin": {
+      "vol24": 778303.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "overtake": {
+      "vol24": 5577554.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "dia-data": {
+      "vol24": 5816778.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "b3": {
+      "vol24": 5753198.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "power-ledger": {
+      "vol24": 6319651.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "sui-bridged-usdt-sui": {
+      "vol24": 94974673.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "ocean-protocol": {
+      "vol24": 465232.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "aevo-exchange": {
+      "vol24": 19133913.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "somnia": {
+      "vol24": 14379396.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "kgen": {
+      "vol24": 3527078.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "swftcoin": {
+      "vol24": 967580.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "definitive": {
+      "vol24": 1997367.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "bonfida": {
+      "vol24": 6169134.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "sign-global": {
+      "vol24": 7296095.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "energy-web-token": {
+      "vol24": 421733.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "audius": {
+      "vol24": 14898677.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "allora": {
+      "vol24": 204860440.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "xpin-network": {
+      "vol24": 7791577.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "mass-vehicle-ledger": {
+      "vol24": 551609.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "yzy": {
+      "vol24": 10580005.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "spell-token": {
+      "vol24": 6128680.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "seda-2": {
+      "vol24": 1193177.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "nkyc-token": {
+      "vol24": 207149.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "delysium": {
+      "vol24": 3345692.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "balancer": {
+      "vol24": 3800109.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "usd": {
+      "vol24": 2914564.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "straitsx-xusd": {
+      "vol24": 80752512.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "cronos-bridged-wbtc-cronos": {
+      "vol24": 630790.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "mythos": {
+      "vol24": 2448484.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "kyber-network-crystal": {
+      "vol24": 8025768.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "mindwavedao": {
+      "vol24": 173272.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "pythia": {
+      "vol24": 1684214.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "everipedia": {
+      "vol24": 1639781.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "zentry": {
+      "vol24": 9987167.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "gemini-dollar": {
+      "vol24": 414871.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "carv": {
+      "vol24": 23612610.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "orderly-network": {
+      "vol24": 14885932.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "liquity-bold-2": {
+      "vol24": 970046.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "resolv": {
+      "vol24": 91350106.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "avici": {
+      "vol24": 15685383.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "liquity": {
+      "vol24": 12521017.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "songbird": {
+      "vol24": 223689.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "safecoin": {
+      "vol24": 1011448.0,
+      "ts": "2025-11-14T16:13:09.983342"
+    },
+    "janction": {
+      "vol24": 31755442.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "ergo": {
+      "vol24": 369875.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "4-2": {
+      "vol24": 12218668.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "hivemapper": {
+      "vol24": 2680385.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "clearpool": {
+      "vol24": 4547024.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "tokamak-network": {
+      "vol24": 869369.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "milk-alliance": {
+      "vol24": 5863613.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "solayer": {
+      "vol24": 10388275.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "venice-token": {
+      "vol24": 4273877.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "targon": {
+      "vol24": 224598.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "nillion": {
+      "vol24": 10585247.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "vaultbridge-bridged-usdc-katana": {
+      "vol24": 35189375.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "ong": {
+      "vol24": 2736502.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "ai16z": {
+      "vol24": 1323606.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "ecomi": {
+      "vol24": 2857886.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "sanctum-2": {
+      "vol24": 2551484.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "storx": {
+      "vol24": 2587926.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "bridged-wrapped-bitcoin-starkgate": {
+      "vol24": 25810682.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "freysa-ai": {
+      "vol24": 1382813.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "dora-2": {
+      "vol24": 288328.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "supra": {
+      "vol24": 6271865.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "across-protocol": {
+      "vol24": 4720463.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "pha": {
+      "vol24": 13920673.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "auction": {
+      "vol24": 10910959.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "harrypotterobamasonic10in": {
+      "vol24": 15571303.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "huma-finance": {
+      "vol24": 64809781.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "cyberconnect": {
+      "vol24": 15706590.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "unifai-network": {
+      "vol24": 334818856.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "impossible-cloud-network-token": {
+      "vol24": 12606807.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "sapien-2": {
+      "vol24": 24439526.0,
+      "ts": "2025-11-14T16:13:09.984342"
+    },
+    "civic": {
+      "vol24": 14824437.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "bridged-tether-linea": {
+      "vol24": 12137073.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "nusd": {
+      "vol24": 332225.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "gigachad-2": {
+      "vol24": 4172494.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "marlin": {
+      "vol24": 2914138.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "law-blocks": {
+      "vol24": 429507.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "auki-labs": {
+      "vol24": 247175.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "goatseus-maximus": {
+      "vol24": 13611847.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "echelon-prime": {
+      "vol24": 2637275.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "moonwell-artemis": {
+      "vol24": 6769882.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "marinade": {
+      "vol24": 3804505.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "socean-staked-sol": {
+      "vol24": 7302733.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "verasity": {
+      "vol24": 16450801.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "coinbase-wrapped-xrp": {
+      "vol24": 2830887.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "steem": {
+      "vol24": 13704623.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "binance-peg-dai": {
+      "vol24": 548308.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "noble-dollar-usdn": {
+      "vol24": 10059411.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "lava-network": {
+      "vol24": 1571317.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "qanplatform": {
+      "vol24": 221711.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "aegis-yusd": {
+      "vol24": 480441.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "g-token": {
+      "vol24": 4623726.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "rif-token": {
+      "vol24": 4322610.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "flock-2": {
+      "vol24": 8064229.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "taiko": {
+      "vol24": 16560834.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "oobit-2": {
+      "vol24": 11623387.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "usd-coin-avalanche-bridged-usdc-e": {
+      "vol24": 3383336.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "nomina": {
+      "vol24": 23816165.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "stbl": {
+      "vol24": 20336696.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "iagon": {
+      "vol24": 267000.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "metal": {
+      "vol24": 9881560.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "certik": {
+      "vol24": 1420230.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "ekubo-protocol": {
+      "vol24": 763700.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "chain-key-bitcoin": {
+      "vol24": 130319.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "stakestone": {
+      "vol24": 12882241.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "sophon": {
+      "vol24": 11586479.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "avalon-2": {
+      "vol24": 123768665.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "amiko": {
+      "vol24": 257129.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "cobak-token": {
+      "vol24": 9862961.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "solayer-staked-sol": {
+      "vol24": 347334.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "cookie": {
+      "vol24": 14602341.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "caldera": {
+      "vol24": 26734491.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "space-id": {
+      "vol24": 10176509.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "nym": {
+      "vol24": 3359094.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "gains-network": {
+      "vol24": 2291202.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "anime": {
+      "vol24": 15376316.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "magic": {
+      "vol24": 17115769.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "sonic-svm": {
+      "vol24": 15567483.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "wax": {
+      "vol24": 1906875.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "dkargo": {
+      "vol24": 3463224.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "aura-on-sol": {
+      "vol24": 6912827.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "gamebuild": {
+      "vol24": 1272147.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "helio-protocol-hay": {
+      "vol24": 334242.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "arcblock": {
+      "vol24": 935883.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "glidr": {
+      "vol24": 105118.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "the-grays-currency": {
+      "vol24": 121751.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "troll-2": {
+      "vol24": 6551955.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "liquity-usd": {
+      "vol24": 220057.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "mira-3": {
+      "vol24": 14956063.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "terrausd": {
+      "vol24": 4651115.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "wilder-world": {
+      "vol24": 3348559.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "smooth-love-potion": {
+      "vol24": 3619917.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "dent": {
+      "vol24": 3672415.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "chaingpt": {
+      "vol24": 11338225.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "corn-3": {
+      "vol24": 14945534.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "yield-basis": {
+      "vol24": 38272978.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "pepecoin-network": {
+      "vol24": 220154.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "xai-blockchain": {
+      "vol24": 14948870.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "cartesi": {
+      "vol24": 4263052.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "baby-shark-universe": {
+      "vol24": 11856062.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "mantle-bridged-usdc-mantle": {
+      "vol24": 3102562.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "velodrome-finance": {
+      "vol24": 14362969.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "hylo-usd": {
+      "vol24": 4638337.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "gigadot": {
+      "vol24": 1588089.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "destra-network": {
+      "vol24": 2503967.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "fractal-bitcoin": {
+      "vol24": 9418887.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "bless-2": {
+      "vol24": 9970684.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "wmatic": {
+      "vol24": 12703600.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "doodles": {
+      "vol24": 10659989.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "savings-crvusd": {
+      "vol24": 4292092.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "celo-dollar": {
+      "vol24": 6383054.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "avalanche-old-bridged-wbtc-avalanche": {
+      "vol24": 136005.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "moonriver": {
+      "vol24": 7454072.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "hippo-protocol": {
+      "vol24": 452405.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "joe": {
+      "vol24": 8103793.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bucket-protocol-buck-stablecoin": {
+      "vol24": 1070736.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "derive": {
+      "vol24": 273672.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "devve": {
+      "vol24": 349763.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bridged-usd-coin-optimism": {
+      "vol24": 1930225.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "looped-hype": {
+      "vol24": 468270.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "banana-gun": {
+      "vol24": 10155563.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "aergo": {
+      "vol24": 11798912.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bsquared-network": {
+      "vol24": 32991956.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "medibloc": {
+      "vol24": 380247.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bifrost": {
+      "vol24": 2911395.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "holoworld": {
+      "vol24": 21853357.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "pol-staked-wbera": {
+      "vol24": 108082.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "limitless-3": {
+      "vol24": 2253396.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bankercoin-2": {
+      "vol24": 2135170.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "plume-usd": {
+      "vol24": 459386.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "unipoly": {
+      "vol24": 248138.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "mango-network": {
+      "vol24": 3906810.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "synfutures": {
+      "vol24": 29879361.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "dymension": {
+      "vol24": 6007509.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "electroneum": {
+      "vol24": 1471397.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "quark-chain": {
+      "vol24": 1156539.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ix-token": {
+      "vol24": 267340.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "zerebro": {
+      "vol24": 22382270.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "darkstar": {
+      "vol24": 758777.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "game-by-virtuals": {
+      "vol24": 9935955.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "xtusd": {
+      "vol24": 7382717.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "cross-2": {
+      "vol24": 7560636.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "vine": {
+      "vol24": 26555910.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "proprietary-trading-network": {
+      "vol24": 525217.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "pippin": {
+      "vol24": 12932232.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "moonbeam": {
+      "vol24": 4846295.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bitcoin-on-katana": {
+      "vol24": 108815.0,
+      "ts": "2025-11-14T15:47:07.475114"
+    },
+    "boundless": {
+      "vol24": 28355868.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "deapcoin": {
+      "vol24": 3325490.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "usual": {
+      "vol24": 31071904.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "alchemix": {
+      "vol24": 80631686.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "rujira": {
+      "vol24": 272237.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "gogopool-ggavax": {
+      "vol24": 156163.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bouncebit": {
+      "vol24": 17157361.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "apertum": {
+      "vol24": 582854.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "xtcom-token": {
+      "vol24": 49139139.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "coin98": {
+      "vol24": 11219288.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ao-computer": {
+      "vol24": 258277.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "chex-token": {
+      "vol24": 955247.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "tesla-xstock": {
+      "vol24": 42469585.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ai-rig-complex": {
+      "vol24": 9857215.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "solidus-aitech": {
+      "vol24": 14937178.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "hyperlane": {
+      "vol24": 13629495.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "dacxi": {
+      "vol24": 393695.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "avail": {
+      "vol24": 10553178.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "renzo": {
+      "vol24": 9381915.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "hunt-token": {
+      "vol24": 4153334.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "victoria-vr": {
+      "vol24": 1090958.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "adshares": {
+      "vol24": 2282627.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "researchcoin": {
+      "vol24": 934192.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "cetus-protocol": {
+      "vol24": 12632434.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "binance-peg-avalanche": {
+      "vol24": 114487.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "meet48": {
+      "vol24": 6162132.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "autonolas": {
+      "vol24": 310474.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "georgeplaysclashroyale": {
+      "vol24": 836273.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "airtor-protocol": {
+      "vol24": 1217106.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "reactive-network": {
+      "vol24": 2095402.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ageur": {
+      "vol24": 124751.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "zerobase": {
+      "vol24": 33070348.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "bugscoin": {
+      "vol24": 13525284.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "benqi": {
+      "vol24": 1244251.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "goldfinch": {
+      "vol24": 356342.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "zeus-netwok-zbtc": {
+      "vol24": 2797947.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "honey-3": {
+      "vol24": 11544776.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "sceptre-staked-flr": {
+      "vol24": 900431.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "luck-3": {
+      "vol24": 121085.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "dupe": {
+      "vol24": 20598038.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "puffer-finance": {
+      "vol24": 22625476.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "paparazzi-token": {
+      "vol24": 853156.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "torch-of-liberty": {
+      "vol24": 1404735.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "omnibridge-bridged-zcash-solana": {
+      "vol24": 19861593.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "aria-2": {
+      "vol24": 46130166.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "gods-unchained": {
+      "vol24": 921971.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "elastos": {
+      "vol24": 402866.0,
+      "ts": "2025-11-14T16:07:47.858411"
+    },
+    "zksync-bridged-usdc-zksync": {
+      "vol24": 1903559.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "pocket-network": {
+      "vol24": 1842950.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "tether-gold-tokens": {
+      "vol24": 7630302.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "kled-ai": {
+      "vol24": 1000421.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "celer-network": {
+      "vol24": 3131207.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "alethea-artificial-liquid-intelligence-token": {
+      "vol24": 2292167.0,
+      "ts": "2025-11-14T14:36:33.853212"
+    },
+    "capx-ai": {
+      "vol24": 1446620.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "l2-standard-bridged-usdt-base": {
+      "vol24": 7404663.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ssv-network": {
+      "vol24": 16217589.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ruby-coin": {
+      "vol24": 2484868.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "c8ntinuum": {
+      "vol24": 1556337.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "ika": {
+      "vol24": 15174527.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "soneium-bridged-usdc-soneium": {
+      "vol24": 1804422.0,
+      "ts": "2025-11-14T15:00:07.925474"
+    },
+    "saucerswap": {
+      "vol24": 282447.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "tradoor": {
+      "vol24": 3285408.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "lorenzo-wrapped-bitcoin": {
+      "vol24": 211215.0,
+      "ts": "2025-11-14T16:13:08.757164"
+    },
+    "beets-staked-sonic": {
+      "vol24": 1710372.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "satoshi-stablecoin": {
+      "vol24": 170231.0,
+      "ts": "2025-11-14T16:13:07.831154"
+    },
+    "adventure-gold": {
+      "vol24": 11373720.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "super-oeth": {
+      "vol24": 100691.0,
+      "ts": "2025-11-14T15:34:31.139006+00:00"
+    },
+    "islamic-coin": {
+      "vol24": 126760.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "dovu-2": {
+      "vol24": 108407.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "radix": {
+      "vol24": 200971.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "saga-2": {
+      "vol24": 13345569.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "empulser-enterprises": {
+      "vol24": 500906.0,
+      "ts": "2025-11-14T15:53:46.752584"
+    },
+    "metronome-synth-eth": {
+      "vol24": 13389110.0,
+      "ts": "2025-11-14T15:53:46.752584"
+    },
+    "bertram-the-pomeranian": {
+      "vol24": 3837809.0,
+      "ts": "2025-11-14T15:30:17.964168"
+    },
+    "hakimi": {
+      "vol24": 15529989.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "scroll": {
+      "vol24": 14596921.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    },
+    "wrapped-nxm": {
+      "vol24": 152058.0,
+      "ts": "2025-11-14T16:11:02.785648"
+    },
+    "numine-token": {
+      "vol24": 3458949.0,
+      "ts": "2025-11-14T16:11:02.787187"
+    }
+  },
+  "global_last_run": "2025-11-14T16:13:10.776762"
+}

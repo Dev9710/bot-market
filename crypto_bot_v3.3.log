@@ -1,0 +1,4 @@
+2025-09-04 04:28:02,589 - INFO - Aucun nouveau signal, pas d'envoi Telegram.
+2025-09-04 04:43:03,272 - INFO - Aucun nouveau signal, pas d'envoi Telegram.
+2025-09-04 12:54:27,018 - ERROR - Erreur analyse PUMP: '>' not supported between instances of 'NoneType' and 'int'
+2025-09-05 02:02:53,509 - ERROR - Erreur analyse PUMP: '<=' not supported between instances of 'NoneType' and 'int'

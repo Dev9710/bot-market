@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  crypto-monitor:
+    build: .
+    container_name: crypto-monitor
+    restart: always
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
+      ETHERSCAN_API_KEY: "${ETHERSCAN_API_KEY}"
+      CMC_API_KEY: "${CMC_API_KEY}"
+    volumes:
+      - ./config_tokens.json:/app/config_tokens.json
+      - ./monitor_state.json:/app/monitor_state.json
+    command: ["python", "alerte.py", "--silent"]

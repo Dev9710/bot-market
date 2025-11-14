@@ -1,0 +1,101 @@
+{
+  "poll_interval_seconds": 30,
+  "alert_cooldown_seconds": 300,
+
+  "global_volume_scan": {
+    "enabled": true,
+    "interval_seconds": 60,
+    "min_vol24_usd": 100000,
+    "ratio_threshold": 5.0,
+    "min_price_usd": 0.0001
+  },
+
+  "tokens": [
+    {
+      "symbol": "XRP",
+      "coingecko_id": "ripple",
+      "cmc_symbol": "XRP",
+      "chains": {},
+      "cex_symbols": ["XRPUSDT"],
+      "whale_trade_usd": 20000,
+      "whale_onchain_usd": 0
+    },
+    {
+      "symbol": "XLM",
+      "coingecko_id": "stellar",
+      "cmc_symbol": "XLM",
+      "chains": {},
+      "cex_symbols": ["XLMUSDT"],
+      "whale_trade_usd": 10000,
+      "whale_onchain_usd": 0
+    },
+    {
+      "symbol": "HBAR",
+      "coingecko_id": "hedera-hashgraph",
+      "cmc_symbol": "HBAR",
+      "chains": {},
+      "cex_symbols": ["HBARUSDT"],
+      "whale_trade_usd": 15000,
+      "whale_onchain_usd": 0
+    },
+    {
+      "symbol": "FLR",
+      "coingecko_id": "flare-networks",
+      "cmc_symbol": "FLR",
+      "chains": {},
+      "cex_symbols": ["FLRUSDT"],
+      "whale_trade_usd": 8000,
+      "whale_onchain_usd": 0
+    },
+    {
+      "symbol": "TEL",
+      "coingecko_id": "telcoin",
+      "cmc_symbol": "TEL",
+      "chains": {
+        "1": "0x85e076361cc813A908Ff672F9bAd1541474402b2",
+        "137": "0x467Bccd9d29f223BcE8043b84E8C8B282827790F"
+      },
+      "cex_symbols": ["TELUSDT"],
+      "whale_trade_usd": 6000,
+      "whale_onchain_usd": 15000
+    },
+    {
+      "symbol": "XMR",
+      "coingecko_id": "monero",
+      "cmc_symbol": "XMR",
+      "chains": {},
+      "cex_symbols": ["XMRUSDT"],
+      "whale_trade_usd": 20000,
+      "whale_onchain_usd": 0
+    },
+    {
+      "symbol": "BTC",
+      "coingecko_id": "bitcoin",
+      "cmc_symbol": "BTC",
+      "chains": {},
+      "cex_symbols": ["BTCUSDT"],
+      "whale_trade_usd": 100000,
+      "whale_onchain_usd": 300000
+    },
+    {
+      "symbol": "ETH",
+      "coingecko_id": "ethereum",
+      "cmc_symbol": "ETH",
+      "chains": {},
+      "cex_symbols": ["ETHUSDT"],
+      "whale_trade_usd": 30000,
+      "whale_onchain_usd": 80000
+    },
+    {
+      "symbol": "EIGEN",
+      "coingecko_id": "eigenlayer",
+      "cmc_symbol": "EIGEN",
+      "chains": {
+        "1": "0x5f4d57cd06fafaf9d51b22335ed22bff3c1868de"
+      },
+      "cex_symbols": ["EIGENUSDT"],
+      "whale_trade_usd": 10000,
+      "whale_onchain_usd": 30000
+    }
+  ]
+}

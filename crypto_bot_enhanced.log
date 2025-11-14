@@ -1,0 +1,606 @@
+2025-09-05 02:15:33,614 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:15:33,614 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:15:33,620 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:16:03,622 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:16:04,052 - INFO - ✅ 5 signaux trending
+2025-09-05 02:16:05,326 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:16:05,328 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:16:06,539 - INFO - 🔍 Analyse $PIN
+2025-09-05 02:16:07,877 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:16:09,483 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:21:51,410 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:21:56,503 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:21:56,503 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:21:56,509 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:22:26,511 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:22:27,172 - INFO - ✅ 5 signaux trending
+2025-09-05 02:22:28,734 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:22:28,744 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:22:30,238 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:22:31,894 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:22:33,907 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:22:33,907 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:24:21,605 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:24:27,360 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:24:27,369 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:24:27,369 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:24:57,373 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:24:57,959 - INFO - ✅ 5 signaux trending
+2025-09-05 02:24:59,497 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:24:59,497 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:25:00,871 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:25:02,240 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:25:04,282 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:25:04,282 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:25:33,994 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:25:39,753 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:25:39,753 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:25:39,753 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:26:09,759 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:26:10,449 - INFO - ✅ 5 signaux trending
+2025-09-05 02:26:12,037 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:26:12,037 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:26:13,635 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:26:15,202 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:26:17,210 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:26:17,225 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 02:29:52,111 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:31:38,685 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:31:38,685 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:31:38,685 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:32:08,696 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:32:09,364 - INFO - ✅ 5 signaux trending
+2025-09-05 02:32:12,064 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:32:12,068 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:32:14,582 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:32:16,952 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:32:20,395 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:32:20,395 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:37:23,522 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:37:29,017 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:37:29,017 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:37:29,017 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:37:59,028 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:37:59,659 - INFO - ✅ 5 signaux trending
+2025-09-05 02:38:01,383 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:38:01,383 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:38:02,998 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:38:04,728 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:38:07,165 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:38:07,166 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:39:32,643 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:39:37,932 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:39:37,938 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:39:37,938 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:40:07,941 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:40:08,555 - INFO - ✅ 5 signaux trending
+2025-09-05 02:40:10,128 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:40:10,135 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:40:11,573 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:40:12,914 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:40:15,005 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:40:15,011 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:44:19,343 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:44:25,373 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:44:25,373 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:44:25,373 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:44:55,381 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:44:56,099 - INFO - ✅ 5 signaux trending
+2025-09-05 02:44:57,792 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:44:57,792 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:44:59,518 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:45:01,300 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:45:03,683 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:45:03,683 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:55:03,696 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:55:05,046 - INFO - ✅ 5 signaux trending
+2025-09-05 02:55:07,809 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:55:07,809 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:55:10,532 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:55:13,311 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:55:18,349 - ERROR - ❌ Erreur Telegram: Pool timeout: All connections in the connection pool are occupied. Request was *not* sent to Telegram. Consider adjusting the connection pool size or the pool timeout.
+2025-09-05 02:55:18,350 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:58:16,763 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:58:23,867 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:58:23,869 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:58:23,869 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 02:58:53,874 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 02:58:54,528 - INFO - ✅ 5 signaux trending
+2025-09-05 02:58:56,153 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 02:58:56,153 - INFO - 🔍 Analyse $WLFI
+2025-09-05 02:58:57,548 - INFO - 🔍 Analyse $SOMI
+2025-09-05 02:58:58,986 - INFO - 🔍 Analyse $PUMP
+2025-09-05 02:59:00,996 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 02:59:00,996 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 02:59:54,697 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 02:59:59,566 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 02:59:59,566 - INFO - ✅ Message Telegram envoyé
+2025-09-05 02:59:59,566 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 03:00:29,573 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:00:30,186 - INFO - ✅ 5 signaux trending
+2025-09-05 03:00:31,693 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:00:31,693 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:00:33,140 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:00:34,633 - INFO - 🔍 Analyse $PUMP
+2025-09-05 03:00:36,787 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 03:00:36,787 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 03:00:38,389 - INFO - ✅ Message envoyé (HTTP fallback)
+2025-09-05 03:00:38,389 - INFO - 📊 Statistiques affichées
+2025-09-05 03:10:38,410 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:10:39,423 - INFO - ✅ 5 signaux trending
+2025-09-05 03:10:43,202 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:10:43,202 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:10:45,285 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:10:47,574 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:10:51,942 - ERROR - ❌ Erreur Telegram: Pool timeout: All connections in the connection pool are occupied. Request was *not* sent to Telegram. Consider adjusting the connection pool size or the pool timeout.
+2025-09-05 03:10:51,942 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 03:18:29,644 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 03:18:35,137 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 03:18:35,152 - INFO - ✅ Message Telegram envoyé
+2025-09-05 03:18:35,153 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 03:19:05,154 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:19:06,395 - INFO - ✅ 5 signaux trending
+2025-09-05 03:19:08,503 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:19:08,519 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:19:10,827 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:19:12,751 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:19:15,478 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 03:19:15,478 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 03:24:54,607 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 03:28:32,183 - INFO - ✅ Message Telegram envoyé
+2025-09-05 03:28:32,183 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 03:28:32,183 - INFO - 🎯 Test d'analyses manuelles...
+2025-09-05 03:28:32,183 - INFO - 🔍 Analyse manuelle: ['BTC', 'ETH', 'SOL']
+2025-09-05 03:28:32,183 - INFO - 🔍 Analyse $BTC
+2025-09-05 03:28:33,732 - INFO - 🔍 Analyse $ETH
+2025-09-05 03:28:35,287 - INFO - 🔍 Analyse $SOL
+2025-09-05 03:28:38,223 - ERROR - ❌ Erreur HTTP Telegram: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 712"}
+2025-09-05 03:29:08,229 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:29:08,893 - INFO - ✅ 5 signaux trending
+2025-09-05 03:29:11,110 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:29:11,110 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:29:14,579 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:29:17,550 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:29:20,129 - ERROR - ❌ Erreur HTTP Telegram: {"ok":false,"error_code":400,"description":"Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 323"}
+2025-09-05 03:29:20,129 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 03:31:32,723 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 03:33:56,349 - INFO - HTTP Request: POST https://api.telegram.org/bot8451477317:AAFlppZm7GHGeV2Uv_gR7qfpDkDwONPktVM/sendMessage "HTTP/1.1 200 OK"
+2025-09-05 03:33:56,349 - INFO - ✅ Message Telegram envoyé
+2025-09-05 03:33:56,349 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 03:33:56,349 - INFO - 🎯 Test d'analyses manuelles...
+2025-09-05 03:33:56,349 - INFO - 🔍 Analyse manuelle: ['BTC', 'ETH', 'SOL']
+2025-09-05 03:33:56,349 - INFO - 🔍 Analyse $BTC
+2025-09-05 03:33:57,912 - INFO - 🔍 Analyse $ETH
+2025-09-05 03:33:59,462 - INFO - 🔍 Analyse $SOL
+2025-09-05 03:34:02,202 - ERROR - ❌ Erreur Telegram: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-09-05 03:34:32,203 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:34:33,800 - INFO - ✅ 5 signaux trending
+2025-09-05 03:34:38,074 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:34:38,077 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:34:41,049 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:34:43,595 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:34:47,272 - ERROR - ❌ Erreur Telegram: Pool timeout: All connections in the connection pool are occupied. Request was *not* sent to Telegram. Consider adjusting the connection pool size or the pool timeout.
+2025-09-05 03:34:47,288 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 03:38:58,381 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 03:39:24,749 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 03:39:24,749 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 03:39:24,749 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-05 03:39:24,764 - INFO - 🎯 Test d'analyses manuelles...
+2025-09-05 03:39:24,764 - INFO - 🔍 Analyse manuelle: ['BTC', 'ETH', 'SOL']
+2025-09-05 03:39:24,765 - INFO - 🔍 Analyse $BTC
+2025-09-05 03:39:27,073 - INFO - 🔍 Analyse $ETH
+2025-09-05 03:39:28,904 - INFO - 🔍 Analyse $SOL
+2025-09-05 03:39:30,782 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 03:39:30,782 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 03:40:00,793 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:40:01,844 - INFO - ✅ 5 signaux trending
+2025-09-05 03:40:04,699 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:40:04,704 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:40:07,809 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:40:10,570 - INFO - 🔍 Analyse $SOMI
+2025-09-05 03:40:13,065 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 03:40:13,067 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 03:40:13,067 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 03:50:13,076 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 03:50:14,217 - INFO - ✅ 5 signaux trending
+2025-09-05 03:50:16,777 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 03:50:16,793 - INFO - 🔍 Analyse $WLFI
+2025-09-05 03:50:19,549 - INFO - 🔍 Analyse $PIN
+2025-09-05 03:50:22,048 - INFO - 🔍 Analyse $PTB
+2025-09-05 03:50:24,774 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 03:50:24,774 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 03:50:24,774 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 04:00:24,794 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 04:00:24,794 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 04:00:24,794 - INFO - 📊 Statistiques affichées
+2025-09-05 04:00:24,794 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 04:00:25,860 - INFO - ✅ 5 signaux trending
+2025-09-05 04:00:28,186 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 04:00:28,186 - INFO - 🔍 Analyse $WLFI
+2025-09-05 04:00:30,674 - INFO - 🔍 Analyse $PTB
+2025-09-05 04:00:33,244 - INFO - 🔍 Analyse $SOMI
+2025-09-05 04:00:35,820 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 04:00:35,820 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 04:00:35,820 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 04:10:35,835 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 04:10:36,906 - INFO - ✅ 5 signaux trending
+2025-09-05 04:10:39,675 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 04:10:39,675 - INFO - 🔍 Analyse $WLFI
+2025-09-05 11:32:02,639 - INFO - 🔍 Analyse $PTB
+2025-09-05 11:32:04,444 - INFO - 🔍 Analyse $PUMP
+2025-09-05 11:32:07,922 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 11:32:07,923 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 11:32:07,923 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 11:33:07,930 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 11:33:07,933 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 11:33:07,933 - INFO - 📊 Statistiques affichées
+2025-09-05 11:42:07,941 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 11:42:08,622 - INFO - ✅ 5 signaux trending
+2025-09-05 11:42:09,944 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 11:42:09,946 - INFO - 🔍 Analyse $RED
+2025-09-05 11:42:11,391 - INFO - 🔍 Analyse $WLFI
+2025-09-05 11:42:12,729 - INFO - 🔍 Analyse $PIN
+2025-09-05 11:42:14,049 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 11:42:14,049 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 11:42:14,049 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-05 11:52:14,057 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 11:52:14,995 - INFO - ✅ 5 signaux trending
+2025-09-05 11:52:17,208 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 11:52:17,208 - INFO - 🔍 Analyse $RED
+2025-09-05 11:52:19,574 - INFO - 🔍 Analyse $WLFI
+2025-09-05 11:52:21,713 - INFO - 🔍 Analyse $PTB
+2025-09-05 11:52:22,836 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 11:52:22,836 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 11:52:22,836 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 12:00:22,847 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 12:00:22,847 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 12:00:22,847 - INFO - 📊 Statistiques affichées
+2025-09-05 12:02:22,851 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 12:02:23,781 - INFO - ✅ 5 signaux trending
+2025-09-05 12:02:26,294 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 12:02:26,294 - INFO - 🔍 Analyse $RED
+2025-09-05 12:02:28,762 - INFO - 🔍 Analyse $WLFI
+2025-09-05 12:02:31,039 - INFO - 🔍 Analyse $PTB
+2025-09-05 12:02:32,089 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 12:02:32,089 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 12:02:32,089 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 12:12:32,109 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-05 12:12:33,086 - INFO - ✅ 5 signaux trending
+2025-09-05 12:12:35,191 - INFO - ✅ 0 signaux reversal détectés
+2025-09-05 12:12:35,191 - INFO - 🔍 Analyse $WLFI
+2025-09-05 12:12:37,587 - INFO - 🔍 Analyse $RED
+2025-09-05 12:12:40,100 - INFO - 🔍 Analyse $PTB
+2025-09-05 12:12:41,430 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 12:12:41,430 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-05 12:12:41,430 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-05 12:12:48,510 - INFO - 🛑 Arrêt du bot (Ctrl+C)
+2025-09-05 12:12:48,510 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-05 12:12:48,511 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:25:28,302 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:25:28,309 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:25:28,309 - INFO - 🚀 Bot crypto enhanced démarré
+2025-09-10 18:25:28,309 - INFO - 🎯 Test d'analyses manuelles...
+2025-09-10 18:25:28,311 - INFO - 🔍 Analyse manuelle: ['BTC', 'ETH', 'SOL']
+2025-09-10 18:25:28,311 - INFO - 🔍 Analyse $BTC
+2025-09-10 18:25:29,424 - INFO - 🔍 Analyse $ETH
+2025-09-10 18:25:30,548 - INFO - 🔍 Analyse $SOL
+2025-09-10 18:25:32,040 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:25:32,040 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:26:02,040 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 18:26:02,611 - INFO - ✅ 5 signaux trending
+2025-09-10 18:26:03,992 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 18:26:03,994 - INFO - 🔍 Analyse $LINEA
+2025-09-10 18:26:05,251 - INFO - 🔍 Analyse $AVNT
+2025-09-10 18:26:06,498 - INFO - 🔍 Analyse $PUMP
+2025-09-10 18:26:07,861 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:26:07,862 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:26:07,862 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 18:36:07,884 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 18:36:08,465 - INFO - ✅ 5 signaux trending
+2025-09-10 18:36:09,698 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 18:36:09,699 - INFO - 🔍 Analyse $LINEA
+2025-09-10 18:36:10,975 - INFO - 🔍 Analyse $AVNT
+2025-09-10 18:36:12,851 - INFO - 🔍 Analyse $PUMP
+2025-09-10 18:36:14,249 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:36:14,250 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:36:14,250 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 18:46:14,252 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 18:46:14,896 - INFO - ✅ 5 signaux trending
+2025-09-10 18:46:16,210 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 18:46:16,213 - INFO - 🔍 Analyse $LINEA
+2025-09-10 18:46:17,640 - INFO - 🔍 Analyse $AVNT
+2025-09-10 18:46:18,828 - INFO - 🔍 Analyse $PUMP
+2025-09-10 18:46:20,419 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:46:20,420 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:46:20,420 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 18:56:20,449 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 18:56:21,029 - INFO - ✅ 5 signaux trending
+2025-09-10 18:56:22,769 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 18:56:22,772 - INFO - 🔍 Analyse $LINEA
+2025-09-10 18:56:24,570 - INFO - 🔍 Analyse $AVNT
+2025-09-10 18:56:26,141 - INFO - 🔍 Analyse $PUMP
+2025-09-10 18:56:27,586 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 18:56:27,586 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 18:56:27,587 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 19:00:27,590 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:00:27,590 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:00:27,591 - INFO - 📊 Statistiques affichées
+2025-09-10 19:06:27,591 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:06:28,337 - INFO - ✅ 5 signaux trending
+2025-09-10 19:06:30,089 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:06:30,091 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:06:31,871 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:06:33,617 - INFO - 🔍 Analyse $PUMP
+2025-09-10 19:06:35,284 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:06:35,284 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:06:35,285 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 19:16:35,289 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:16:36,093 - INFO - ✅ 5 signaux trending
+2025-09-10 19:16:37,693 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:16:37,696 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:16:39,574 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:16:41,492 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 19:16:43,295 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:16:43,297 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:16:43,297 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 19:26:43,301 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:26:44,071 - INFO - ✅ 5 signaux trending
+2025-09-10 19:26:45,729 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:26:45,731 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:26:47,559 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:26:49,705 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 19:26:50,486 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:26:50,486 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:26:50,488 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 19:36:50,491 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:36:51,315 - INFO - ✅ 5 signaux trending
+2025-09-10 19:36:53,270 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:36:53,274 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:36:55,257 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:36:57,163 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 19:36:59,081 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:36:59,082 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:36:59,082 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 19:47:59,077 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:47:59,803 - INFO - ✅ 5 signaux trending
+2025-09-10 19:48:01,623 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:48:01,626 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:48:03,334 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:48:05,420 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 19:48:07,015 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:48:07,015 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:48:07,016 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 19:58:07,016 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 19:58:07,774 - INFO - ✅ 5 signaux trending
+2025-09-10 19:58:09,587 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 19:58:09,590 - INFO - 🔍 Analyse $LINEA
+2025-09-10 19:58:11,638 - INFO - 🔍 Analyse $AVNT
+2025-09-10 19:58:13,674 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 19:58:14,671 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 19:58:14,672 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 19:58:14,672 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 20:00:14,673 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:00:14,673 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:00:14,674 - INFO - 📊 Statistiques affichées
+2025-09-10 20:08:14,676 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 20:08:15,481 - INFO - ✅ 5 signaux trending
+2025-09-10 20:08:17,273 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 20:08:17,276 - INFO - 🔍 Analyse $LINEA
+2025-09-10 20:08:19,163 - INFO - 🔍 Analyse $AVNT
+2025-09-10 20:08:20,815 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 20:08:22,751 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:08:22,751 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:08:22,752 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 20:19:22,750 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 20:19:23,537 - INFO - ✅ 5 signaux trending
+2025-09-10 20:19:25,411 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 20:19:25,414 - INFO - 🔍 Analyse $LINEA
+2025-09-10 20:19:27,363 - INFO - 🔍 Analyse $AVNT
+2025-09-10 20:19:29,394 - INFO - 🔍 Analyse $PUMP
+2025-09-10 20:19:30,988 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:19:30,989 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:19:30,989 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 20:29:30,989 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 20:29:31,670 - INFO - ✅ 5 signaux trending
+2025-09-10 20:29:33,369 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 20:29:33,373 - INFO - 🔍 Analyse $LINEA
+2025-09-10 20:29:35,135 - INFO - 🔍 Analyse $AVNT
+2025-09-10 20:29:36,826 - INFO - 🔍 Analyse $SAROS
+2025-09-10 20:29:38,677 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:29:38,678 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:29:38,679 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 20:39:38,682 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 20:39:39,383 - INFO - ✅ 5 signaux trending
+2025-09-10 20:39:41,106 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 20:39:41,109 - INFO - 🔍 Analyse $LINEA
+2025-09-10 20:39:42,676 - INFO - 🔍 Analyse $AVNT
+2025-09-10 20:39:44,258 - INFO - 🔍 Analyse $PUMP
+2025-09-10 20:39:45,752 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:39:45,753 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:39:45,753 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 20:50:45,748 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 20:50:46,451 - INFO - ✅ 5 signaux trending
+2025-09-10 20:50:48,159 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 20:50:48,161 - INFO - 🔍 Analyse $LINEA
+2025-09-10 20:50:49,936 - INFO - 🔍 Analyse $AVNT
+2025-09-10 20:50:51,746 - INFO - 🔍 Analyse $PUMP
+2025-09-10 20:50:52,547 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 20:50:52,547 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 20:50:52,548 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 21:00:52,544 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:00:52,544 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:00:52,545 - INFO - 📊 Statistiques affichées
+2025-09-10 21:01:52,546 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:01:53,210 - INFO - ✅ 5 signaux trending
+2025-09-10 21:01:54,916 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:01:54,918 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:01:56,668 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:01:58,458 - INFO - 🔍 Analyse $PUMP
+2025-09-10 21:02:00,428 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:02:00,429 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:02:00,429 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 21:13:00,429 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:13:01,273 - INFO - ✅ 5 signaux trending
+2025-09-10 21:13:03,159 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:13:03,162 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:13:05,052 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:13:06,953 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 21:13:07,712 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:13:07,712 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:13:07,713 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 21:23:07,716 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:23:08,476 - INFO - ✅ 5 signaux trending
+2025-09-10 21:23:10,154 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:23:10,156 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:23:11,950 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 21:23:13,707 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:23:15,914 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:23:15,915 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:23:15,915 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 21:33:15,919 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:33:16,792 - INFO - ✅ 5 signaux trending
+2025-09-10 21:33:18,845 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:33:18,848 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:33:21,747 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 21:33:23,699 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:33:25,992 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:33:25,993 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:33:25,994 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 21:43:25,998 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:43:27,648 - INFO - ✅ 5 signaux trending
+2025-09-10 21:43:32,090 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:43:32,095 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:43:35,555 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 21:43:37,960 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:43:40,147 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:43:40,148 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:43:40,148 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 21:53:40,150 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 21:53:41,105 - INFO - ✅ 5 signaux trending
+2025-09-10 21:53:43,357 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 21:53:43,359 - INFO - 🔍 Analyse $LINEA
+2025-09-10 21:53:45,873 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 21:53:48,731 - INFO - 🔍 Analyse $AVNT
+2025-09-10 21:53:49,968 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 21:53:49,969 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 21:53:49,969 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-10 22:00:49,961 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 22:00:49,963 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 22:00:49,964 - INFO - 📊 Statistiques affichées
+2025-09-10 22:04:49,961 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 22:04:50,918 - INFO - ✅ 5 signaux trending
+2025-09-10 22:04:53,034 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 22:04:53,038 - INFO - 🔍 Analyse $LINEA
+2025-09-10 22:04:55,559 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 22:04:58,748 - INFO - 🔍 Analyse $OVPP
+2025-09-10 22:05:01,521 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 22:05:01,522 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 22:05:01,522 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-10 22:16:01,516 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-10 22:16:02,540 - INFO - ✅ 5 signaux trending
+2025-09-10 22:16:04,752 - INFO - ✅ 0 signaux reversal détectés
+2025-09-10 22:16:04,755 - INFO - 🔍 Analyse $LINEA
+2025-09-10 22:16:06,864 - INFO - 🔍 Analyse $NEIRO
+2025-09-10 22:16:09,532 - INFO - 🔍 Analyse $OVPP
+2025-09-10 22:16:12,806 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-10 22:16:12,821 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-10 22:16:12,824 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 09:33:32,687 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 09:33:33,061 - INFO - ✅ 5 signaux trending
+2025-09-11 09:33:34,141 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 09:33:34,141 - INFO - 🔍 Analyse $LINEA
+2025-09-11 09:33:35,291 - INFO - 🔍 Analyse $NEIRO
+2025-09-11 09:33:36,362 - INFO - 🔍 Analyse $MYX
+2025-09-11 09:33:38,106 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 09:33:38,106 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 09:33:38,106 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 09:33:38,106 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 09:33:38,106 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 09:33:38,106 - INFO - 📊 Statistiques affichées
+2025-09-11 09:43:38,117 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 09:43:38,653 - INFO - ✅ 5 signaux trending
+2025-09-11 09:43:39,831 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 09:43:39,833 - INFO - 🔍 Analyse $LINEA
+2025-09-11 09:43:40,983 - INFO - 🔍 Analyse $MYX
+2025-09-11 09:43:42,069 - INFO - 🔍 Analyse $OVPP
+2025-09-11 09:43:43,328 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 09:43:43,329 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 09:43:43,329 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 09:53:43,335 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 09:53:43,774 - INFO - ✅ 5 signaux trending
+2025-09-11 09:53:45,644 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 09:53:45,646 - INFO - 🔍 Analyse $LINEA
+2025-09-11 09:53:46,750 - INFO - 🔍 Analyse $MYX
+2025-09-11 09:53:47,990 - INFO - 🔍 Analyse $OVPP
+2025-09-11 09:53:49,156 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 09:53:49,156 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 09:53:49,157 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-11 10:00:49,161 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:00:49,162 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:00:49,162 - INFO - 📊 Statistiques affichées
+2025-09-11 10:03:49,164 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:03:49,624 - INFO - ✅ 5 signaux trending
+2025-09-11 10:03:50,855 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:03:50,858 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:03:52,132 - INFO - 🔍 Analyse $MYX
+2025-09-11 10:03:53,189 - INFO - 🔍 Analyse $OVPP
+2025-09-11 10:03:54,506 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:03:54,506 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:03:54,507 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 10:13:54,511 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:13:55,029 - INFO - ✅ 5 signaux trending
+2025-09-11 10:13:56,374 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:13:56,376 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:13:57,499 - INFO - 🔍 Analyse $MNT
+2025-09-11 10:13:58,669 - INFO - 🔍 Analyse $OVPP
+2025-09-11 10:13:59,904 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:13:59,905 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:13:59,905 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 10:23:59,910 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:24:00,355 - INFO - ✅ 5 signaux trending
+2025-09-11 10:24:01,445 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:24:01,448 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:24:02,706 - INFO - 🔍 Analyse $MNT
+2025-09-11 10:24:03,966 - INFO - 🔍 Analyse $SAROS
+2025-09-11 10:24:04,512 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:24:04,512 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:24:04,512 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-11 10:34:04,519 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:34:04,966 - INFO - ✅ 5 signaux trending
+2025-09-11 10:34:06,028 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:34:06,032 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:34:07,145 - INFO - 🔍 Analyse $MNT
+2025-09-11 10:34:08,415 - INFO - 🔍 Analyse $SAROS
+2025-09-11 10:34:09,725 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:34:09,727 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:34:09,728 - INFO - ✅ Rapport envoyé: 5 signaux, 8 analyses
+2025-09-11 10:44:09,733 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:44:10,202 - INFO - ✅ 5 signaux trending
+2025-09-11 10:44:11,507 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:44:11,511 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:44:12,619 - INFO - 🔍 Analyse $MNT
+2025-09-11 10:44:13,804 - INFO - 🔍 Analyse $NEIRO
+2025-09-11 10:44:15,154 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:44:15,155 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:44:15,155 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 10:54:15,161 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 10:54:15,661 - INFO - ✅ 5 signaux trending
+2025-09-11 10:54:16,790 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 10:54:16,793 - INFO - 🔍 Analyse $LINEA
+2025-09-11 10:54:17,918 - INFO - 🔍 Analyse $NEIRO
+2025-09-11 10:54:19,470 - INFO - 🔍 Analyse $MNT
+2025-09-11 10:54:20,709 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 10:54:20,709 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 10:54:20,709 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
+2025-09-11 11:00:20,714 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 11:00:20,715 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 11:00:20,716 - INFO - 📊 Statistiques affichées
+2025-09-11 11:04:20,718 - INFO - 🚀 Démarrage scan enhanced crypto
+2025-09-11 11:04:21,173 - INFO - ✅ 5 signaux trending
+2025-09-11 11:04:22,365 - INFO - ✅ 0 signaux reversal détectés
+2025-09-11 11:04:22,367 - INFO - 🔍 Analyse $LINEA
+2025-09-11 11:04:23,670 - INFO - 🔍 Analyse $NEIRO
+2025-09-11 11:04:24,951 - INFO - 🔍 Analyse $ACE
+2025-09-11 11:04:26,238 - WARNING - ⚠️ Async send échoué: 'EnhancedCryptoSignalBot' object has no attribute '_send_async' — tentative fallback HTTP
+2025-09-11 11:04:26,238 - ERROR - ❌ Fallback HTTP échoué: 'EnhancedCryptoSignalBot' object has no attribute 'session'
+2025-09-11 11:04:26,238 - INFO - ✅ Rapport envoyé: 5 signaux, 9 analyses
