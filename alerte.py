@@ -165,6 +165,7 @@ def scan_global(state, cfg):
                     continue
 
                 symbol = (c.get("symbol") or "???").upper()
+                name = c.get("name") or "Unknown"
                 prix = float(c.get("current_price") or 0)
                 vol24 = float(c.get("total_volume") or 0)
                 mc = float(c.get("market_cap") or 0)
@@ -209,6 +210,8 @@ def scan_global(state, cfg):
                 if ratio >= ratio_thr:
                     anomalies.append({
                         "symbol": symbol,
+                        "name": name,
+                        "coingecko_id": idcg,
                         "prix": prix,
                         "mc": mc,
                         "pct24": pct24,
@@ -228,17 +231,301 @@ def scan_global(state, cfg):
     return sorted(anomalies, key=lambda x: x["ratio"], reverse=True)
 
 # =========================
+# BINANCE FUTURES API
+# =========================
+
+# Cache pour positions long/short
+LONGSHORT_CACHE = {}
+
+
+def get_binance_longshort_ratio(symbol):
+    """
+    Récupère le ratio long/short depuis Binance Futures API (GRATUIT).
+
+    Args:
+        symbol: Symbole du token (ex: "BTCUSDT")
+
+    Returns:
+        dict avec ratio, pourcentages et interprétation ou None si erreur
+    """
+    # Vérifier le cache d'abord (5 minutes de validité)
+    cache_key = f"{symbol}_{int(time.time() / 300)}"  # Change toutes les 5 min
+    if cache_key in LONGSHORT_CACHE:
+        return LONGSHORT_CACHE[cache_key]
+
+    try:
+        url = "https://fapi.binance.com/futures/data/globalLongShortAccountRatio"
+        params = {
+            "symbol": symbol,
+            "period": "5m",
+            "limit": 1
+        }
+
+        r = requests.get(url, params=params, timeout=10)
+        data = r.json()
+
+        if isinstance(data, list) and len(data) > 0:
+            latest = data[0]
+            ratio = float(latest['longShortRatio'])
+            long_pct = ratio / (1 + ratio)
+            short_pct = 1 - long_pct
+
+            # Interprétation intelligente
+            if long_pct >= 0.65:
+                interpretation = f"⚠️ MAJORITÉ EN LONG ({long_pct*100:.1f}%)"
+                risk = "Risque de liquidations si baisse soudaine"
+                action = "Stop-loss recommandé"
+            elif short_pct >= 0.65:
+                interpretation = f"⚠️ MAJORITÉ EN SHORT ({short_pct*100:.1f}%)"
+                risk = "Risque de short squeeze si hausse"
+                action = "Opportunité d'achat si squeeze confirmé"
+            else:
+                interpretation = f"✓ ÉQUILIBRÉ (L:{long_pct*100:.1f}% S:{short_pct*100:.1f}%)"
+                risk = "Bataille indécise"
+                action = "Attendre signal clair"
+
+            result = {
+                'longShortRatio': ratio,
+                'longPct': long_pct,
+                'shortPct': short_pct,
+                'interpretation': interpretation,
+                'risk': risk,
+                'action': action
+            }
+
+            # Sauvegarder dans le cache
+            LONGSHORT_CACHE[cache_key] = result
+            return result
+
+    except Exception as e:
+        logger.warning(f"Erreur Binance API pour {symbol}: {e}")
+
+    return None
+
+
+# =========================
+# RÉCUPÉRATION INFOS LISTING
+# =========================
+
+# Cache pour éviter de récupérer les mêmes infos plusieurs fois
+PLATFORMS_CACHE = {}
+
+
+def get_token_platforms(coingecko_id):
+    """Récupère les plateformes (exchanges + blockchains) depuis CoinGecko."""
+    # Vérifier le cache d'abord
+    if coingecko_id in PLATFORMS_CACHE:
+        return PLATFORMS_CACHE[coingecko_id]
+
+    try:
+        r = requests.get(
+            f"{COINGECKO_BASE}/coins/{coingecko_id}",
+            params={"localization": "false", "tickers": "true", "community_data": "false", "developer_data": "false"},
+            timeout=10
+        )
+        data = r.json()
+
+        # Récupérer les exchanges (top 5)
+        exchanges = []
+        if "tickers" in data and isinstance(data["tickers"], list):
+            seen_exchanges = set()
+            for ticker in data["tickers"][:20]:  # Limiter pour éviter trop d'appels
+                exchange_name = ticker.get("market", {}).get("name", "")
+                if exchange_name and exchange_name not in seen_exchanges:
+                    seen_exchanges.add(exchange_name)
+                    exchanges.append(exchange_name)
+                if len(exchanges) >= 5:
+                    break
+
+        # Récupérer les blockchains
+        blockchains = []
+        if "platforms" in data and isinstance(data["platforms"], dict):
+            for platform_key in data["platforms"].keys():
+                # Convertir les clés techniques en noms lisibles
+                platform_name = platform_key.replace("-", " ").title()
+                blockchains.append(platform_name)
+
+        result = {
+            "exchanges": exchanges[:5],  # Top 5 exchanges
+            "blockchains": blockchains[:3]  # Top 3 blockchains
+        }
+
+        # Sauvegarder dans le cache
+        PLATFORMS_CACHE[coingecko_id] = result
+        return result
+
+    except Exception as e:
+        logger.warning(f"Erreur récupération platforms pour {coingecko_id}: {e}")
+        result = {"exchanges": [], "blockchains": []}
+        PLATFORMS_CACHE[coingecko_id] = result
+        return result
+
+
+# =========================
+# GÉNÉRATION DESCRIPTIONS INTELLIGENTES
+# =========================
+
+
+def generate_smart_analysis(t, longshort_data=None):
+    """
+    Génère une analyse intelligente et contextuelle pour un token.
+
+    Args:
+        t: Dictionnaire avec les données du token
+        longshort_data: Données Binance long/short (optionnel)
+
+    Returns:
+        str: Description formatée avec analyse et recommandations
+    """
+    ratio = t['ratio']
+    pct24 = t['pct24']
+    pct_from_low = t['pct_from_low']
+    h_l_ratio = t['h_l_ratio']
+    vol1m = t['vol1m']
+    vol24 = t['vol24']
+
+    # Calcul volume moyen
+    avg1m = vol24 / 1440
+
+    # Construction de l'analyse
+    txt = "\n🚨 *POURQUOI CETTE ALERTE ?*\n"
+
+    # 1. Volume
+    txt += f"✓ Volume x{ratio:.1f} supérieur à la moyenne ({vol1m:,.0f}$/min vs {avg1m:,.0f}$/min)\n"
+
+    # 2. Prix (hausse/baisse/stable)
+    if pct24 > 2:
+        txt += f"✓ Prix en hausse : +{pct24:.2f}% sur 24h, +{pct_from_low:.1f}% depuis le plus bas\n"
+    elif pct24 < -2:
+        txt += f"⚠️ Prix en baisse : {pct24:.2f}% sur 24h, à {pct_from_low:.1f}% du plus bas\n"
+    else:
+        txt += f"✓ Prix stable : {pct24:+.2f}% sur 24h avec faible variation\n"
+
+    # 3. Volatilité
+    volatility_pct = (h_l_ratio - 1) * 100
+    if volatility_pct > 10:
+        txt += f"✓ Volatilité élevée : {volatility_pct:.1f}% d'écart haut/bas\n"
+    else:
+        txt += f"✓ Volatilité modérée : {volatility_pct:.1f}% d'écart haut/bas\n"
+
+    # 4. Positions long/short (si disponible)
+    if longshort_data:
+        txt += f"✓ Positions : {longshort_data['interpretation']}\n"
+
+    # INTERPRÉTATION
+    txt += "\n💡 *CE QUE ÇA SIGNIFIE :*\n"
+
+    # Déterminer le scénario
+    if ratio >= 10 and pct24 > 20:
+        # PUMP massif
+        txt += f"🔥 *PUMP DÉTECTÉ !* Volume x{ratio:.1f} + Prix +{pct24:.1f}% = FOMO massif.\n"
+        txt += "Des acheteurs entrent en panique, probablement après une annonce.\n"
+        txt += "⚠️ DANGER : Ce qui monte vite redescend vite !\n"
+
+    elif pct24 > 3 and pct_from_low > 10:
+        # Accumulation forte (hausse)
+        txt += f"Gros acheteurs entrent massivement. Prix monte avec volume élevé\n"
+        txt += "= Signal d'accumulation forte. Momentum haussier confirmé.\n"
+        if longshort_data and longshort_data['longPct'] > 0.60:
+            txt += f"⚠️ Attention : {longshort_data['longPct']*100:.0f}% en long, risque si correction.\n"
+
+    elif pct24 < -3 and pct_from_low < 10:
+        # Capitulation (baisse)
+        txt += f"Gros vendeurs liquident leurs positions massivement.\n"
+        txt += "Volume élevé + Prix en baisse = Capitulation possible.\n"
+        txt += "⚠️ Pression vendeuse importante, proche du support critique.\n"
+        if longshort_data and longshort_data['shortPct'] > 0.60:
+            txt += f"⚠️ {longshort_data['shortPct']*100:.0f}% en short, risque de short squeeze si rebond.\n"
+
+    elif abs(pct24) < 2 and ratio > 5:
+        # Volume élevé + prix stable (accumulation silencieuse)
+        txt += f"Volume anormalement élevé mais prix stable = Accumulation silencieuse.\n"
+        txt += "Les gros joueurs se positionnent avant un mouvement futur.\n"
+
+    else:
+        # Cas général
+        txt += f"Activité inhabituelle détectée. Volume x{ratio:.1f} au-dessus de la normale.\n"
+        txt += "Les traders s'intéressent fortement à ce token en ce moment.\n"
+
+    # RECOMMANDATION
+    txt += "\n⚠️ *QUE FAIRE :*\n"
+
+    if ratio >= 10 and pct24 > 20:
+        # PUMP - NE PAS ACHETER
+        txt += "❌ NE PAS ACHETER maintenant (risque de dump imminent) !\n"
+        txt += "✓ Si vous détenez : Prenez vos profits progressivement\n"
+        txt += "✓ Si vous n'en avez pas : Attendre une correction avant d'entrer\n"
+
+    elif pct24 > 3 and pct_from_low > 10:
+        # Signal d'achat potentiel
+        txt += "✓ Surveiller les prochaines minutes\n"
+        txt += "✓ Si volume reste élevé + prix continue de monter = Signal d'achat\n"
+        if longshort_data:
+            txt += f"✓ {longshort_data['action']}\n"
+
+    elif pct24 < -3 and pct_from_low < 5:
+        # Signal de vente
+        txt += "⚠️ ATTENTION - Signal de vente potentiel\n"
+        txt += "✓ Si vous détenez ce token : Surveillez le support\n"
+        txt += "✓ Si cassure du plus bas 24h : Vente recommandée\n"
+
+    else:
+        # Attendre
+        txt += "✓ Surveiller l'évolution des prochaines minutes\n"
+        txt += "✓ Attendre confirmation avant d'entrer en position\n"
+        if longshort_data:
+            txt += f"✓ {longshort_data['action']}\n"
+
+    return txt
+
+
+# =========================
 # FORMATTAGE ALERTES
 # =========================
 
 
 def format_global_alert(top):
     txt = "🌍 *Top activités crypto détectées*\n"
-    txt += "_(Volume anormal — explications adaptées débutants)_\n\n"
+    txt += "_(Volume anormal — Analyse détaillée)_\n\n"
 
     for i, t in enumerate(top, start=1):
+        # Récupérer les plateformes de listing
+        platforms = get_token_platforms(t['coingecko_id'])
+
+        # Formater les exchanges
+        exchanges_txt = ""
+        if platforms["exchanges"]:
+            exchanges_list = ", ".join(platforms["exchanges"][:3])
+            exchanges_txt = f"🏪 Exchanges : `{exchanges_list}`\n"
+
+        # Formater les blockchains
+        blockchains_txt = ""
+        if platforms["blockchains"]:
+            blockchains_list = ", ".join(platforms["blockchains"])
+            blockchains_txt = f"⛓️ Blockchains : `{blockchains_list}`\n"
+        elif not platforms["exchanges"]:  # Si pas de blockchain ni exchange détecté
+            blockchains_txt = f"⛓️ Natif (blockchain propre)\n"
+
+        # Essayer de récupérer les positions long/short (Binance)
+        # Convertir le symbol en format Binance (ex: BTC -> BTCUSDT)
+        binance_symbol = f"{t['symbol']}USDT"
+        longshort_data = get_binance_longshort_ratio(binance_symbol)
+
+        # Section positions (si disponible)
+        positions_txt = ""
+        if longshort_data:
+            positions_txt = (
+                f"\n📊 *POSITIONS (Binance Futures) :*\n"
+                f"🟢 LONGS : {longshort_data['longPct']*100:.1f}%  |  "
+                f"🔴 SHORTS : {longshort_data['shortPct']*100:.1f}%\n"
+                f"{longshort_data['interpretation']}\n"
+            )
+
+        # Générer l'analyse intelligente
+        analysis = generate_smart_analysis(t, longshort_data)
+
         txt += (
-            f"*#{i} — {t['symbol']}*\n"
+            f"*#{i} — {t['symbol']} ({t['name']})*\n"
             f"💰 Prix : `{t['prix']:.6f} $`\n"
             f"📈 Volume 1m estimé : `{t['vol1m']:,.0f} $`\n"
             f"🔥 Multiplicateur : `x{t['ratio']:.1f}`\n"
@@ -246,7 +533,11 @@ def format_global_alert(top):
             f"📊 Variation 24h : `{t['pct24']:.2f}%`\n"
             f"📉 Depuis le bas 24h : `{t['pct_from_low']:.1f}%`\n"
             f"🧱 Ratio Haut/Bas : `{t['h_l_ratio']:.2f}`\n"
-            f"_→ Cela indique qu’un mouvement inhabituel apparaît sur ce token. Les traders commencent à s’y intéresser._\n\n"
+            f"{exchanges_txt}"
+            f"{blockchains_txt}"
+            f"{positions_txt}"
+            f"{analysis}\n"
+            f"{'─'*40}\n\n"
         )
 
     return txt

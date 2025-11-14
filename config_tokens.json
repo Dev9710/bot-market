@@ -1,6 +1,6 @@
 {
   "poll_interval_seconds": 30,
-  "alert_cooldown_seconds": 300,
+  "alert_cooldown_seconds": 600,
 
   "global_volume_scan": {
     "enabled": true,
