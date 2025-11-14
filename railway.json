@@ -1,7 +1,9 @@
 {
-  "build": "pip install -r requirements.txt",
-  "start": "python alerte.py",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
   }
 }
