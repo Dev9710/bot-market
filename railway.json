@@ -1,0 +1,7 @@
+{
+  "build": "pip install -r requirements.txt",
+  "start": "python alerte.py",
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
+}

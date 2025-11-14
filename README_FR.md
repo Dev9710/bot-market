@@ -1,19 +1,15 @@
-# Bot de Surveillance Crypto (FR)
+# Crypto Global Scanner Bot
 
-## 🎯 Objectif
+Bot Telegram qui scanne l’ensemble du marché crypto (CoinGecko / CMC / Etherscan)
+et envoie des alertes lisibles pour débutants.
 
-T'aider à repérer **le plus tôt possible** les cryptos où :
+## 🚀 Déploiement instantané sur Railway
 
-- le **volume explose**  
-- des **whales achètent**  
-- le **prix bouge fort** (à la hausse ou à la baisse)  
+Clique ici :
 
-Et t'envoyer tout ça **directement sur Telegram**.
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=<URL_DU_GITHUB>)
 
----
+## 🔧 Variables d’environnement requises
 
-## 📦 Installation (sans Docker)
+Dans Railway → Variables → ajoute :
 
-```bash
-pip install requests
-python crypto_monitor_bot.py --silent
