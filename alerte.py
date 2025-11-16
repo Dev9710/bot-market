@@ -141,7 +141,7 @@ def scan_global(state, cfg):
     anomalies = []
 
     try:
-        for page in range(1, 5):  # ~1000 coins
+        for page in range(1, 3):  # Top 500 coins seulement (évite rate limit)
             r = requests.get(
                 f"{COINGECKO_BASE}/coins/markets",
                 params={
@@ -154,8 +154,25 @@ def scan_global(state, cfg):
             )
 
             markets = r.json()
+
+            # Vérifier si rate limit atteint
+            if isinstance(markets, dict) and "status" in markets:
+                error_code = markets.get("status", {}).get("error_code")
+                if error_code == 429:
+                    logger.error("⚠️ RATE LIMIT CoinGecko atteint! Attente 60 secondes...")
+                    tg("⚠️ *Rate limit CoinGecko atteint*\n\nLe bot attend 60 secondes avant de réessayer.\n\n💡 *Solutions:*\n- Augmenter l'intervalle de scan (actuellement 60s)\n- Réduire le nombre de pages scannées\n- Utiliser CoinGecko Pro API")
+                    time.sleep(60)
+                    break
+                elif "error" in markets.get("status", {}):
+                    logger.error(f"Erreur API CoinGecko: {markets['status']}")
+                    break
+
             if not isinstance(markets, list):
                 continue
+
+            # Petit délai entre les pages pour éviter rate limit
+            if page > 1:
+                time.sleep(2)
 
             for c in markets:
 
