@@ -1,0 +1,17 @@
+{
+  "scan_interval_seconds": 120,
+  "alert_cooldown_seconds": 600,
+  "volume_threshold": 5.0,
+  "min_volume_usd": 50000,
+  "max_pairs_to_scan": 150,
+  "max_alerts_per_scan": 3,
+
+  "comments": {
+    "scan_interval_seconds": "Intervalle entre chaque scan (120s = 2 minutes)",
+    "alert_cooldown_seconds": "Temps minimum entre 2 alertes (600s = 10 minutes)",
+    "volume_threshold": "Ratio de volume minimum pour alerter (5.0 = volume x5)",
+    "min_volume_usd": "Volume 1min minimum en USD pour considérer le token",
+    "max_pairs_to_scan": "Nombre de tokens à scanner (top N par volume 24h)",
+    "max_alerts_per_scan": "Nombre maximum d'alertes à envoyer par scan"
+  }
+}
