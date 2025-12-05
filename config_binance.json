@@ -1,8 +1,8 @@
 {
   "scan_interval_seconds": 120,
   "alert_cooldown_seconds": 600,
-  "volume_threshold": 5.0,
-  "min_volume_usd": 50000,
+  "volume_threshold": 3.0,
+  "min_volume_usd": 30000,
   "max_pairs_to_scan": 150,
   "max_alerts_per_scan": 3,
 
