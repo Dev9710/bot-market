@@ -130,11 +130,14 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
         volume_24h = float(attrs.get("volume_usd", {}).get("h24", 0))
         liquidity = float(attrs.get("reserve_in_usd", 0))
 
-        # Transactions
+        # Transactions et traders
         txns_24h = attrs.get("transactions", {}).get("h24", {})
         buys = txns_24h.get("buys", 0)
         sells = txns_24h.get("sells", 0)
         total_txns = buys + sells
+
+        # Nombre de traders uniques (si disponible)
+        traders_24h = txns_24h.get("buyers", 0) + txns_24h.get("sellers", 0)
 
         # Variation prix
         price_change_24h = float(attrs.get("price_change_percentage", {}).get("h24", 0))
@@ -159,6 +162,7 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
             "total_txns": total_txns,
             "buys": buys,
             "sells": sells,
+            "traders_24h": traders_24h,
             "price_change_24h": price_change_24h,
             "age_hours": age_hours,
             "network": network,
@@ -215,23 +219,36 @@ def generer_alerte_dex(pool_data: Dict) -> str:
     txns = pool_data["total_txns"]
     buys = pool_data["buys"]
     sells = pool_data["sells"]
+    traders = pool_data.get("traders_24h", 0)
     network = pool_data["network"].upper()
     ratio_vol_liq = vol_24h / liq if liq > 0 else 0
+
+    # Calculer variation volume (approximation)
+    vol_avg = liq * 0.5  # Estimation volume moyen = 50% liquidite
+    vol_change_pct = ((vol_24h - vol_avg) / vol_avg * 100) if vol_avg > 0 else 0
 
     # Alerte concise
     txt = f"\n🆕 *NOUVEAU TOKEN DEX*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
     txt += f"💎 {name}\n"
     txt += f"🌐 Reseau: {network}\n"
-    txt += f"💰 Prix: ${price:.8f}\n"
-    txt += f"📊 Vol 24h: ${vol_24h/1000:.0f}K\n"
+    txt += f"💰 Prix: ${price:.8f} ({pct_24h:+.1f}% 24h)\n"
+    txt += f"📊 Vol 24h: ${vol_24h/1000:.0f}K ({vol_change_pct:+.0f}%)\n"
+
+    if traders > 0:
+        txt += f"👥 Traders: {traders/1000:.1f}K\n"
+
     txt += f"💧 Liquidite: ${liq/1000:.0f}K\n"
-    txt += f"📈 Variation: {pct_24h:+.1f}%\n"
     txt += f"⏰ Age: {age:.0f}h\n"
-    txt += f"🔄 Txns: {txns} (A:{buys} V:{sells})\n"
-    txt += f"📊 Vol/Liq: {ratio_vol_liq:.1%}\n\n"
+    txt += f"🔄 Txns: {txns} (A:{buys} V:{sells})\n\n"
 
     txt += f"🔍 *ANALYSE:*\n"
+
+    # Analyse volume
+    if vol_change_pct >= 200:
+        txt += f"🔥 Volume EXPLOSIF +{vol_change_pct:.0f}%!\n"
+    elif vol_change_pct >= 100:
+        txt += f"📈 Forte hausse volume +{vol_change_pct:.0f}%\n"
 
     # Analyse liquidite
     if liq >= 200000:
@@ -240,6 +257,16 @@ def generer_alerte_dex(pool_data: Dict) -> str:
         txt += f"⚠️ Liquidite moyenne (${liq/1000:.0f}K)\n"
     else:
         txt += f"⚠️ Liquidite faible - PRUDENCE!\n"
+
+    # Analyse traders (adoption organique)
+    if traders > 0:
+        avg_vol_per_trader = vol_24h / traders if traders > 0 else 0
+        if traders >= 1000 and avg_vol_per_trader < 500:
+            txt += f"✅ Bonne adoption ({traders/1000:.1f}K traders)\n"
+        elif traders >= 500:
+            txt += f"📊 Adoption moyenne ({traders/1000:.1f}K traders)\n"
+        elif traders < 100 and vol_24h > 100000:
+            txt += f"⚠️ Peu de traders ({traders}) + gros volume = Whales?\n"
 
     # Analyse activite
     if ratio_vol_liq >= 1.0:

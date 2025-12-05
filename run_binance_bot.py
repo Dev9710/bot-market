@@ -105,7 +105,7 @@ def get_top_pairs(max_pairs=150):
         return []
 
 def get_klines_volume(symbol):
-    """Recupere volume 1min reel."""
+    """Recupere volume 1min reel avec variations de prix."""
     url = f"{BINANCE_BASE}/api/v3/klines"
     params = {"symbol": symbol, "interval": "1m", "limit": 60}
 
@@ -118,8 +118,16 @@ def get_klines_volume(symbol):
 
         latest = klines[-1]
         close_price = float(latest[4])
+        open_price = float(latest[1])
         latest_volume_token = float(latest[5])
         latest_volume_usd = latest_volume_token * close_price
+
+        # Prix il y a 1h (pour variation 1h)
+        hour_ago_price = float(klines[0][4])
+        price_change_1h = ((close_price - hour_ago_price) / hour_ago_price * 100) if hour_ago_price > 0 else 0
+
+        # Nombre de trades (approximation via nombre de klines avec volume)
+        trades_count = sum(1 for k in klines if float(k[5]) > 0)
 
         total_volume_usd = 0
         for kline in klines[:-1]:
@@ -130,12 +138,18 @@ def get_klines_volume(symbol):
         avg_volume_1min = total_volume_usd / len(klines[:-1]) if len(klines) > 1 else 1
         ratio = latest_volume_usd / avg_volume_1min if avg_volume_1min > 0 else 0
 
+        # Variation du volume
+        volume_change_pct = ((latest_volume_usd - avg_volume_1min) / avg_volume_1min * 100) if avg_volume_1min > 0 else 0
+
         return {
             'symbol': symbol,
             'current_1min_volume': latest_volume_usd,
             'avg_1h_volume': avg_volume_1min,
             'ratio': ratio,
-            'price': close_price
+            'price': close_price,
+            'price_change_1h': price_change_1h,
+            'volume_change_pct': volume_change_pct,
+            'trades_count_1h': trades_count
         }
     except:
         return None
@@ -271,36 +285,54 @@ def generer_analyse(anomaly):
     else:
         prix_fmt = f"${price:.6f}"
 
+    # Recuperer nouvelles metriques
+    price_change_1h = v.get('price_change_1h', 0)
+    volume_change_pct = v.get('volume_change_pct', 0)
+    trades_count = v.get('trades_count_1h', 0)
+
     txt = f"\n🔥 *{symbol}*"
     if token_name != symbol:
         txt += f" ({token_name})"
     txt += f"\n━━━━━━━━━━━━━━━━\n"
-    txt += f"💰 Prix: {prix_fmt}\n"
-    txt += f"📊 Vol 1min: ${vol_1min/1000:.0f}K (+{vol_increase_pct:.0f}% vs moy 1h)\n"
+    txt += f"💰 Prix: {prix_fmt} ({price_change_1h:+.1f}% 1h)\n"
+    txt += f"📊 Vol 1min: ${vol_1min/1000:.0f}K ({volume_change_pct:+.0f}%)\n"
     txt += f"📈 Ratio: x{ratio:.1f}\n"
 
+    if trades_count > 0:
+        txt += f"🔄 Trades 1h: ~{trades_count}\n"
+
     if oi and oi['open_interest_usd'] > 0:
-        txt += f"💼 OI: ${oi['open_interest_usd']/1_000_000:.1f}M (positions futures)\n"
+        txt += f"💼 OI: ${oi['open_interest_usd']/1_000_000:.1f}M\n"
 
-    txt += f"\n🔍 *QUE SE PASSE-T-IL?*\n\n"
+    txt += f"\n🔍 *ANALYSE:*\n"
 
-    # Section volume detaillee
-    txt += f"💵 INJECTION DE VOLUME x{ratio:.1f}!\n"
-    txt += f"   ↳ Volume normal: ${vol_avg/1000:.0f}K/min\n"
-    txt += f"   ↳ Volume actuel: ${vol_1min/1000:.0f}K/min\n"
-    txt += f"   ↳ Difference: +${vol_diff/1000:.0f}K en 1 minute!\n"
-    txt += f"   ↳ Quelqu'un vient d'acheter MASSIVEMENT\n\n"
+    # Analyse du volume
+    if volume_change_pct >= 300:
+        txt += f"🔥 Volume EXPLOSIF +{volume_change_pct:.0f}%!\n"
+    elif volume_change_pct >= 100:
+        txt += f"📈 Forte hausse volume +{volume_change_pct:.0f}%\n"
+    elif volume_change_pct >= 50:
+        txt += f"📊 Hausse volume significative +{volume_change_pct:.0f}%\n"
 
-    # Explication importance volume
-    txt += f"📊 POURQUOI LE VOLUME COMPTE?\n"
-    txt += f"   • Volume eleve = Gros acheteurs entrent\n"
+    # Analyse du prix
+    if price_change_1h >= 3:
+        txt += f"🚀 Prix en hausse forte +{price_change_1h:.1f}% (1h)\n"
+    elif price_change_1h >= 1:
+        txt += f"📈 Prix monte +{price_change_1h:.1f}% (1h)\n"
+    elif price_change_1h <= -3:
+        txt += f"📉 Prix en baisse forte {price_change_1h:.1f}% (1h)\n"
+    elif price_change_1h <= -1:
+        txt += f"📉 Prix baisse {price_change_1h:.1f}% (1h)\n"
+    else:
+        txt += f"⚖️ Prix stable ({price_change_1h:+.1f}% 1h)\n"
+
+    # Analyse du ratio (spike)
     if ratio >= 10:
-        txt += f"   • Spike x{ratio:.0f} = Info privilegiee possible\n"
-        txt += f"   • Pas un achat retail normal\n"
-        txt += f"   • Probable: Institution, whale, ou insider\n\n"
+        txt += f"⚠️ Spike EXTREME x{ratio:.0f} = Probable whale/institution\n"
     elif ratio >= 5:
-        txt += f"   • Spike x{ratio:.1f} = Activite anormale\n"
-        txt += f"   • Acheteurs importants actifs\n\n"
+        txt += f"📊 Activite anormale detectee (x{ratio:.1f})\n"
+
+    txt += f"\n"
 
     # Liquidations
     if liq and liq['total_liquidated_usd'] > 0:
