@@ -23,8 +23,8 @@ if sys.platform == "win32":
 
 # Configuration
 GECKOTERMINAL_API = "https://api.geckoterminal.com/api/v2"
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "7868518759:AAFxEXGz0DgMPYVKILJOEb5kNDwPy3N5W5c")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "7994790177")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # Reseaux a surveiller (ordre de priorite)
 NETWORKS = [
