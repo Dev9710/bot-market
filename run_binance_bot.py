@@ -85,11 +85,17 @@ def get_top_pairs(max_pairs=150):
     ticker_url = f"{BINANCE_BASE}/api/v3/ticker/24hr"
     try:
         r = requests.get(ticker_url, timeout=10)
+        r.raise_for_status()
         tickers = r.json()
+
+        # Verifier que c'est bien une liste
+        if not isinstance(tickers, list):
+            logger.error(f"Reponse API invalide: {tickers}")
+            return []
 
         usdt_tickers = [
             t for t in tickers
-            if t['symbol'].endswith('USDT') and float(t.get('quoteVolume', 0)) > 1000000
+            if isinstance(t, dict) and t.get('symbol', '').endswith('USDT') and float(t.get('quoteVolume', 0)) > 1000000
         ]
 
         usdt_tickers.sort(key=lambda x: float(x.get('quoteVolume', 0)), reverse=True)
