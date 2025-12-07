@@ -168,6 +168,33 @@ def get_klines_volume(symbol):
         elif vol_t0 > vol_t1 and vol_t1 < vol_t2:
             momentum = "reprise"  # Volume remonte apres baisse = POSSIBLE REBOND
 
+        # PRE-PUMP DETECTION: Comparer volume recent (5min) vs volume ancien (10min avant)
+        # Si volume double PROGRESSIVEMENT = accumulation (BON)
+        # Si volume x10 INSTANTANE = pump deja parti (TROP TARD)
+        if len(klines) >= 15:
+            # Volume moyen des 5 dernieres minutes (recent)
+            recent_vol = sum(float(k[5]) * float(k[4]) for k in klines[-5:]) / 5
+
+            # Volume moyen des 5 minutes il y a 10min (ancien)
+            old_vol = sum(float(k[5]) * float(k[4]) for k in klines[-15:-10]) / 5
+
+            if old_vol > 0:
+                pre_pump_ratio = recent_vol / old_vol
+            else:
+                pre_pump_ratio = 1
+        else:
+            pre_pump_ratio = 1
+
+        # Classification PRE-PUMP
+        if 2 <= pre_pump_ratio <= 5 and momentum == "acceleration":
+            pre_pump_signal = "accumulation"  # EXCELLENT: accumulation progressive
+        elif pre_pump_ratio > 10:
+            pre_pump_signal = "too_late"  # MAUVAIS: pump deja parti
+        elif 1.5 <= pre_pump_ratio < 2:
+            pre_pump_signal = "early_interest"  # BON: interet commence
+        else:
+            pre_pump_signal = "normal"  # Neutre
+
         return {
             'symbol': symbol,
             'current_1min_volume': latest_volume_usd,
@@ -180,7 +207,9 @@ def get_klines_volume(symbol):
             'momentum': momentum,
             'vol_t0': vol_t0,
             'vol_t1': vol_t1,
-            'vol_t2': vol_t2
+            'vol_t2': vol_t2,
+            'pre_pump_signal': pre_pump_signal,
+            'pre_pump_ratio': pre_pump_ratio
         }
     except:
         return None
@@ -320,7 +349,21 @@ def calculer_score_confiance(anomaly):
         score += 12
         details.append("Volume correct (x3+)")
 
-    # 2. MOMENTUM VOLUME (15 points max)
+    # 2. PRE-PUMP SIGNAL (20 points max) - LE PLUS IMPORTANT!
+    pre_pump = v.get('pre_pump_signal', 'normal')
+    pre_pump_ratio = v.get('pre_pump_ratio', 1)
+
+    if pre_pump == "accumulation":
+        score += 20
+        details.append(f"ACCUMULATION PRE-PUMP! (x{pre_pump_ratio:.1f})")
+    elif pre_pump == "early_interest":
+        score += 12
+        details.append(f"Interet early (x{pre_pump_ratio:.1f})")
+    elif pre_pump == "too_late":
+        score -= 20
+        details.append("PUMP DEJA PARTI - Trop tard!")
+
+    # 3. MOMENTUM VOLUME (15 points max)
     momentum = v.get('momentum', 'neutre')
 
     if momentum == "acceleration":
@@ -333,7 +376,7 @@ def calculer_score_confiance(anomaly):
         score -= 10
         details.append("Volume decelere (mauvais signe)")
 
-    # 3. MOMENTUM PRIX (20 points max)
+    # 4. MOMENTUM PRIX (20 points max)
     price_change = v.get('price_change_1h', 0)
 
     if price_change > 5 and volume_change > 200:
@@ -349,7 +392,7 @@ def calculer_score_confiance(anomaly):
         score -= 10
         details.append("Prix baisse malgre volume")
 
-    # 4. LIQUIDATIONS (25 points max)
+    # 5. LIQUIDATIONS (25 points max)
     if liq and liq['total_liquidated_usd'] > 0:
         total_liq = liq['total_liquidated_usd']
         short_liq = liq['short_liquidated']
@@ -365,7 +408,7 @@ def calculer_score_confiance(anomaly):
             score -= 15
             details.append("Long Squeeze (baisse)")
 
-    # 5. VOLUME ABSOLU (20 points max)
+    # 6. VOLUME ABSOLU (20 points max)
     vol_1min = v['current_1min_volume']
 
     if vol_1min >= 500_000:
@@ -497,6 +540,20 @@ def generer_analyse(anomaly):
         txt += f"   💡 Volume diminue progressivement\n"
         txt += f"   ❌ Signal s'affaiblit - PRUDENCE!\n"
 
+    # Analyse PRE-PUMP
+    pre_pump = v.get('pre_pump_signal', 'normal')
+    pre_pump_ratio = v.get('pre_pump_ratio', 1)
+
+    if pre_pump == "accumulation":
+        txt += f"🎯 SIGNAL PRE-PUMP: ACCUMULATION!\n"
+        txt += f"   💡 Volume x{pre_pump_ratio:.1f} sur 10min (progression)\n"
+        txt += f"   ✅ SMART MONEY accumule AVANT le pump\n"
+        txt += f"   🚀 Tu entres AVANT la masse = EXCELLENT!\n"
+    elif pre_pump == "early_interest":
+        txt += f"👀 SIGNAL: Interet commence\n"
+        txt += f"   💡 Volume x{pre_pump_ratio:.1f} sur 10min\n"
+        txt += f"   ⚠️ Early stage - A surveiller\n"
+
     txt += f"\n"
 
     # Liquidations
@@ -606,6 +663,42 @@ def generer_analyse(anomaly):
     return txt
 
 # =========================
+# FILTRE MACRO MARCHE
+# =========================
+
+def verifier_contexte_marche():
+    """
+    Verifie le contexte macro (BTC + ETH) pour eviter de trader contre le marche.
+    Retourne: ('bull'|'bear'|'neutre', BTC_change_1h, ETH_change_1h)
+    """
+    try:
+        # Check BTC sur 1h
+        btc_data = get_klines_volume('BTCUSDT')
+        eth_data = get_klines_volume('ETHUSDT')
+
+        if not btc_data or not eth_data:
+            return 'neutre', 0, 0
+
+        btc_change = btc_data.get('price_change_1h', 0)
+        eth_change = eth_data.get('price_change_1h', 0)
+
+        # Marche BEAR: BTC ou ETH baisse de -2%+
+        if btc_change <= -2 or eth_change <= -2:
+            return 'bear', btc_change, eth_change
+
+        # Marche BULL: BTC ET ETH montent de +2%+
+        elif btc_change >= 2 and eth_change >= 2:
+            return 'bull', btc_change, eth_change
+
+        # Marche NEUTRE
+        else:
+            return 'neutre', btc_change, eth_change
+
+    except Exception as e:
+        logger.error(f"Erreur contexte marche: {e}")
+        return 'neutre', 0, 0
+
+# =========================
 # SCANNER
 # =========================
 
@@ -631,6 +724,11 @@ def scanner(cfg):
         scanned += 1
 
         if vol_data['current_1min_volume'] < cfg['min_volume_usd']:
+            continue
+
+        # FILTRE PRE-PUMP: Skip si "too_late" (pump deja parti)
+        if vol_data.get('pre_pump_signal') == 'too_late':
+            logger.info(f"Skip {symbol}: Pump deja parti (x{vol_data.get('pre_pump_ratio', 0):.1f})")
             continue
 
         if vol_data['ratio'] >= cfg['volume_threshold']:
@@ -950,6 +1048,18 @@ def boucle():
                         tg(exit_alert['message'])
                         logger.info(f"Alerte sortie envoyee: {exit_alert['symbol']} - {exit_alert['action']}")
 
+            # VERIFIER CONTEXTE MACRO (BTC/ETH)
+            market_context, btc_change, eth_change = verifier_contexte_marche()
+            logger.info(f"Contexte marche: {market_context.upper()} (BTC {btc_change:+.1f}%, ETH {eth_change:+.1f}%)")
+
+            # Si marche BEAR fort, skip scan (evite de perdre contre le marche)
+            if market_context == 'bear' and (btc_change <= -3 or eth_change <= -3):
+                logger.warning(f"MARCHE BEAR FORT - Skip scan (BTC {btc_change:.1f}%, ETH {eth_change:.1f}%)")
+                state["last_scan"] = datetime.utcnow().isoformat()
+                save_json(STATE_FILE, state)
+                time.sleep(cfg['scan_interval_seconds'])
+                continue
+
             anomalies = scanner(cfg)
 
             if anomalies:
@@ -969,6 +1079,16 @@ def boucle():
                         sorted_anomalies = sorted(anomalies_filtrees, key=lambda x: x['volume_data']['ratio'], reverse=True)[:cfg['max_alerts_per_scan']]
 
                         msg = "Top activites crypto detectees\n(Volume temps reel Binance)\n"
+
+                        # Afficher contexte marche
+                        if market_context == 'bull':
+                            msg += f"\n🟢 *MARCHE: BULL* (BTC {btc_change:+.1f}%, ETH {eth_change:+.1f}%)\n"
+                            msg += f"   ✅ Conditions favorables pour acheter\n"
+                        elif market_context == 'bear':
+                            msg += f"\n🔴 *MARCHE: BEAR* (BTC {btc_change:+.1f}%, ETH {eth_change:+.1f}%)\n"
+                            msg += f"   ⚠️ Prudence - Marche defavorable\n"
+                        else:
+                            msg += f"\n🟡 *MARCHE: NEUTRE* (BTC {btc_change:+.1f}%, ETH {eth_change:+.1f}%)\n"
 
                         # Afficher les performances si disponibles
                         if perf and perf['total_alerts'] >= 5:  # Au moins 5 alertes pour stats fiables
