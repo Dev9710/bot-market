@@ -105,7 +105,7 @@ def get_top_pairs(max_pairs=150):
         return []
 
 def get_klines_volume(symbol):
-    """Recupere volume 1min reel avec variations de prix."""
+    """Recupere volume 1min reel avec variations de prix + momentum."""
     url = f"{BINANCE_BASE}/api/v3/klines"
     params = {"symbol": symbol, "interval": "1m", "limit": 60}
 
@@ -113,7 +113,7 @@ def get_klines_volume(symbol):
         r = requests.get(url, params=params, timeout=10)
         klines = r.json()
 
-        if not isinstance(klines, list) or len(klines) < 2:
+        if not isinstance(klines, list) or len(klines) < 4:
             return None
 
         latest = klines[-1]
@@ -141,6 +141,33 @@ def get_klines_volume(symbol):
         # Variation du volume
         volume_change_pct = ((latest_volume_usd - avg_volume_1min) / avg_volume_1min * 100) if avg_volume_1min > 0 else 0
 
+        # MOMENTUM DETECTION: Comparer t-0, t-1, t-2 pour voir si accelere/decelere
+        # t-0 = derniere minute (latest)
+        # t-1 = avant-derniere minute
+        # t-2 = 2 minutes avant
+        vol_t0 = latest_volume_usd
+
+        if len(klines) >= 2:
+            kline_t1 = klines[-2]
+            vol_t1 = float(kline_t1[5]) * float(kline_t1[4])
+        else:
+            vol_t1 = 0
+
+        if len(klines) >= 3:
+            kline_t2 = klines[-3]
+            vol_t2 = float(kline_t2[5]) * float(kline_t2[4])
+        else:
+            vol_t2 = 0
+
+        # Calculer le momentum
+        momentum = "neutre"
+        if vol_t0 > vol_t1 and vol_t1 > vol_t2 and vol_t2 > 0:
+            momentum = "acceleration"  # Volume augmente progressivement = BON SIGNE
+        elif vol_t0 < vol_t1 and vol_t1 < vol_t2:
+            momentum = "deceleration"  # Volume diminue = SIGNAL FAIBLIT
+        elif vol_t0 > vol_t1 and vol_t1 < vol_t2:
+            momentum = "reprise"  # Volume remonte apres baisse = POSSIBLE REBOND
+
         return {
             'symbol': symbol,
             'current_1min_volume': latest_volume_usd,
@@ -149,7 +176,11 @@ def get_klines_volume(symbol):
             'price': close_price,
             'price_change_1h': price_change_1h,
             'volume_change_pct': volume_change_pct,
-            'trades_count_1h': trades_count
+            'trades_count_1h': trades_count,
+            'momentum': momentum,
+            'vol_t0': vol_t0,
+            'vol_t1': vol_t1,
+            'vol_t2': vol_t2
         }
     except:
         return None
@@ -257,6 +288,102 @@ def get_token_info(symbol):
     return token_names.get(base_symbol, base_symbol)
 
 # =========================
+# SCORE DE CONFIANCE
+# =========================
+
+def calculer_score_confiance(anomaly):
+    """
+    Calcule un score de confiance 0-100 pour evaluer la qualite du signal.
+    Score eleve = signal fiable, forte probabilite de profit.
+    """
+    v = anomaly['volume_data']
+    liq = anomaly.get('liquidations')
+    oi = anomaly.get('open_interest')
+
+    score = 0
+    details = []
+
+    # 1. VOLUME SPIKE (30 points max)
+    ratio = v['ratio']
+    volume_change = v.get('volume_change_pct', 0)
+
+    if ratio >= 10 and volume_change >= 300:
+        score += 30
+        details.append("Volume exceptionnel (x10+)")
+    elif ratio >= 7 and volume_change >= 200:
+        score += 25
+        details.append("Volume tres fort (x7+)")
+    elif ratio >= 5 and volume_change >= 100:
+        score += 20
+        details.append("Volume fort (x5+)")
+    elif ratio >= 3:
+        score += 12
+        details.append("Volume correct (x3+)")
+
+    # 2. MOMENTUM VOLUME (15 points max)
+    momentum = v.get('momentum', 'neutre')
+
+    if momentum == "acceleration":
+        score += 15
+        details.append("Acceleration volume (t-2 < t-1 < t-0)")
+    elif momentum == "reprise":
+        score += 8
+        details.append("Reprise apres baisse")
+    elif momentum == "deceleration":
+        score -= 10
+        details.append("Volume decelere (mauvais signe)")
+
+    # 3. MOMENTUM PRIX (20 points max)
+    price_change = v.get('price_change_1h', 0)
+
+    if price_change > 5 and volume_change > 200:
+        score += 20
+        details.append("Prix + Volume synchronises")
+    elif price_change > 3 and volume_change > 100:
+        score += 15
+        details.append("Bon momentum")
+    elif price_change > 1:
+        score += 10
+        details.append("Momentum positif")
+    elif price_change < -2:
+        score -= 10
+        details.append("Prix baisse malgre volume")
+
+    # 4. LIQUIDATIONS (25 points max)
+    if liq and liq['total_liquidated_usd'] > 0:
+        total_liq = liq['total_liquidated_usd']
+        short_liq = liq['short_liquidated']
+        long_liq = liq['long_liquidated']
+
+        if short_liq > long_liq * 3 and total_liq > 1_000_000:
+            score += 25
+            details.append("Short Squeeze massif!")
+        elif short_liq > long_liq * 2 and total_liq > 500_000:
+            score += 18
+            details.append("Short Squeeze confirme")
+        elif long_liq > short_liq * 3:
+            score -= 15
+            details.append("Long Squeeze (baisse)")
+
+    # 5. VOLUME ABSOLU (20 points max)
+    vol_1min = v['current_1min_volume']
+
+    if vol_1min >= 500_000:
+        score += 20
+        details.append("Gros volume absolu")
+    elif vol_1min >= 200_000:
+        score += 15
+        details.append("Volume solide")
+    elif vol_1min >= 100_000:
+        score += 10
+        details.append("Volume correct")
+
+    # Limiter entre 0 et 100
+    score = max(0, min(100, score))
+
+    return score, details
+
+# =========================
 # ANALYSE PEDAGOGIQUE
 # =========================
 
@@ -277,6 +404,9 @@ def generer_analyse(anomaly):
     vol_increase_pct = ((vol_1min - vol_avg) / vol_avg * 100) if vol_avg > 0 else 0
     vol_diff = vol_1min - vol_avg
 
+    # CALCULER LE SCORE DE CONFIANCE
+    score, score_details = calculer_score_confiance(anomaly)
+
     # Determiner nombre de decimales (2 pour prix > $1, sinon plus)
     if price >= 1:
         prix_fmt = f"${price:.2f}"
@@ -290,10 +420,30 @@ def generer_analyse(anomaly):
     volume_change_pct = v.get('volume_change_pct', 0)
     trades_count = v.get('trades_count_1h', 0)
 
+    # HEADER AVEC SCORE
     txt = f"\n🔥 *{symbol}*"
     if token_name != symbol:
         txt += f" ({token_name})"
     txt += f"\n━━━━━━━━━━━━━━━━\n"
+
+    # AFFICHER LE SCORE DE CONFIANCE
+    if score >= 80:
+        txt += f"🎯 *SCORE: {score}/100* ⭐⭐⭐ EXCELLENT\n"
+        txt += f"   💡 Signal TRES fiable - Forte probabilite profit\n\n"
+    elif score >= 60:
+        txt += f"🎯 *SCORE: {score}/100* ⭐⭐ BON\n"
+        txt += f"   💡 Signal fiable - Bonne opportunite\n\n"
+    elif score >= 40:
+        txt += f"🎯 *SCORE: {score}/100* ⭐ MOYEN\n"
+        txt += f"   ⚠️ Signal correct mais prudence\n\n"
+    else:
+        txt += f"🎯 *SCORE: {score}/100* ⚠️ FAIBLE\n"
+        txt += f"   ❌ Signal peu fiable - A eviter\n\n"
+
+    txt += f"📋 Raisons du score:\n"
+    for detail in score_details[:3]:  # Top 3 raisons
+        txt += f"   • {detail}\n"
+    txt += f"\n"
     txt += f"💰 Prix: {prix_fmt} ({price_change_1h:+.1f}% 1h)\n"
     txt += f"📊 Vol 1min: ${vol_1min/1000:.0f}K ({volume_change_pct:+.0f}%)\n"
     txt += f"📈 Ratio: x{ratio:.1f}\n"
@@ -331,6 +481,21 @@ def generer_analyse(anomaly):
         txt += f"⚠️ Spike EXTREME x{ratio:.0f} = Probable whale/institution\n"
     elif ratio >= 5:
         txt += f"📊 Activite anormale detectee (x{ratio:.1f})\n"
+
+    # Analyse du momentum
+    momentum = v.get('momentum', 'neutre')
+    if momentum == "acceleration":
+        txt += f"🚀 MOMENTUM: Acceleration detectee!\n"
+        txt += f"   💡 Volume augmente progressivement (t-2 < t-1 < t-0)\n"
+        txt += f"   ✅ Signal se RENFORCE = BON SIGNE\n"
+    elif momentum == "reprise":
+        txt += f"🔄 MOMENTUM: Reprise apres baisse\n"
+        txt += f"   💡 Volume remonte apres une pause\n"
+        txt += f"   ⚠️ Possible rebond - A surveiller\n"
+    elif momentum == "deceleration":
+        txt += f"📉 MOMENTUM: Deceleration detectee\n"
+        txt += f"   💡 Volume diminue progressivement\n"
+        txt += f"   ❌ Signal s'affaiblit - PRUDENCE!\n"
 
     txt += f"\n"
 
@@ -487,12 +652,135 @@ def scanner(cfg):
     return anomalies
 
 # =========================
+# PERFORMANCE TRACKING
+# =========================
+
+def verifier_performance(alert_history_with_price):
+    """
+    Verifie les performances des alertes passees.
+    Retourne le win rate et stats utiles.
+    """
+    if not alert_history_with_price:
+        return None
+
+    wins = 0
+    losses = 0
+    total = 0
+
+    for symbol, alerts in alert_history_with_price.items():
+        for alert in alerts:
+            if 'outcome' in alert:
+                total += 1
+                if alert['outcome'] == 'win':
+                    wins += 1
+                elif alert['outcome'] == 'loss':
+                    losses += 1
+
+    if total == 0:
+        return None
+
+    win_rate = (wins / total * 100) if total > 0 else 0
+
+    return {
+        'total_alerts': total,
+        'wins': wins,
+        'losses': losses,
+        'win_rate': win_rate
+    }
+
+def evaluer_alertes_passees(alert_history):
+    """
+    Evalue les alertes passees (il y a 1h+) pour calculer le win rate.
+    Une alerte = 'win' si prix a monte de 3%+ dans l'heure suivante.
+    """
+    now = datetime.utcnow()
+    evaluated = 0
+
+    for symbol, alerts in alert_history.items():
+        for alert in alerts:
+            # Si l'alerte n'a pas encore de outcome et date d'il y a 1h+
+            if 'outcome' not in alert and 'price' in alert and 'timestamp' in alert:
+                alert_time = datetime.fromisoformat(alert['timestamp'])
+                hours_elapsed = (now - alert_time).total_seconds() / 3600
+
+                # Si alerte date d'au moins 1h, on peut evaluer
+                if hours_elapsed >= 1:
+                    try:
+                        # Recuperer le prix actuel
+                        r = requests.get(f"{BINANCE_BASE}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
+                        current_price = float(r.json().get('price', 0))
+
+                        if current_price > 0:
+                            entry_price = alert['price']
+                            change_pct = ((current_price - entry_price) / entry_price * 100)
+
+                            # Critere: +3% = win
+                            alert['outcome'] = 'win' if change_pct >= 3 else 'loss'
+                            alert['profit_pct'] = change_pct
+                            evaluated += 1
+                    except:
+                        pass
+
+    if evaluated > 0:
+        logger.info(f"Evalues {evaluated} alertes passees")
+
+    return alert_history
+
+# =========================
+# FILTRE ANTI-MANIPULATION
+# =========================
+
+def nettoyer_historique(alert_history):
+    """Nettoie l'historique des alertes > 7 jours."""
+    now = datetime.utcnow()
+    cleaned = {}
+
+    for symbol, alerts in alert_history.items():
+        # Garder seulement les alertes des 7 derniers jours
+        recent_alerts = []
+        for a in alerts:
+            # Nouveau format: dict avec timestamp
+            if isinstance(a, dict) and 'timestamp' in a:
+                if (now - datetime.fromisoformat(a['timestamp'])).days <= 7:
+                    recent_alerts.append(a)
+            # Ancien format: simple string ISO timestamp (backward compatibility)
+            elif isinstance(a, str):
+                if (now - datetime.fromisoformat(a)).days <= 7:
+                    recent_alerts.append(a)
+
+        if recent_alerts:
+            cleaned[symbol] = recent_alerts
+
+    return cleaned
+
+def est_manipule(symbol, alert_history, max_alerts=3):
+    """
+    Verifie si un token est probablement manipule.
+    Critere: >3 alertes dans les 7 derniers jours = suspect.
+    """
+    if symbol not in alert_history:
+        return False
+
+    # Compter les alertes recentes
+    count = len(alert_history[symbol])
+
+    if count > max_alerts:
+        logger.warning(f"Token {symbol} filtre: {count} alertes en 7j (manipulation suspectee)")
+        return True
+
+    return False
+
+# =========================
 # BOUCLE PRINCIPALE
 # =========================
 
 def boucle():
     """Boucle principale du bot."""
-    state = charger_json(STATE_FILE, {"last_alerts": {}, "last_scan": None})
+    state = charger_json(STATE_FILE, {
+        "last_alerts": {},
+        "last_scan": None,
+        "alert_history": {}  # Nouveau: track alert count par symbol
+    })
 
     cfg = charger_json(CONFIG_FILE, {
         "scan_interval_seconds": 120,
@@ -510,25 +798,69 @@ def boucle():
 
     while True:
         try:
+            # Nettoyer l'historique des alertes anciennes (> 7 jours)
+            state["alert_history"] = nettoyer_historique(state.get("alert_history", {}))
+
+            # Evaluer les alertes passees (performance tracking)
+            state["alert_history"] = evaluer_alertes_passees(state.get("alert_history", {}))
+
+            # Calculer le win rate actuel
+            perf = verifier_performance(state.get("alert_history", {}))
+            if perf:
+                logger.info(f"Performance: {perf['wins']}/{perf['total_alerts']} wins = {perf['win_rate']:.1f}% win rate")
+
             anomalies = scanner(cfg)
 
             if anomalies:
-                alert_key = "binance_alerts"
+                # FILTRE ANTI-MANIPULATION: Retirer les tokens suspects
+                anomalies_filtrees = [
+                    a for a in anomalies
+                    if not est_manipule(a['symbol'], state["alert_history"], max_alerts=3)
+                ]
 
-                if alert_key not in state["last_alerts"] or secondes_depuis(state["last_alerts"][alert_key]) >= cfg['alert_cooldown_seconds']:
+                if not anomalies_filtrees:
+                    logger.info("Toutes les anomalies filtrees (manipulation suspectee)")
+                else:
+                    alert_key = "binance_alerts"
 
-                    sorted_anomalies = sorted(anomalies, key=lambda x: x['volume_data']['ratio'], reverse=True)[:cfg['max_alerts_per_scan']]
+                    if alert_key not in state["last_alerts"] or secondes_depuis(state["last_alerts"][alert_key]) >= cfg['alert_cooldown_seconds']:
 
-                    msg = "Top activites crypto detectees\n(Volume temps reel Binance)\n"
+                        sorted_anomalies = sorted(anomalies_filtrees, key=lambda x: x['volume_data']['ratio'], reverse=True)[:cfg['max_alerts_per_scan']]
 
-                    for i, anomaly in enumerate(sorted_anomalies, 1):
-                        msg += f"\n#{i} " + generer_analyse(anomaly)
+                        msg = "Top activites crypto detectees\n(Volume temps reel Binance)\n"
 
-                    msg += f"\n\nScan effectue : {datetime.now().strftime('%H:%M:%S')}"
+                        # Afficher les performances si disponibles
+                        if perf and perf['total_alerts'] >= 5:  # Au moins 5 alertes pour stats fiables
+                            msg += f"\n📊 *PERFORMANCES BOT:*\n"
+                            msg += f"   ✅ Win Rate: {perf['win_rate']:.1f}%\n"
+                            msg += f"   📈 Wins: {perf['wins']} | ❌ Losses: {perf['losses']}\n"
+                            msg += f"   (Critere: +3% en 1h)\n"
 
-                    tg(msg)
-                    state["last_alerts"][alert_key] = datetime.utcnow().isoformat()
-                    logger.info("Alerte envoyee")
+                        for i, anomaly in enumerate(sorted_anomalies, 1):
+                            msg += f"\n#{i} " + generer_analyse(anomaly)
+
+                        msg += f"\n\nScan effectue : {datetime.now().strftime('%H:%M:%S')}"
+
+                        tg(msg)
+                        state["last_alerts"][alert_key] = datetime.utcnow().isoformat()
+
+                        # Enregistrer les alertes dans l'historique (avec prix pour tracking perf)
+                        now = datetime.utcnow().isoformat()
+                        for anomaly in sorted_anomalies:
+                            symbol = anomaly['symbol']
+                            price = anomaly['volume_data']['price']
+
+                            if symbol not in state["alert_history"]:
+                                state["alert_history"][symbol] = []
+
+                            # Nouveau format: dict avec timestamp et prix
+                            state["alert_history"][symbol].append({
+                                'timestamp': now,
+                                'price': price
+                                # 'outcome' sera ajoute plus tard par evaluer_alertes_passees()
+                            })
+
+                        logger.info("Alerte envoyee")
                 else:
                     temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
                     logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
