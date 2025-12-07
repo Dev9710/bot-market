@@ -123,6 +123,18 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
 
         # Infos de base
         name = attrs.get("name", "Unknown")
+
+        # Recuperer le nom complet du token (pas juste la paire)
+        base_token_symbol = attrs.get("base_token_symbol", "")
+        quote_token_symbol = attrs.get("quote_token_symbol", "")
+
+        # Si on a les symboles, utiliser le base token
+        if base_token_symbol:
+            token_name = base_token_symbol
+        else:
+            # Sinon extraire du nom de la paire
+            token_name = name.split("/")[0].strip() if "/" in name else name
+
         base_token = attrs.get("base_token_price_usd")
         price_usd = float(base_token) if base_token else 0
 
@@ -156,6 +168,7 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
 
         return {
             "name": name,
+            "token_name": token_name,
             "price_usd": price_usd,
             "volume_24h": volume_24h,
             "liquidity": liquidity,
@@ -211,6 +224,7 @@ def generer_alerte_dex(pool_data: Dict) -> str:
     """Genere alerte CONCISE avec emojis (meme format que Binance)."""
 
     name = pool_data["name"]
+    token_name = pool_data.get("token_name", name.split("/")[0])
     price = pool_data["price_usd"]
     vol_24h = pool_data["volume_24h"]
     liq = pool_data["liquidity"]
@@ -220,7 +234,21 @@ def generer_alerte_dex(pool_data: Dict) -> str:
     buys = pool_data["buys"]
     sells = pool_data["sells"]
     traders = pool_data.get("traders_24h", 0)
-    network = pool_data["network"].upper()
+    network_id = pool_data["network"]
+
+    # Mapper les IDs de réseau vers des noms lisibles
+    network_names = {
+        "eth": "Ethereum",
+        "bsc": "BSC (Binance Smart Chain)",
+        "polygon": "Polygon",
+        "arbitrum": "Arbitrum",
+        "base": "Base",
+        "solana": "Solana",
+        "optimism": "Optimism",
+        "avalanche": "Avalanche"
+    }
+    blockchain = network_names.get(network_id, network_id.upper() if network_id != "unknown" else "Non identifié")
+
     ratio_vol_liq = vol_24h / liq if liq > 0 else 0
 
     # Calculer variation volume (approximation)
@@ -230,8 +258,9 @@ def generer_alerte_dex(pool_data: Dict) -> str:
     # Alerte concise
     txt = f"\n🆕 *NOUVEAU TOKEN DEX*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
-    txt += f"💎 {name}\n"
-    txt += f"🌐 Reseau: {network}\n"
+    txt += f"💎 {token_name}\n"
+    txt += f"   Paire: {name}\n"
+    txt += f"⛓️ Blockchain: {blockchain}\n"
     txt += f"💰 Prix: ${price:.8f} ({pct_24h:+.1f}% 24h)\n"
     txt += f"📊 Vol 24h: ${vol_24h/1000:.0f}K ({vol_change_pct:+.0f}%)\n"
 
@@ -311,7 +340,7 @@ def generer_alerte_dex(pool_data: Dict) -> str:
         txt += f"❌ EVITER - Liquidite trop faible!\n"
         txt += f"🚨 Risque RUG PULL eleve!\n"
 
-    txt += f"\n🔗 https://geckoterminal.com/{network}/pools/{pool_data['pool_address']}\n"
+    txt += f"\n🔗 https://geckoterminal.com/{network_id}/pools/{pool_data['pool_address']}\n"
 
     return txt
 
