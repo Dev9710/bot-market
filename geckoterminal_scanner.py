@@ -185,10 +185,135 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         log(f"⚠️ Erreur parse pool: {e}")
         return None
 
-def is_valid_opportunity(pool_data: Dict) -> tuple[bool, str]:
-    """Verifie si pool est une opportunite valide."""
+def calculer_score_confiance_dex(pool_data: Dict) -> tuple[int, list]:
+    """
+    Calcule score de confiance 0-100 pour tokens DEX.
+    Adapte des Quick Wins Binance pour le contexte DEX.
 
-    # Check liquidite min (anti rug pull)
+    Criteres:
+    1. Liquidite (30 pts) - Plus important sur DEX (rug pull risk)
+    2. Age du token (25 pts) - Nouveau mais pas trop (sweet spot 12-48h)
+    3. Volume/Liquidite ratio (20 pts) - Activite organique
+    4. Distribution Buy/Sell (15 pts) - Pas de pump & dump
+    5. Adoption (traders) (10 pts) - Vraie communaute
+    """
+    score = 0
+    details = []
+
+    liq = pool_data["liquidity"]
+    age = pool_data["age_hours"]
+    vol_24h = pool_data["volume_24h"]
+    buys = pool_data["buys"]
+    sells = pool_data["sells"]
+    traders = pool_data.get("traders_24h", 0)
+    price_change = pool_data["price_change_24h"]
+
+    # 1. LIQUIDITE (30 points max) - CRITIQUE pour DEX
+    if liq >= 1_000_000:
+        score += 30
+        details.append("Liquidite excellente ($1M+)")
+    elif liq >= 500_000:
+        score += 25
+        details.append("Liquidite tres bonne ($500K+)")
+    elif liq >= 200_000:
+        score += 20
+        details.append("Liquidite correcte ($200K+)")
+    elif liq >= 100_000:
+        score += 12
+        details.append("Liquidite minimale ($100K+)")
+    else:
+        score += 5
+        details.append("Liquidite faible (risque!)")
+
+    # 2. AGE TOKEN (25 points max) - Sweet spot 12-48h
+    if 12 <= age <= 48:
+        score += 25
+        details.append(f"Age IDEAL ({age:.0f}h - pas rug, pas trop tard)")
+    elif 6 <= age < 12:
+        score += 15
+        details.append(f"Tres recent ({age:.0f}h - surveiller)")
+    elif age < 6:
+        score -= 15
+        details.append(f"TROP RECENT ({age:.0f}h - RUG RISK!)")
+    elif 48 < age <= 72:
+        score += 10
+        details.append(f"Recent ({age:.0f}h)")
+    else:
+        score -= 10
+        details.append(f"Trop vieux ({age:.0f}h)")
+
+    # 3. VOLUME/LIQUIDITE RATIO (20 points max)
+    vol_liq_ratio = (vol_24h / liq * 100) if liq > 0 else 0
+
+    if 100 <= vol_liq_ratio <= 500:
+        score += 20
+        details.append(f"Activite organique ({vol_liq_ratio:.0f}%)")
+    elif 50 <= vol_liq_ratio < 100:
+        score += 15
+        details.append(f"Activite correcte ({vol_liq_ratio:.0f}%)")
+    elif vol_liq_ratio > 1000:
+        score -= 20
+        details.append(f"WASH TRADING suspect ({vol_liq_ratio:.0f}%!)")
+    elif vol_liq_ratio < 50:
+        score += 5
+        details.append(f"Activite faible ({vol_liq_ratio:.0f}%)")
+
+    # 4. DISTRIBUTION BUY/SELL (15 points max)
+    buy_sell_ratio = buys / sells if sells > 0 else 999
+
+    if 0.7 <= buy_sell_ratio <= 1.5:
+        score += 15
+        details.append("Equilibre achats/ventes sain")
+    elif 0.5 <= buy_sell_ratio < 0.7 or 1.5 < buy_sell_ratio <= 2:
+        score += 10
+        details.append("Distribution acceptable")
+    elif buy_sell_ratio > 3:
+        score -= 15
+        details.append("PUMP suspect (trop achats!)")
+    elif buy_sell_ratio < 0.3:
+        score -= 15
+        details.append("DUMP en cours (trop ventes!)")
+
+    # 5. ADOPTION (10 points max)
+    if traders >= 10_000:
+        score += 10
+        details.append(f"Forte adoption ({traders/1000:.0f}K traders)")
+    elif traders >= 5_000:
+        score += 8
+        details.append(f"Bonne adoption ({traders/1000:.1f}K traders)")
+    elif traders >= 1_000:
+        score += 5
+        details.append(f"Adoption moyenne ({traders} traders)")
+
+    # BONUS/MALUS: Prix change extremes
+    if price_change > 10_000:
+        score -= 25
+        details.append(f"PUMP DEJA FINI (+{price_change:.0f}% = TOO LATE!)")
+    elif price_change > 1_000:
+        score -= 15
+        details.append(f"Pump violent (+{price_change:.0f}% - risque haut)")
+
+    # Limiter score entre 0 et 100
+    score = max(0, min(100, score))
+
+    return score, details
+
+def is_valid_opportunity(pool_data: Dict) -> tuple[bool, str]:
+    """
+    Verifie si pool est une opportunite valide.
+    Utilise score de confiance + filtres basiques.
+    """
+
+    # NOUVEAU: Calculer score de confiance
+    score, details = calculer_score_confiance_dex(pool_data)
+    pool_data['score'] = score  # Stocker pour affichage
+    pool_data['score_details'] = details
+
+    # FILTRE PRINCIPAL: Score minimum
+    if score < 40:
+        return False, f"❌ Score trop faible: {score}/100 ({details[0] if details else 'multiples problemes'})"
+
+    # Check liquidite min (anti rug pull) - Garde pour securite
     if pool_data["liquidity"] < MIN_LIQUIDITY_USD:
         return False, f"❌ Liquidite trop faible: ${pool_data['liquidity']:,.0f}"
 
@@ -200,24 +325,20 @@ def is_valid_opportunity(pool_data: Dict) -> tuple[bool, str]:
     if pool_data["total_txns"] < MIN_TXNS_24H:
         return False, f"⚠️ Pas assez de txns: {pool_data['total_txns']}"
 
-    # Check age (nouveaux tokens uniquement)
-    if pool_data["age_hours"] > MAX_TOKEN_AGE_HOURS:
-        return False, f"⏳ Token trop ancien: {pool_data['age_hours']:.0f}h"
+    # FILTRE STRICT: Pump deja fini (>10,000%)
+    if pool_data["price_change_24h"] > 10_000:
+        return False, f"🚨 PUMP DEJA FINI: +{pool_data['price_change_24h']:.0f}% (TOO LATE!)"
 
-    # Check ratio volume/liquidite (activite)
-    ratio = pool_data["volume_24h"] / pool_data["liquidity"] if pool_data["liquidity"] > 0 else 0
-    if ratio < VOLUME_LIQUIDITY_RATIO:
-        return False, f"📉 Ratio Vol/Liq trop faible: {ratio:.1%}"
+    # FILTRE STRICT: Token trop recent (<6h = rug pull risk)
+    if pool_data["age_hours"] < 6:
+        return False, f"🚨 TROP RECENT: {pool_data['age_hours']:.1f}h (RUG RISK 90%!)"
 
-    # Detecter pump & dump potentiel
-    buy_sell_ratio = pool_data["buys"] / pool_data["sells"] if pool_data["sells"] > 0 else 999
-    if buy_sell_ratio > 5:
-        return False, f"🚨 Trop de achats vs ventes (pump?): {buy_sell_ratio:.1f}"
+    # FILTRE STRICT: Wash trading suspect (vol/liq > 1000%)
+    vol_liq_ratio = (pool_data["volume_24h"] / pool_data["liquidity"] * 100) if pool_data["liquidity"] > 0 else 0
+    if vol_liq_ratio > 1000:
+        return False, f"🚨 WASH TRADING: Vol/Liq {vol_liq_ratio:.0f}% (faux volume!)"
 
-    if buy_sell_ratio < 0.2:
-        return False, f"📉 Trop de ventes vs achats (dump?): {buy_sell_ratio:.1f}"
-
-    return True, "✅ Opportunite valide"
+    return True, f"✅ Score: {score}/100"
 
 def generer_alerte_dex(pool_data: Dict) -> str:
     """Genere alerte CONCISE avec emojis (meme format que Binance)."""
@@ -254,12 +375,37 @@ def generer_alerte_dex(pool_data: Dict) -> str:
     vol_avg = liq * 0.5  # Estimation volume moyen = 50% liquidite
     vol_change_pct = ((vol_24h - vol_avg) / vol_avg * 100) if vol_avg > 0 else 0
 
-    # Alerte concise
+    # Recuperer score et details
+    score = pool_data.get('score', 0)
+    score_details = pool_data.get('score_details', [])
+
+    # Alerte concise avec SCORE
     txt = f"\n🆕 *NOUVEAU TOKEN DEX*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
     txt += f"💎 {token_name}\n"
     txt += f"   Paire: {name}\n"
-    txt += f"⛓️ Blockchain: {blockchain}\n"
+    txt += f"⛓️ Blockchain: {blockchain}\n\n"
+
+    # AFFICHER SCORE DE CONFIANCE
+    if score >= 80:
+        txt += f"🎯 *SCORE: {score}/100* ⭐⭐⭐ EXCELLENT\n"
+        txt += f"   💡 Token tres fiable pour DEX\n\n"
+    elif score >= 60:
+        txt += f"🎯 *SCORE: {score}/100* ⭐⭐ BON\n"
+        txt += f"   💡 Opportunite interessante\n\n"
+    elif score >= 40:
+        txt += f"🎯 *SCORE: {score}/100* ⭐ MOYEN\n"
+        txt += f"   ⚠️ Risque moyen - Prudence\n\n"
+    else:
+        txt += f"🎯 *SCORE: {score}/100* ⚠️ FAIBLE\n"
+        txt += f"   ❌ Risque eleve - A eviter\n\n"
+
+    # Top 3 raisons du score
+    if score_details:
+        txt += f"📋 Raisons du score:\n"
+        for detail in score_details[:3]:
+            txt += f"   • {detail}\n"
+        txt += f"\n"
     txt += f"💰 Prix: ${price:.8f} ({pct_24h:+.1f}% 24h)\n"
     txt += f"📊 Vol 24h: ${vol_24h/1000:.0f}K ({vol_change_pct:+.0f}%)\n"
 
