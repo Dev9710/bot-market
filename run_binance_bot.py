@@ -1252,9 +1252,9 @@ def boucle():
                             }
 
                         logger.info(f"Alerte envoyee + {len(sorted_anomalies)} positions ajoutees au tracking")
-                else:
-                    temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
-                    logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
+                    else:
+                        temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
+                        logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
 
             state["last_scan"] = datetime.utcnow().isoformat()
             save_json(STATE_FILE, state)
