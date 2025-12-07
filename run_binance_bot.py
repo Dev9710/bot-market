@@ -271,6 +271,109 @@ def get_open_interest(symbol):
     except:
         return None
 
+def get_liquidity_check(symbol):
+    """
+    Verifie la liquidite REELLE (order book depth).
+
+    Criteres pour etre tradable:
+    1. Spread bid/ask < 0.5% (sinon perte instantanee)
+    2. Liquidite +/- 1% > $50K (sinon slippage enorme)
+    3. Pas de "mur" suspect (1 ordre > 70% liquidite = manipulation)
+
+    Returns: {'is_liquid': bool, 'spread_pct': float, 'liquidity_usd': float, 'reason': str}
+    """
+    try:
+        # Recuperer order book (20 niveaux de chaque cote)
+        url = f"{BINANCE_BASE}/api/v3/depth"
+        params = {"symbol": symbol, "limit": 20}
+        r = requests.get(url, params=params, timeout=10)
+        data = r.json()
+
+        bids = data.get('bids', [])
+        asks = data.get('asks', [])
+
+        if not bids or not asks:
+            return {
+                'is_liquid': False,
+                'spread_pct': 999,
+                'liquidity_usd': 0,
+                'reason': "Order book vide"
+            }
+
+        # Meilleur bid (prix achat le plus haut) et ask (prix vente le plus bas)
+        best_bid = float(bids[0][0])
+        best_ask = float(asks[0][0])
+        mid_price = (best_bid + best_ask) / 2
+
+        # 1. SPREAD BID/ASK
+        spread_pct = ((best_ask - best_bid) / mid_price * 100) if mid_price > 0 else 999
+
+        if spread_pct > 0.5:
+            return {
+                'is_liquid': False,
+                'spread_pct': spread_pct,
+                'liquidity_usd': 0,
+                'reason': f"Spread trop large ({spread_pct:.2f}%)"
+            }
+
+        # 2. LIQUIDITE +/- 1% (somme des ordres dans cette fourchette)
+        price_1pct_up = mid_price * 1.01
+        price_1pct_down = mid_price * 0.99
+
+        # Liquidite cote achat (bids)
+        bid_liquidity = sum(
+            float(price) * float(qty)
+            for price, qty in bids
+            if float(price) >= price_1pct_down
+        )
+
+        # Liquidite cote vente (asks)
+        ask_liquidity = sum(
+            float(price) * float(qty)
+            for price, qty in asks
+            if float(price) <= price_1pct_up
+        )
+
+        # Liquidite totale = moyenne des 2 cotes
+        total_liquidity = (bid_liquidity + ask_liquidity) / 2
+
+        if total_liquidity < 50000:  # Minimum $50K
+            return {
+                'is_liquid': False,
+                'spread_pct': spread_pct,
+                'liquidity_usd': total_liquidity,
+                'reason': f"Liquidite faible (${total_liquidity/1000:.0f}K)"
+            }
+
+        # 3. CHECK "MUR" SUSPECT (1 gros ordre = manipulation)
+        # Check si 1 ordre represent > 70% de la liquidite
+        if bids:
+            max_bid_order = max(float(price) * float(qty) for price, qty in bids[:10])
+            if bid_liquidity > 0 and (max_bid_order / bid_liquidity) > 0.7:
+                return {
+                    'is_liquid': False,
+                    'spread_pct': spread_pct,
+                    'liquidity_usd': total_liquidity,
+                    'reason': "Mur suspect (manipulation)"
+                }
+
+        # TOUT EST BON!
+        return {
+            'is_liquid': True,
+            'spread_pct': spread_pct,
+            'liquidity_usd': total_liquidity,
+            'reason': "OK"
+        }
+
+    except Exception as e:
+        logger.error(f"Erreur liquidity check {symbol}: {e}")
+        return {
+            'is_liquid': False,
+            'spread_pct': 999,
+            'liquidity_usd': 0,
+            'reason': f"Erreur API: {str(e)}"
+        }
+
 def get_token_info(symbol):
     """Recupere info token (nom complet)."""
     # Dict statique des noms complets (peut etre etendu)
@@ -496,6 +599,12 @@ def generer_analyse(anomaly):
 
     if oi and oi['open_interest_usd'] > 0:
         txt += f"💼 OI: ${oi['open_interest_usd']/1_000_000:.1f}M\n"
+
+    # Afficher info liquidite (CRITIQUE pour savoir si tradable!)
+    liq = anomaly.get('liquidity')
+    if liq and liq['is_liquid']:
+        txt += f"💧 Liquidite: ${liq['liquidity_usd']/1000:.0f}K (Spread {liq['spread_pct']:.2f}%)\n"
+        txt += f"   ✅ Token TRADABLE - Sortie facile\n"
 
     txt += f"\n🔍 *ANALYSE:*\n"
 
@@ -732,11 +841,19 @@ def scanner(cfg):
             continue
 
         if vol_data['ratio'] >= cfg['volume_threshold']:
+            # FILTRE LIQUIDITE: Verifier que le token est VRAIMENT tradable
+            liq_check = get_liquidity_check(symbol)
+
+            if not liq_check['is_liquid']:
+                logger.warning(f"Skip {symbol}: {liq_check['reason']} (spread={liq_check['spread_pct']:.2f}%, liq=${liq_check['liquidity_usd']/1000:.0f}K)")
+                continue
+
             anomaly = {
                 'symbol': symbol.replace('USDT', ''),
                 'volume_data': vol_data,
                 'liquidations': get_liquidations(symbol),
                 'open_interest': get_open_interest(symbol),
+                'liquidity': liq_check,  # Nouveau: info liquidite
                 'detection_time': datetime.now()
             }
 
