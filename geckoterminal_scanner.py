@@ -116,7 +116,7 @@ def get_new_pools(network: str, page: int = 1) -> Optional[List[Dict]]:
         log(f"❌ Erreur get_new_pools {network}: {e}")
         return None
 
-def parse_pool_data(pool: Dict) -> Optional[Dict]:
+def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
     """Parse donnees pool GeckoTerminal."""
     try:
         attrs = pool.get("attributes", {})
@@ -162,8 +162,7 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
         else:
             age_hours = 999999  # Inconnu = tres vieux
 
-        # Reseau et adresse
-        network = pool.get("relationships", {}).get("network", {}).get("data", {}).get("id", "unknown")
+        # Adresse du pool
         pool_address = attrs.get("address", "")
 
         return {
@@ -178,7 +177,7 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
             "traders_24h": traders_24h,
             "price_change_24h": price_change_24h,
             "age_hours": age_hours,
-            "network": network,
+            "network": network,  # Utilise le parametre passe (eth, bsc, etc.)
             "pool_address": pool_address,
         }
 
@@ -373,7 +372,7 @@ def scan_geckoterminal():
             log(f"   📊 {len(trending)} pools trending trouves")
 
             for pool in trending:
-                pool_data = parse_pool_data(pool)
+                pool_data = parse_pool_data(pool, network)  # Passer le network
 
                 if pool_data:
                     is_valid, reason = is_valid_opportunity(pool_data)
@@ -394,7 +393,7 @@ def scan_geckoterminal():
             log(f"   🆕 {len(new_pools)} nouveaux pools trouves")
 
             for pool in new_pools:
-                pool_data = parse_pool_data(pool)
+                pool_data = parse_pool_data(pool, network)  # Passer le network
 
                 if pool_data:
                     # Filtrer uniquement les tres nouveaux (<72h)

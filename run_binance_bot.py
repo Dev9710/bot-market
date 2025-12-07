@@ -727,6 +727,135 @@ def evaluer_alertes_passees(alert_history):
     return alert_history
 
 # =========================
+# ALERTES DE SORTIE (EXIT SIGNALS)
+# =========================
+
+def verifier_sorties(active_positions):
+    """
+    Verifie les positions actives et genere alertes de sortie.
+
+    Criteres de sortie:
+    - Target 1: +5% (prendre 50% profit)
+    - Target 2: +10% (prendre 30% profit)
+    - Target 3: +15% (prendre 20% profit, laisser courir)
+    - Stop Loss: -3% (sortir 100%)
+    - Volume drop 70%: momentum mort, sortir 100%
+    """
+    exit_alerts = []
+
+    for symbol, position in list(active_positions.items()):
+        try:
+            # Recuperer prix actuel
+            r = requests.get(f"{BINANCE_BASE}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
+            current_price = float(r.json().get('price', 0))
+
+            if current_price == 0:
+                continue
+
+            entry_price = position['entry_price']
+            change_pct = ((current_price - entry_price) / entry_price * 100)
+
+            # Recuperer volume actuel pour detecter drop
+            vol_data = get_klines_volume(symbol)
+            if vol_data:
+                current_vol = vol_data['current_1min_volume']
+                entry_vol = position.get('entry_volume', current_vol)
+                vol_drop_pct = ((entry_vol - current_vol) / entry_vol * 100) if entry_vol > 0 else 0
+            else:
+                vol_drop_pct = 0
+
+            alert_msg = None
+            action = None
+
+            # STOP LOSS: -3%
+            if change_pct <= -3 and not position.get('stop_hit'):
+                alert_msg = generer_alerte_sortie(symbol, "STOP LOSS", change_pct, current_price,
+                                                   "Sortir 100%", "❌",
+                                                   "Prix a touche -3% = Protection capital")
+                action = 'stop_loss'
+                position['stop_hit'] = True
+
+            # VOLUME DROP 70%
+            elif vol_drop_pct >= 70 and not position.get('vol_drop_alerted'):
+                alert_msg = generer_alerte_sortie(symbol, "VOLUME DROP", vol_drop_pct, current_price,
+                                                   "Sortir 100%", "⚠️",
+                                                   "Volume a chute de 70% = Momentum mort")
+                action = 'volume_drop'
+                position['vol_drop_alerted'] = True
+
+            # TARGET 3: +15%
+            elif change_pct >= 15 and not position.get('target3_hit'):
+                alert_msg = generer_alerte_sortie(symbol, "TARGET 3", change_pct, current_price,
+                                                   "Prendre 20% profit (laisser courir le reste)", "🎯",
+                                                   "Excellent gain! Securise profit, garde exposition")
+                action = 'target3'
+                position['target3_hit'] = True
+
+            # TARGET 2: +10%
+            elif change_pct >= 10 and not position.get('target2_hit'):
+                alert_msg = generer_alerte_sortie(symbol, "TARGET 2", change_pct, current_price,
+                                                   "Prendre 30% profit", "🎯",
+                                                   "Bon gain! Securise une partie")
+                action = 'target2'
+                position['target2_hit'] = True
+
+            # TARGET 1: +5%
+            elif change_pct >= 5 and not position.get('target1_hit'):
+                alert_msg = generer_alerte_sortie(symbol, "TARGET 1", change_pct, current_price,
+                                                   "Prendre 50% profit", "🎯",
+                                                   "Premier objectif atteint! Securise 50%")
+                action = 'target1'
+                position['target1_hit'] = True
+
+            if alert_msg:
+                exit_alerts.append({
+                    'symbol': symbol,
+                    'message': alert_msg,
+                    'action': action,
+                    'change_pct': change_pct
+                })
+
+            # Si stop loss ou volume drop, retirer position
+            if action in ['stop_loss', 'volume_drop']:
+                del active_positions[symbol]
+                logger.info(f"Position {symbol} fermee: {action}")
+
+        except Exception as e:
+            logger.error(f"Erreur verification sortie {symbol}: {e}")
+
+    return exit_alerts, active_positions
+
+def generer_alerte_sortie(symbol, trigger, change_pct, current_price, action, emoji, explication):
+    """Genere message d'alerte de sortie."""
+
+    # Format prix
+    if current_price >= 1:
+        prix_fmt = f"${current_price:.2f}"
+    elif current_price >= 0.01:
+        prix_fmt = f"${current_price:.4f}"
+    else:
+        prix_fmt = f"${current_price:.6f}"
+
+    txt = f"\n{emoji} *ALERTE SORTIE: {symbol}*\n"
+    txt += f"━━━━━━━━━━━━━━━━\n"
+    txt += f"🔔 Trigger: *{trigger}*\n"
+    txt += f"💰 Prix actuel: {prix_fmt}\n"
+
+    if "TARGET" in trigger:
+        txt += f"📈 Profit: +{change_pct:.1f}%\n"
+    elif "STOP" in trigger:
+        txt += f"📉 Perte: {change_pct:.1f}%\n"
+    elif "VOLUME" in trigger:
+        txt += f"📊 Volume drop: -{change_pct:.0f}%\n"
+
+    txt += f"\n⚡ *ACTION IMMEDIATE:*\n"
+    txt += f"{action}\n\n"
+    txt += f"💡 *POURQUOI?*\n"
+    txt += f"{explication}\n"
+
+    return txt
+
+# =========================
 # FILTRE ANTI-MANIPULATION
 # =========================
 
@@ -779,7 +908,8 @@ def boucle():
     state = charger_json(STATE_FILE, {
         "last_alerts": {},
         "last_scan": None,
-        "alert_history": {}  # Nouveau: track alert count par symbol
+        "alert_history": {},  # Track alert count par symbol
+        "active_positions": {}  # Nouveau: track positions actives pour alertes sortie
     })
 
     cfg = charger_json(CONFIG_FILE, {
@@ -808,6 +938,17 @@ def boucle():
             perf = verifier_performance(state.get("alert_history", {}))
             if perf:
                 logger.info(f"Performance: {perf['wins']}/{perf['total_alerts']} wins = {perf['win_rate']:.1f}% win rate")
+
+            # VERIFIER ALERTES DE SORTIE pour positions actives
+            active_positions = state.get("active_positions", {})
+            if active_positions:
+                exit_alerts, state["active_positions"] = verifier_sorties(active_positions)
+
+                # Envoyer alertes de sortie immediatement (prioritaires!)
+                if exit_alerts:
+                    for exit_alert in exit_alerts:
+                        tg(exit_alert['message'])
+                        logger.info(f"Alerte sortie envoyee: {exit_alert['symbol']} - {exit_alert['action']}")
 
             anomalies = scanner(cfg)
 
@@ -849,6 +990,7 @@ def boucle():
                         for anomaly in sorted_anomalies:
                             symbol = anomaly['symbol']
                             price = anomaly['volume_data']['price']
+                            volume = anomaly['volume_data']['current_1min_volume']
 
                             if symbol not in state["alert_history"]:
                                 state["alert_history"][symbol] = []
@@ -860,7 +1002,19 @@ def boucle():
                                 # 'outcome' sera ajoute plus tard par evaluer_alertes_passees()
                             })
 
-                        logger.info("Alerte envoyee")
+                            # AJOUTER aux positions actives pour tracking sortie
+                            state["active_positions"][symbol] = {
+                                'entry_price': price,
+                                'entry_volume': volume,
+                                'entry_time': now,
+                                'target1_hit': False,
+                                'target2_hit': False,
+                                'target3_hit': False,
+                                'stop_hit': False,
+                                'vol_drop_alerted': False
+                            }
+
+                        logger.info(f"Alerte envoyee + {len(sorted_anomalies)} positions ajoutees au tracking")
                 else:
                     temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
                     logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
