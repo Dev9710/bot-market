@@ -85,13 +85,6 @@ def get_top_pairs(max_pairs=150):
     ticker_url = f"{BINANCE_BASE}/api/v3/ticker/24hr"
     try:
         r = requests.get(ticker_url, timeout=10)
-<<<<<<< HEAD
-        tickers = r.json()
-
-        usdt_tickers = [
-            t for t in tickers
-            if t['symbol'].endswith('USDT') and float(t.get('quoteVolume', 0)) > 1000000
-=======
         r.raise_for_status()
         tickers = r.json()
 
@@ -103,7 +96,6 @@ def get_top_pairs(max_pairs=150):
         usdt_tickers = [
             t for t in tickers
             if isinstance(t, dict) and t.get('symbol', '').endswith('USDT') and float(t.get('quoteVolume', 0)) > 1000000
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
         ]
 
         usdt_tickers.sort(key=lambda x: float(x.get('quoteVolume', 0)), reverse=True)
@@ -113,11 +105,7 @@ def get_top_pairs(max_pairs=150):
         return []
 
 def get_klines_volume(symbol):
-<<<<<<< HEAD
-    """Recupere volume 1min reel."""
-=======
     """Recupere volume 1min reel avec variations de prix + momentum."""
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
     url = f"{BINANCE_BASE}/api/v3/klines"
     params = {"symbol": symbol, "interval": "1m", "limit": 60}
 
@@ -125,20 +113,11 @@ def get_klines_volume(symbol):
         r = requests.get(url, params=params, timeout=10)
         klines = r.json()
 
-<<<<<<< HEAD
-        if not isinstance(klines, list) or len(klines) < 2:
-=======
         if not isinstance(klines, list) or len(klines) < 4:
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
             return None
 
         latest = klines[-1]
         close_price = float(latest[4])
-<<<<<<< HEAD
-        latest_volume_token = float(latest[5])
-        latest_volume_usd = latest_volume_token * close_price
-
-=======
         open_price = float(latest[1])
         latest_volume_token = float(latest[5])
         latest_volume_usd = latest_volume_token * close_price
@@ -150,7 +129,6 @@ def get_klines_volume(symbol):
         # Nombre de trades (approximation via nombre de klines avec volume)
         trades_count = sum(1 for k in klines if float(k[5]) > 0)
 
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
         total_volume_usd = 0
         for kline in klines[:-1]:
             volume_token = float(kline[5])
@@ -160,8 +138,6 @@ def get_klines_volume(symbol):
         avg_volume_1min = total_volume_usd / len(klines[:-1]) if len(klines) > 1 else 1
         ratio = latest_volume_usd / avg_volume_1min if avg_volume_1min > 0 else 0
 
-<<<<<<< HEAD
-=======
         # Variation du volume
         volume_change_pct = ((latest_volume_usd - avg_volume_1min) / avg_volume_1min * 100) if avg_volume_1min > 0 else 0
 
@@ -219,15 +195,11 @@ def get_klines_volume(symbol):
         else:
             pre_pump_signal = "normal"  # Neutre
 
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
         return {
             'symbol': symbol,
             'current_1min_volume': latest_volume_usd,
             'avg_1h_volume': avg_volume_1min,
             'ratio': ratio,
-<<<<<<< HEAD
-            'price': close_price
-=======
             'price': close_price,
             'price_change_1h': price_change_1h,
             'volume_change_pct': volume_change_pct,
@@ -238,7 +210,6 @@ def get_klines_volume(symbol):
             'vol_t2': vol_t2,
             'pre_pump_signal': pre_pump_signal,
             'pre_pump_ratio': pre_pump_ratio
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
         }
     except:
         return None
@@ -300,8 +271,6 @@ def get_open_interest(symbol):
     except:
         return None
 
-<<<<<<< HEAD
-=======
 def get_liquidity_check(symbol):
     """
     Verifie la liquidite REELLE (order book depth).
@@ -405,7 +374,6 @@ def get_liquidity_check(symbol):
             'reason': f"Erreur API: {str(e)}"
         }
 
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 def get_token_info(symbol):
     """Recupere info token (nom complet)."""
     # Dict statique des noms complets (peut etre etendu)
@@ -452,8 +420,6 @@ def get_token_info(symbol):
     return token_names.get(base_symbol, base_symbol)
 
 # =========================
-<<<<<<< HEAD
-=======
 # SCORE DE CONFIANCE
 # =========================
 
@@ -564,7 +530,6 @@ def calculer_score_confiance(anomaly):
     return score, details
 
 # =========================
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 # ANALYSE PEDAGOGIQUE
 # =========================
 
@@ -585,12 +550,9 @@ def generer_analyse(anomaly):
     vol_increase_pct = ((vol_1min - vol_avg) / vol_avg * 100) if vol_avg > 0 else 0
     vol_diff = vol_1min - vol_avg
 
-<<<<<<< HEAD
-=======
     # CALCULER LE SCORE DE CONFIANCE
     score, score_details = calculer_score_confiance(anomaly)
 
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
     # Determiner nombre de decimales (2 pour prix > $1, sinon plus)
     if price >= 1:
         prix_fmt = f"${price:.2f}"
@@ -599,47 +561,16 @@ def generer_analyse(anomaly):
     else:
         prix_fmt = f"${price:.6f}"
 
-<<<<<<< HEAD
-=======
     # Recuperer nouvelles metriques
     price_change_1h = v.get('price_change_1h', 0)
     volume_change_pct = v.get('volume_change_pct', 0)
     trades_count = v.get('trades_count_1h', 0)
 
     # HEADER AVEC SCORE
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
     txt = f"\n🔥 *{symbol}*"
     if token_name != symbol:
         txt += f" ({token_name})"
     txt += f"\n━━━━━━━━━━━━━━━━\n"
-<<<<<<< HEAD
-    txt += f"💰 Prix: {prix_fmt}\n"
-    txt += f"📊 Vol 1min: ${vol_1min/1000:.0f}K (+{vol_increase_pct:.0f}% vs moy 1h)\n"
-    txt += f"📈 Ratio: x{ratio:.1f}\n"
-
-    if oi and oi['open_interest_usd'] > 0:
-        txt += f"💼 OI: ${oi['open_interest_usd']/1_000_000:.1f}M (positions futures)\n"
-
-    txt += f"\n🔍 *QUE SE PASSE-T-IL?*\n\n"
-
-    # Section volume detaillee
-    txt += f"💵 INJECTION DE VOLUME x{ratio:.1f}!\n"
-    txt += f"   ↳ Volume normal: ${vol_avg/1000:.0f}K/min\n"
-    txt += f"   ↳ Volume actuel: ${vol_1min/1000:.0f}K/min\n"
-    txt += f"   ↳ Difference: +${vol_diff/1000:.0f}K en 1 minute!\n"
-    txt += f"   ↳ Quelqu'un vient d'acheter MASSIVEMENT\n\n"
-
-    # Explication importance volume
-    txt += f"📊 POURQUOI LE VOLUME COMPTE?\n"
-    txt += f"   • Volume eleve = Gros acheteurs entrent\n"
-    if ratio >= 10:
-        txt += f"   • Spike x{ratio:.0f} = Info privilegiee possible\n"
-        txt += f"   • Pas un achat retail normal\n"
-        txt += f"   • Probable: Institution, whale, ou insider\n\n"
-    elif ratio >= 5:
-        txt += f"   • Spike x{ratio:.1f} = Activite anormale\n"
-        txt += f"   • Acheteurs importants actifs\n\n"
-=======
 
     # AFFICHER LE SCORE DE CONFIANCE
     if score >= 80:
@@ -670,9 +601,9 @@ def generer_analyse(anomaly):
         txt += f"💼 OI: ${oi['open_interest_usd']/1_000_000:.1f}M\n"
 
     # Afficher info liquidite (CRITIQUE pour savoir si tradable!)
-    liq = anomaly.get('liquidity')
-    if liq and liq['is_liquid']:
-        txt += f"💧 Liquidite: ${liq['liquidity_usd']/1000:.0f}K (Spread {liq['spread_pct']:.2f}%)\n"
+    liq_check = anomaly.get('liquidity')
+    if liq_check and liq_check['is_liquid']:
+        txt += f"💧 Liquidite: ${liq_check['liquidity_usd']/1000:.0f}K (Spread {liq_check['spread_pct']:.2f}%)\n"
         txt += f"   ✅ Token TRADABLE - Sortie facile\n"
 
     txt += f"\n🔍 *ANALYSE:*\n"
@@ -733,7 +664,6 @@ def generer_analyse(anomaly):
         txt += f"   ⚠️ Early stage - A surveiller\n"
 
     txt += f"\n"
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 
     # Liquidations
     if liq and liq['total_liquidated_usd'] > 0:
@@ -842,8 +772,6 @@ def generer_analyse(anomaly):
     return txt
 
 # =========================
-<<<<<<< HEAD
-=======
 # FILTRE MACRO MARCHE
 # =========================
 
@@ -880,7 +808,6 @@ def verifier_contexte_marche():
         return 'neutre', 0, 0
 
 # =========================
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 # SCANNER
 # =========================
 
@@ -908,9 +835,6 @@ def scanner(cfg):
         if vol_data['current_1min_volume'] < cfg['min_volume_usd']:
             continue
 
-<<<<<<< HEAD
-        if vol_data['ratio'] >= cfg['volume_threshold']:
-=======
         # FILTRE PRE-PUMP: Skip si "too_late" (pump deja parti)
         if vol_data.get('pre_pump_signal') == 'too_late':
             logger.info(f"Skip {symbol}: Pump deja parti (x{vol_data.get('pre_pump_ratio', 0):.1f})")
@@ -924,16 +848,12 @@ def scanner(cfg):
                 logger.warning(f"Skip {symbol}: {liq_check['reason']} (spread={liq_check['spread_pct']:.2f}%, liq=${liq_check['liquidity_usd']/1000:.0f}K)")
                 continue
 
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
             anomaly = {
                 'symbol': symbol.replace('USDT', ''),
                 'volume_data': vol_data,
                 'liquidations': get_liquidations(symbol),
                 'open_interest': get_open_interest(symbol),
-<<<<<<< HEAD
-=======
                 'liquidity': liq_check,  # Nouveau: info liquidite
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
                 'detection_time': datetime.now()
             }
 
@@ -947,8 +867,6 @@ def scanner(cfg):
     return anomalies
 
 # =========================
-<<<<<<< HEAD
-=======
 # PERFORMANCE TRACKING
 # =========================
 
@@ -1197,22 +1115,17 @@ def est_manipule(symbol, alert_history, max_alerts=3):
     return False
 
 # =========================
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 # BOUCLE PRINCIPALE
 # =========================
 
 def boucle():
     """Boucle principale du bot."""
-<<<<<<< HEAD
-    state = charger_json(STATE_FILE, {"last_alerts": {}, "last_scan": None})
-=======
     state = charger_json(STATE_FILE, {
         "last_alerts": {},
         "last_scan": None,
         "alert_history": {},  # Track alert count par symbol
         "active_positions": {}  # Nouveau: track positions actives pour alertes sortie
     })
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 
     cfg = charger_json(CONFIG_FILE, {
         "scan_interval_seconds": 120,
@@ -1230,30 +1143,6 @@ def boucle():
 
     while True:
         try:
-<<<<<<< HEAD
-            anomalies = scanner(cfg)
-
-            if anomalies:
-                alert_key = "binance_alerts"
-
-                if alert_key not in state["last_alerts"] or secondes_depuis(state["last_alerts"][alert_key]) >= cfg['alert_cooldown_seconds']:
-
-                    sorted_anomalies = sorted(anomalies, key=lambda x: x['volume_data']['ratio'], reverse=True)[:cfg['max_alerts_per_scan']]
-
-                    msg = "Top activites crypto detectees\n(Volume temps reel Binance)\n"
-
-                    for i, anomaly in enumerate(sorted_anomalies, 1):
-                        msg += f"\n#{i} " + generer_analyse(anomaly)
-
-                    msg += f"\n\nScan effectue : {datetime.now().strftime('%H:%M:%S')}"
-
-                    tg(msg)
-                    state["last_alerts"][alert_key] = datetime.utcnow().isoformat()
-                    logger.info("Alerte envoyee")
-                else:
-                    temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
-                    logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
-=======
             # Nettoyer l'historique des alertes anciennes (> 7 jours)
             state["alert_history"] = nettoyer_historique(state.get("alert_history", {}))
 
@@ -1366,7 +1255,6 @@ def boucle():
                     else:
                         temps_restant = cfg['alert_cooldown_seconds'] - secondes_depuis(state["last_alerts"][alert_key])
                         logger.info(f"Cooldown actif, {temps_restant:.0f}s restantes")
->>>>>>> fffc69dec2c886ff1baf43daf462318f466f1a32
 
             state["last_scan"] = datetime.utcnow().isoformat()
             save_json(STATE_FILE, state)
