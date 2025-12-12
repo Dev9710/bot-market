@@ -85,6 +85,17 @@ def get_top_pairs(max_pairs=150):
     ticker_url = f"{BINANCE_BASE}/api/v3/ticker/24hr"
     try:
         r = requests.get(ticker_url, timeout=10)
+
+        # HTTP 451 = Unavailable For Legal Reasons (geo-blocking)
+        if r.status_code == 451:
+            logger.error("❌ ERREUR 451: Binance bloque votre region/pays")
+            logger.error("💡 SOLUTIONS:")
+            logger.error("   1. Utilisez un VPN (recommande: USA, Canada, UK)")
+            logger.error("   2. Contactez votre ISP")
+            logger.error("   3. Utilisez un proxy")
+            logger.error("\n⚠️ Le scanner Binance ne fonctionnera pas sans VPN dans votre region")
+            return []
+
         r.raise_for_status()
         tickers = r.json()
 
@@ -100,6 +111,12 @@ def get_top_pairs(max_pairs=150):
 
         usdt_tickers.sort(key=lambda x: float(x.get('quoteVolume', 0)), reverse=True)
         return [t['symbol'] for t in usdt_tickers[:max_pairs]]
+    except requests.exceptions.HTTPError as e:
+        if '451' in str(e):
+            logger.error(f"❌ HTTP 451: Binance API bloquee dans votre region - Utilisez un VPN")
+        else:
+            logger.error(f"Erreur HTTP recuperation pairs: {e}")
+        return []
     except Exception as e:
         logger.error(f"Erreur recuperation pairs: {e}")
         return []

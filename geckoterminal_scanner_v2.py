@@ -70,6 +70,23 @@ alert_cooldown = {}
 # ============================================
 # UTILITAIRES
 # ============================================
+# Mapping des networks pour affichage lisible
+NETWORK_NAMES = {
+    "eth": "Ethereum",
+    "bsc": "BSC (Binance Smart Chain)",
+    "arbitrum": "Arbitrum",
+    "base": "Base",
+    "solana": "Solana",
+    "polygon": "Polygon",
+    "avalanche": "Avalanche",
+    "optimism": "Optimism",
+    "fantom": "Fantom",
+}
+
+def get_network_display_name(network_id: str) -> str:
+    """Convertit ID network en nom lisible."""
+    return NETWORK_NAMES.get(network_id.lower(), network_id.upper())
+
 def log(msg: str):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {msg}")
 
@@ -166,16 +183,18 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
         base_token_price = attrs.get("base_token_price_usd")
         price_usd = float(base_token_price) if base_token_price else 0
 
-        # Volume et liquidité
-        volume_24h = float(attrs.get("volume_usd", {}).get("h24", 0))
-        volume_6h = float(attrs.get("volume_usd", {}).get("h6", 0))
-        volume_1h = float(attrs.get("volume_usd", {}).get("h1", 0))
-        liquidity = float(attrs.get("reserve_in_usd", 0))
+        # Volume et liquidité (protéger contre None)
+        volume_usd_data = attrs.get("volume_usd", {}) or {}
+        volume_24h = float(volume_usd_data.get("h24") or 0)
+        volume_6h = float(volume_usd_data.get("h6") or 0)
+        volume_1h = float(volume_usd_data.get("h1") or 0)
+        liquidity = float(attrs.get("reserve_in_usd") or 0)
 
-        # Transactions
-        txns_24h = attrs.get("transactions", {}).get("h24", {})
-        txns_6h = attrs.get("transactions", {}).get("h6", {})
-        txns_1h = attrs.get("transactions", {}).get("h1", {})
+        # Transactions (protéger contre None)
+        transactions_data = attrs.get("transactions", {}) or {}
+        txns_24h = transactions_data.get("h24", {}) or {}
+        txns_6h = transactions_data.get("h6", {}) or {}
+        txns_1h = transactions_data.get("h1", {}) or {}
 
         buys_24h = txns_24h.get("buys", 0)
         sells_24h = txns_24h.get("sells", 0)
@@ -186,11 +205,11 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
 
         total_txns = buys_24h + sells_24h
 
-        # Variations prix (multi-timeframe depuis API)
-        price_changes = attrs.get("price_change_percentage", {})
-        price_change_24h = float(price_changes.get("h24", 0))
-        price_change_6h = float(price_changes.get("h6", 0))
-        price_change_1h = float(price_changes.get("h1", 0))
+        # Variations prix (multi-timeframe depuis API) - Protéger contre None
+        price_changes = attrs.get("price_change_percentage", {}) or {}
+        price_change_24h = float(price_changes.get("h24") or 0)
+        price_change_6h = float(price_changes.get("h6") or 0)
+        price_change_1h = float(price_changes.get("h1") or 0)
 
         # Age du pool
         pool_created = attrs.get("pool_created_at")
@@ -200,13 +219,24 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
         else:
             age_hours = 999999
 
-        # Réseau et adresse
-        network = pool.get("relationships", {}).get("network", {}).get("data", {}).get("id", "unknown")
+        # Réseau et adresse - Protection robuste
+        relationships = pool.get("relationships", {}) or {}
+        network_data = relationships.get("network", {}) or {}
+        network_inner = network_data.get("data", {}) or {}
+        network = network_inner.get("id", "unknown")
+
+        # Si network toujours unknown, essayer de l'extraire du type
+        if network == "unknown":
+            pool_type = pool.get("type", "")
+            # Format peut être "pool" ou "network-name-pool"
+            if "-" in pool_type:
+                network = pool_type.split("-")[0]
+
         pool_address = attrs.get("address", "")
 
-        # FDV et Market Cap
-        fdv_usd = float(attrs.get("fdv_usd", 0))
-        market_cap_usd = float(attrs.get("market_cap_usd", 0))
+        # FDV et Market Cap (protéger contre None)
+        fdv_usd = float(attrs.get("fdv_usd") or 0)
+        market_cap_usd = float(attrs.get("market_cap_usd") or 0)
 
         return {
             "name": name,
@@ -371,7 +401,10 @@ def analyze_multi_pool(pools: List[Dict]) -> Dict:
 # SCORING DYNAMIQUE
 # ============================================
 def calculate_base_score(pool_data: Dict) -> int:
-    """Score de base (fondamentaux)."""
+    """
+    Score de base DYNAMIQUE (fondamentaux) avec pénalités.
+    Corrigé pour ALMANAK: score ne doit plus monter pendant une chute.
+    """
     score = 0
 
     # Liquidité (max 30 points)
@@ -425,81 +458,219 @@ def calculate_base_score(pool_data: Dict) -> int:
     elif buy_ratio < 0.4 or buy_ratio > 2.0:
         score += 5  # Déséquilibré
 
-    return min(score, 70)  # Max 70 pour base
+    # === NOUVELLES PÉNALITÉS DYNAMIQUES (Correction ALMANAK) ===
+
+    # PÉNALITÉ 1: Tendance baissière 24h (CRITIQUE)
+    price_change_24h = pool_data.get("price_change_24h", 0)
+    if price_change_24h < -40:
+        score -= 35  # Crash massif (-45% comme ALMANAK)
+    elif price_change_24h < -30:
+        score -= 25  # Chute sévère
+    elif price_change_24h < -20:
+        score -= 15  # Chute importante
+    elif price_change_24h < -10:
+        score -= 8   # Baisse modérée
+
+    # PÉNALITÉ 2: Pression vendeuse massive 24h (CRITIQUE)
+    total_txns_24h = pool_data["buys_24h"] + pool_data["sells_24h"]
+    if total_txns_24h > 0:
+        sell_pressure_24h = pool_data["sells_24h"] / total_txns_24h
+        if sell_pressure_24h > 0.70:  # >70% ventes (cas ALMANAK: 63-68%)
+            score -= 25
+        elif sell_pressure_24h > 0.65:  # >65% ventes
+            score -= 20
+        elif sell_pressure_24h > 0.60:  # >60% ventes
+            score -= 12
+
+    # PÉNALITÉ 3: Liquidité en chute (risque rug pull)
+    # Note: Nécessiterait historique liquidité, simulé via Vol/Liq ratio anormal
+    if vol_liq > 3.0:  # Activité excessive = possiblement liquidité qui fond
+        score -= 10
+
+    return max(score, 0)  # Ne jamais descendre sous 0
 
 def calculate_momentum_bonus(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> int:
-    """Bonus momentum (dynamique actuelle)."""
+    """
+    Bonus momentum INTELLIGENT (dynamique actuelle).
+    Corrigé pour ALMANAK: distingue bon spike (accumulation) vs mauvais spike (panic sell).
+    """
     bonus = 0
 
-    # Prix 1h (max 15 points)
-    if momentum.get("1h"):
-        if momentum["1h"] >= 10:
-            bonus += 15
-        elif momentum["1h"] >= 5:
-            bonus += 10
-        elif momentum["1h"] >= 2:
-            bonus += 5
+    # === Prix 1h (max 15 points) ===
+    price_1h = momentum.get("1h", 0)
+    price_6h = pool_data.get("price_change_6h", 0)
+    price_24h = pool_data.get("price_change_24h", 0)
 
-    # Traders spike (si disponible) (max 10 points)
-    # Note: GeckoTerminal ne donne pas traders count, on simule avec transactions
-    txn_1h = pool_data["buys_1h"] + pool_data["sells_1h"]
-    txn_24h = pool_data["total_txns"]
-    if txn_24h > 0:
-        txn_1h_normalized = txn_1h * 24  # Normaliser sur 24h
-        if txn_1h_normalized > txn_24h * 1.5:  # +50% activité vs moyenne
-            bonus += 10
-        elif txn_1h_normalized > txn_24h * 1.2:
-            bonus += 5
-
-    # Buy ratio 1h (max 10 points)
-    buy_ratio_1h = pool_data["buys_1h"] / pool_data["sells_1h"] if pool_data["sells_1h"] > 0 else 1.0
-    if buy_ratio_1h >= 1.0:
+    if price_1h >= 10:
+        bonus += 15
+    elif price_1h >= 5:
         bonus += 10
-    elif buy_ratio_1h >= 0.8:
+    elif price_1h >= 2:
         bonus += 5
 
-    # Multi-pool (max 10 points)
+    # === DÉTECTION DEAD CAT BOUNCE (Correction ALMANAK) ===
+    # Rebond 1h positif MAIS tendance 24h très négative = piège
+    if price_1h > 0 and price_24h < -20:
+        # Dead cat bounce détecté
+        if price_1h < 10:  # Petit rebond sur grosse chute
+            bonus -= 10  # PÉNALITÉ au lieu de bonus!
+        # Si rebond >10%, on garde le bonus mais on avertira dans les signaux
+
+    # === Volume Spike: BON ou MAUVAIS? ===
+    txn_1h = pool_data["buys_1h"] + pool_data["sells_1h"]
+    txn_24h = pool_data["total_txns"]
+
+    if txn_24h > 0:
+        txn_1h_normalized = txn_1h * 24  # Normaliser sur 24h
+        has_volume_spike = txn_1h_normalized > txn_24h * 1.5  # +50% activité
+
+        if has_volume_spike:
+            # Spike + Prix hausse = BON (accumulation)
+            if price_1h > 3:
+                bonus += 10
+            # Spike + Prix stable/léger hausse = NEUTRE
+            elif price_1h > 0:
+                bonus += 5
+            # Spike + Prix chute = MAUVAIS (panic sell)
+            elif price_1h < -5:
+                bonus -= 10  # PÉNALITÉ pour panic sell
+            # Spike + Prix léger baisse = vigilance
+            else:
+                bonus += 0  # Pas de bonus ni pénalité
+        elif txn_1h_normalized > txn_24h * 1.2:
+            # Activité modérée
+            if price_1h > 0:
+                bonus += 5
+
+    # === Buy Pressure 1h (max 10 points) ===
+    buy_ratio_1h = pool_data["buys_1h"] / pool_data["sells_1h"] if pool_data["sells_1h"] > 0 else 1.0
+    buy_ratio_24h = pool_data["buys_24h"] / pool_data["sells_24h"] if pool_data["sells_24h"] > 0 else 1.0
+
+    # Buy ratio 1h DOIT être comparé au ratio 24h
+    if buy_ratio_1h >= 1.2:  # Forte dominance acheteurs
+        bonus += 10
+    elif buy_ratio_1h >= 1.0:  # Léger avantage acheteurs
+        bonus += 8
+    elif buy_ratio_1h >= 0.8:  # Équilibre
+        bonus += 5
+    elif buy_ratio_1h < 0.5 and buy_ratio_24h < 0.5:
+        # Vendeurs dominent 1h ET 24h = très mauvais
+        bonus -= 5
+
+    # === Multi-pool (max 10 points) ===
     if multi_pool_data.get("is_multi_pool"):
         bonus += 5
         if multi_pool_data.get("is_weth_dominant"):
             bonus += 5
 
-    return min(bonus, 30)  # Max 30 pour momentum
+    # === CORRECTION CONTEXTE GLOBAL ===
+    # Si price_24h très négatif, limiter le momentum bonus max
+    if price_24h < -30:
+        bonus = min(bonus, 10)  # Max 10 points si token en crash
+    elif price_24h < -20:
+        bonus = min(bonus, 15)  # Max 15 points si token en chute
+
+    return max(min(bonus, 30), -20)  # Max +30, Min -20
 
 def calculate_final_score(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Tuple[int, int, int]:
     """Score final = base + momentum."""
     base = calculate_base_score(pool_data)
     momentum_bonus = calculate_momentum_bonus(pool_data, momentum, multi_pool_data)
-    final = min(base + momentum_bonus, 100)
+    final = max(min(base + momentum_bonus, 100), 0)  # Entre 0 et 100
     return final, base, momentum_bonus
+
+def calculate_confidence_score(pool_data: Dict) -> int:
+    """
+    Calcule niveau de confiance dans les données (0-100%).
+    Corrigé pour ALMANAK: ajout indicateur fiabilité.
+    """
+    confidence = 100
+
+    # Réduire confiance si données incomplètes
+    if pool_data.get("network", "").lower() == "unknown":
+        confidence -= 20  # Données réseau manquantes
+
+    # Réduire confiance si liquidité faible = données moins stables
+    liq = pool_data.get("liquidity", 0)
+    if liq < 200000:
+        confidence -= 20  # Liquidité trop faible
+    elif liq < 300000:
+        confidence -= 10  # Liquidité moyenne-faible
+
+    # Réduire confiance si trop récent = historique limité
+    age = pool_data.get("age_hours", 999)
+    if age < 6:
+        confidence -= 20  # Moins de 6h = très peu d'historique
+    elif age < 12:
+        confidence -= 10  # Moins de 12h = historique limité
+
+    # Réduire confiance si volume très faible
+    vol = pool_data.get("volume_24h", 0)
+    if vol < 100000:
+        confidence -= 15  # Volume faible = données peu significatives
+
+    # Réduire confiance si transactions trop peu nombreuses
+    txns = pool_data.get("total_txns", 0)
+    if txns < 200:
+        confidence -= 10  # Peu de transactions = données peu représentatives
+
+    return max(confidence, 0)
 
 # ============================================
 # DÉTECTION SIGNAUX
 # ============================================
 def detect_signals(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> List[str]:
-    """Détecte tous les signaux importants."""
+    """
+    Détecte tous les signaux importants.
+    Corrigé pour ALMANAK: ajoute warnings pour dead cat bounce et panic sell.
+    """
     signals = []
 
-    # ACCELERATION
-    if momentum.get("1h") and momentum["1h"] >= 5:
-        signals.append(f"🚀 ACCELERATION: +{momentum['1h']:.1f}% en 1h")
+    price_1h = momentum.get("1h", 0)
+    price_6h = pool_data.get("price_change_6h", 0)
+    price_24h = pool_data.get("price_change_24h", 0)
 
-    # REVERSAL
-    if pool_data["price_change_24h"] < -10 and momentum.get("1h") and momentum["1h"] > 3:
-        signals.append(f"📈 REVERSAL: Hausse malgré {pool_data['price_change_24h']:.1f}% 24h")
-
-    # VOLUME SPIKE
-    vol_1h_normalized = pool_data["volume_1h"] * 24
-    if vol_1h_normalized > pool_data["volume_24h"] * 1.5:
-        spike_pct = ((vol_1h_normalized / pool_data["volume_24h"]) - 1) * 100
-        signals.append(f"📊 VOLUME SPIKE: +{spike_pct:.0f}% activité vs moyenne")
-
-    # BUY PRESSURE
     buy_ratio_1h = pool_data["buys_1h"] / pool_data["sells_1h"] if pool_data["sells_1h"] > 0 else 1.0
     buy_ratio_24h = pool_data["buys_24h"] / pool_data["sells_24h"] if pool_data["sells_24h"] > 0 else 1.0
 
+    # === DEAD CAT BOUNCE WARNING (NOUVEAU - Correction ALMANAK) ===
+    if price_1h > 0 and price_24h < -20:
+        if price_1h < 10:
+            signals.append(f"⚠️ DEAD CAT BOUNCE: Rebond +{price_1h:.1f}% sur tendance baissière {price_24h:.1f}%")
+        else:
+            signals.append(f"⚠️ REVERSAL FRAGILE: Rebond fort (+{price_1h:.1f}%) mais tendance 24h négative ({price_24h:.1f}%)")
+
+    # ACCELERATION (seulement si pas dead cat bounce)
+    elif price_1h >= 5:
+        signals.append(f"🚀 ACCELERATION: +{price_1h:.1f}% en 1h")
+
+    # REVERSAL (uniquement si contexte positif)
+    if price_24h < -10 and price_1h > 3 and price_6h > 0:
+        # Reversal confirmé si 6h aussi positif
+        signals.append(f"📈 REVERSAL CONFIRMÉ: Hausse 1h/6h malgré {price_24h:.1f}% 24h")
+    elif price_24h < -10 and price_1h > 5:
+        # Reversal possible mais non confirmé
+        signals.append(f"📈 REVERSAL: Hausse malgré {price_24h:.1f}% 24h (confirmation nécessaire)")
+
+    # === VOLUME SPIKE: QUALIFIÉ (NOUVEAU) ===
+    vol_1h_normalized = pool_data["volume_1h"] * 24
+    if vol_1h_normalized > pool_data["volume_24h"] * 1.5:
+        spike_pct = ((vol_1h_normalized / pool_data["volume_24h"]) - 1) * 100
+
+        # Qualifier le spike
+        if price_1h > 3:
+            signals.append(f"📊 VOLUME SPIKE BULLISH: +{spike_pct:.0f}% activité + prix hausse")
+        elif price_1h < -5:
+            signals.append(f"🚨 VOLUME SPIKE BEARISH: +{spike_pct:.0f}% activité = panic sell détecté")
+        else:
+            signals.append(f"📊 VOLUME SPIKE: +{spike_pct:.0f}% activité vs moyenne")
+
+    # === BUY PRESSURE (AMÉLIORÉ) ===
     if buy_ratio_1h > buy_ratio_24h * 1.2 and buy_ratio_1h >= 0.8:
         signals.append(f"🟢 BUY PRESSURE: Ratio 1h ({buy_ratio_1h:.2f}) > 24h ({buy_ratio_24h:.2f})")
+    elif buy_ratio_1h < buy_ratio_24h * 0.8 and buy_ratio_24h < 0.5:
+        # SELL PRESSURE warning (NOUVEAU)
+        signals.append(f"🔴 SELL PRESSURE: Vendeurs intensifient (1h: {buy_ratio_1h:.2f}, 24h: {buy_ratio_24h:.2f})")
 
     # MULTI-POOL
     if multi_pool_data.get("is_multi_pool"):
@@ -507,11 +678,12 @@ def detect_signals(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Li
         if multi_pool_data.get("is_weth_dominant"):
             signals.append(f"⚡ WETH pool dominant = Smart money")
 
-    # BOTTOM CONFIRMÉ
-    # Trouver si prix actuel proche du bottom
-    # (simplification: si price_change_24h négatif mais momentum 1h positif)
-    if pool_data["price_change_24h"] < -5 and momentum.get("1h") and momentum["1h"] > 0:
-        signals.append(f"✅ Bottom potentiel confirmé")
+    # === BOTTOM CONFIRMÉ (AMÉLIORÉ - plus strict) ===
+    # Bottom = prix bas + acheteurs reviennent + pression change
+    if price_24h < -15 and price_1h > 0 and buy_ratio_1h > buy_ratio_24h * 1.3 and buy_ratio_1h > 0.9:
+        signals.append(f"✅ BOTTOM CONFIRMÉ: Acheteurs reviennent massivement")
+    elif price_24h < -10 and price_1h > 3 and price_6h > 0:
+        signals.append(f"✅ Bottom potentiel: Reversal multi-timeframe")
 
     return signals
 
@@ -579,7 +751,8 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     sells = pool_data["sells_24h"]
     buys_1h = pool_data["buys_1h"]
     sells_1h = pool_data["sells_1h"]
-    network = pool_data["network"].upper()
+    network_id = pool_data["network"]  # ID original pour le lien
+    network_display = get_network_display_name(network_id)  # Nom lisible pour affichage
     ratio_vol_liq = (vol_24h / liq * 100) if liq > 0 else 0
     buy_ratio_24h = buys / sells if sells > 0 else 1.0
     buy_ratio_1h = buys_1h / sells_1h if sells_1h > 0 else 1.0
@@ -605,11 +778,13 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     txt = f"\n🆕 *NOUVEAU TOKEN DEX*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
     txt += f"💎 {name}\n"
-    txt += f"⛓️ Blockchain: {network}\n\n"
+    txt += f"⛓️ Blockchain: {network_display}\n\n"
 
-    # SCORE
+    # SCORE + CONFIANCE (NOUVEAU)
+    confidence = calculate_confidence_score(pool_data)
     txt += f"🎯 *SCORE: {score}/100 {score_emoji} {score_label}*\n"
-    txt += f"   Base: {base_score} | Momentum: +{momentum_bonus}\n\n"
+    txt += f"   Base: {base_score} | Momentum: {momentum_bonus:+d}\n"
+    txt += f"📊 Confiance: {confidence}% (fiabilité données)\n\n"
 
     # PRIX & MOMENTUM
     txt += f"━━━ PRIX & MOMENTUM ━━━\n"
@@ -659,8 +834,11 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 
     txt += f"💧 Liquidité: ${liq/1000:.0f}K\n"
 
-    # Transactions 24h - Format explicite
+    # Transactions 24h - Format explicite avec estimation traders (NOUVEAU)
     txt += f"🔄 Transactions 24h: {txns}\n"
+    # Estimation traders: moyenne 2-3 tx par trader
+    traders_estimate = int(txns / 2.5)  # Estimation conservative
+    txt += f"👥 Traders estimés: ~{traders_estimate} (basé sur txns)\n"
     buys_pct = (buys / txns * 100) if txns > 0 else 0
     sells_pct = (sells / txns * 100) if txns > 0 else 0
     txt += f"   🟢 ACHATS: {buys} ({buys_pct:.0f}%)\n"
@@ -761,7 +939,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     else:
         txt += f"🚨 Liquidité faible (${liq/1000:.0f}K) - Risque élevé\n"
 
-    txt += f"\n🔗 https://geckoterminal.com/{network.lower()}/pools/{pool_data['pool_address']}\n"
+    txt += f"\n🔗 https://geckoterminal.com/{network_id.lower()}/pools/{pool_data['pool_address']}\n"
 
     return txt
 
