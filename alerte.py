@@ -6,10 +6,13 @@ Lanceur pour tous les bots
 NOUVEAU FORMAT D'ALERTE PEDAGOGIQUE
 """
 
-import subprocess
-import sys
+import threading
 import time
 from datetime import datetime
+
+# Import des fonctions des bots
+import run_binance_bot
+import geckoterminal_scanner
 
 
 # =========================
@@ -221,6 +224,24 @@ def log(msg: str):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {msg}")
 
 
+def run_binance_scanner():
+    """Lance le scanner Binance dans un thread."""
+    try:
+        log("🔵 Thread Binance Scanner démarré")
+        run_binance_bot.boucle()
+    except Exception as e:
+        log(f"❌ Erreur Binance Scanner: {e}")
+
+
+def run_gecko_scanner():
+    """Lance le scanner GeckoTerminal dans un thread."""
+    try:
+        log("🦎 Thread GeckoTerminal Scanner démarré")
+        geckoterminal_scanner.main()
+    except Exception as e:
+        log(f"❌ Erreur GeckoTerminal Scanner: {e}")
+
+
 def main():
     log("=" * 80)
     log("🚀 LANCEMENT DE TOUS LES BOTS")
@@ -237,83 +258,43 @@ def main():
     log("=" * 80)
     log("")
 
-    processes = []
+    # Créer les threads pour chaque bot
+    binance_thread = threading.Thread(target=run_binance_scanner, daemon=True, name="BinanceScanner")
+    gecko_thread = threading.Thread(target=run_gecko_scanner, daemon=True, name="GeckoScanner")
+
+    # Démarrer les threads
+    log("▶️  Demarrage Binance Scanner...")
+    binance_thread.start()
+    time.sleep(2)
+
+    log("▶️  Demarrage GeckoTerminal Scanner...")
+    gecko_thread.start()
+    time.sleep(2)
+
+    log("")
+    log("✅ Tous les bots sont demarres!")
+    log("📡 Appuyez sur Ctrl+C pour arreter tous les bots")
+    log("")
 
     try:
-        # Lancer Binance Scanner
-        log("▶️  Demarrage Binance Scanner...")
-        binance_process = subprocess.Popen(
-            [sys.executable, "run_binance_bot.py"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        processes.append(("Binance", binance_process))
-        time.sleep(2)
-
-        # Lancer GeckoTerminal Scanner
-        log("▶️  Demarrage GeckoTerminal Scanner...")
-        gecko_process = subprocess.Popen(
-            [sys.executable, "geckoterminal_scanner.py"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        processes.append(("GeckoTerminal", gecko_process))
-        time.sleep(2)
-
-        log("")
-        log("✅ Tous les bots sont demarres!")
-        log("📡 Appuyez sur Ctrl+C pour arreter tous les bots")
-        log("")
-
-        # Surveiller les processus
+        # Garder le programme actif
         while True:
-            for name, proc in processes:
-                if proc.poll() is not None:
-                    log(f"⚠️ {name} s'est arrete! Code: {proc.returncode}")
-                    log(f"🔄 Redemarrage {name}...")
+            # Vérifier si les threads sont toujours vivants
+            if not binance_thread.is_alive():
+                log("⚠️ Binance Scanner s'est arrete! Redemarrage...")
+                binance_thread = threading.Thread(target=run_binance_scanner, daemon=True, name="BinanceScanner")
+                binance_thread.start()
 
-                    if name == "Binance":
-                        new_proc = subprocess.Popen(
-                            [sys.executable, "run_binance_bot.py"],
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            text=True,
-                            bufsize=1
-                        )
-                    else:  # GeckoTerminal
-                        new_proc = subprocess.Popen(
-                            [sys.executable, "geckoterminal_scanner.py"],
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            text=True,
-                            bufsize=1
-                        )
+            if not gecko_thread.is_alive():
+                log("⚠️ GeckoTerminal Scanner s'est arrete! Redemarrage...")
+                gecko_thread = threading.Thread(target=run_gecko_scanner, daemon=True, name="GeckoScanner")
+                gecko_thread.start()
 
-                    # Remplacer le processus dans la liste
-                    processes = [(n, p if n != name else new_proc)
-                                 for n, p in processes]
-                    log(f"✅ {name} redemarre")
-
-            time.sleep(10)
+            time.sleep(30)
 
     except KeyboardInterrupt:
         log("")
         log("⏹️  Arret de tous les bots...")
-
-        for name, proc in processes:
-            try:
-                proc.terminate()
-                proc.wait(timeout=5)
-                log(f"✅ {name} arrete")
-            except:
-                proc.kill()
-                log(f"❌ {name} force d'arreter")
-
-        log("")
         log("👋 Tous les bots sont arretes")
 
 
