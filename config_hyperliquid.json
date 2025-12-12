@@ -1,0 +1,56 @@
+{
+  "comment": "Configuration Hyperliquid Scanner - Detection opportunites perpetuels",
+
+  "thresholds": {
+    "comment_priority": "Alertes Haute Priorite",
+    "new_market_volume_1h": 1000000,
+    "whale_position_size": 500000,
+    "liquidation_cascade": 1000000,
+    "funding_rate_extreme": 0.001,
+    "volume_spike_ratio": 5.0,
+
+    "comment_trading": "Alertes Trading",
+    "breakout_volume_multiplier": 2.0,
+    "long_short_squeeze_threshold": 0.85,
+    "price_divergence_binance_pct": 2.0,
+
+    "comment_longterm": "Opportunites Long-Terme",
+    "volume_growth_days": 7,
+    "institutional_wallet_size": 1000000
+  },
+
+  "scan_settings": {
+    "scan_interval_seconds": 120,
+    "alert_cooldown_seconds": 1800,
+    "max_alerts_per_scan": 5,
+    "api_call_delay_seconds": 2,
+    "top_markets_liquidation_check": 5
+  },
+
+  "telegram": {
+    "bot_token": "7868518759:AAFxEXGz0DgMPYVKILJOEb5kNDwPy3N5W5c",
+    "chat_id": "7994790177"
+  },
+
+  "api": {
+    "hyperliquid_info_endpoint": "https://api.hyperliquid.xyz/info",
+    "rate_limit_weight_per_minute": 1200
+  },
+
+  "alerts_enabled": {
+    "new_markets": true,
+    "whale_positions": true,
+    "liquidations": true,
+    "extreme_funding": true,
+    "volume_spikes": true,
+    "breakouts": true,
+    "squeeze_potential": true,
+    "price_divergence": false
+  },
+
+  "markets_blacklist": [
+  ],
+
+  "markets_whitelist": [
+  ]
+}

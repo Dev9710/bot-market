@@ -1,0 +1,36 @@
+{
+  "comment": "Configuration GeckoTerminal Scanner - Detection nouveaux tokens DEX",
+
+  "networks": [
+    "eth",
+    "bsc",
+    "arbitrum",
+    "base",
+    "solana"
+  ],
+
+  "thresholds": {
+    "min_liquidity_usd": 50000,
+    "min_volume_24h_usd": 100000,
+    "min_transactions_24h": 100,
+    "max_token_age_hours": 72,
+    "volume_liquidity_ratio": 0.5
+  },
+
+  "safety": {
+    "max_buy_sell_ratio": 5.0,
+    "min_buy_sell_ratio": 0.2
+  },
+
+  "scan_settings": {
+    "scan_interval_seconds": 300,
+    "alert_cooldown_seconds": 1800,
+    "max_alerts_per_scan": 3,
+    "api_call_delay_seconds": 2
+  },
+
+  "telegram": {
+    "bot_token": "7868518759:AAFxEXGz0DgMPYVKILJOEb5kNDwPy3N5W5c",
+    "chat_id": "7994790177"
+  }
+}

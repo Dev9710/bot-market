@@ -6,7 +6,7 @@
     "enabled": true,
     "interval_seconds": 120,
     "min_vol24_usd": 100000,
-    "ratio_threshold": 5.0,
+    "ratio_threshold": 2.0,
     "min_price_usd": 0.0001
   },
 
