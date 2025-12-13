@@ -1,1 +1,2 @@
-worker: python3 alerte.py
+web: streamlit run dashboard.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true
+worker: python geckoterminal_scanner_v2.py

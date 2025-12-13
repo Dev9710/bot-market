@@ -20,6 +20,10 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from collections import defaultdict
 
+# Système de sécurité et tracking
+from security_checker import SecurityChecker
+from alert_tracker import AlertTracker
+
 # UTF-8 pour emojis Windows
 if sys.platform == "win32":
     import io
@@ -66,6 +70,10 @@ buy_ratio_history = defaultdict(lambda: defaultdict(list))
 # Multi-pool tracking
 token_pools = defaultdict(list)  # [base_token] = [pool_data, pool_data, ...]
 alert_cooldown = {}
+
+# Système de sécurité et tracking (initialisés dans main())
+security_checker = None
+alert_tracker = None
 
 # ============================================
 # UTILITAIRES
@@ -1042,11 +1050,38 @@ def scan_geckoterminal():
 
     # Envoyer alertes
     alerts_sent = 0
+    tokens_rejected = 0
+
     for opp in opportunities:
         base_token = opp["pool_data"]["base_token_name"]
         pool_addr = opp["pool_data"]["pool_address"]
         alert_key = f"{base_token}_{pool_addr}"
 
+        # ==========================================
+        # VÉRIFICATION DE SÉCURITÉ
+        # ==========================================
+        token_address = opp["pool_data"]["base_token_address"]
+        network = opp["pool_data"]["network"]
+
+        log(f"\n🔒 Vérification sécurité: {opp['pool_data']['name']}")
+
+        security_result = security_checker.check_token_security(token_address, network)
+
+        # Vérifier si le token passe les critères de sécurité
+        should_send, reason = security_checker.should_send_alert(security_result, min_security_score=50)
+
+        if not should_send:
+            log(f"⛔ Token rejeté: {reason}")
+            log(f"   Score sécurité: {security_result['security_score']}/100")
+            log(f"   Niveau risque: {security_result['risk_level']}")
+            tokens_rejected += 1
+            continue
+
+        log(f"✅ Sécurité validée (Score: {security_result['security_score']}/100)")
+
+        # ==========================================
+        # ENVOI DE L'ALERTE (après validation sécurité)
+        # ==========================================
         if check_cooldown(alert_key):
             alert_msg = generer_alerte_complete(
                 opp["pool_data"],
@@ -1059,8 +1094,64 @@ def scan_geckoterminal():
                 opp["resistance_data"]
             )
 
+            # Ajouter les infos de sécurité à l'alerte
+            security_info = security_checker.format_security_warning(security_result)
+            alert_msg = alert_msg + "\n" + security_info
+
             if send_telegram(alert_msg):
                 log(f"✅ Alerte envoyée: {opp['pool_data']['name']} (Score: {opp['score']})")
+
+                # ==========================================
+                # SAUVEGARDE EN BASE DE DONNÉES + TRACKING AUTO
+                # ==========================================
+                try:
+                    # Préparer les données pour la DB
+                    price = opp["pool_data"].get("price_usd", 0)
+                    entry_price = price
+                    stop_loss_price = price * 0.90  # -10%
+                    tp1_price = price * 1.05  # +5%
+                    tp2_price = price * 1.10  # +10%
+                    tp3_price = price * 1.15  # +15%
+
+                    alert_data = {
+                        'token_name': opp["pool_data"]["name"],
+                        'token_address': token_address,
+                        'network': network,
+                        'price_at_alert': price,
+                        'score': opp["score"],
+                        'base_score': opp["base_score"],
+                        'momentum_bonus': opp["momentum_bonus"],
+                        'confidence_score': security_result['security_score'],
+                        'volume_24h': opp["pool_data"].get("volume_24h_usd", 0),
+                        'volume_6h': opp["pool_data"].get("volume_6h_usd", 0),
+                        'volume_1h': opp["pool_data"].get("volume_1h_usd", 0),
+                        'liquidity': opp["pool_data"].get("liquidity_usd", 0),
+                        'buys_24h': opp["pool_data"].get("txns_24h_buys", 0),
+                        'sells_24h': opp["pool_data"].get("txns_24h_sells", 0),
+                        'buy_ratio': opp["pool_data"].get("buy_ratio", 0),
+                        'total_txns': opp["pool_data"].get("txns_24h", 0),
+                        'age_hours': opp["pool_data"].get("age_hours", 0),
+                        'entry_price': entry_price,
+                        'stop_loss_price': stop_loss_price,
+                        'stop_loss_percent': -10,
+                        'tp1_price': tp1_price,
+                        'tp1_percent': 5,
+                        'tp2_price': tp2_price,
+                        'tp2_percent': 10,
+                        'tp3_price': tp3_price,
+                        'tp3_percent': 15,
+                        'alert_message': alert_msg
+                    }
+
+                    alert_id = alert_tracker.save_alert(alert_data)
+                    if alert_id > 0:
+                        log(f"   💾 Sauvegardé en DB (ID: {alert_id}) - Tracking auto démarré")
+                    else:
+                        log(f"   ⚠️ Échec sauvegarde DB (token déjà existant?)")
+
+                except Exception as e:
+                    log(f"   ⚠️ Erreur sauvegarde DB: {e}")
+
                 alerts_sent += 1
             else:
                 log(f"❌ Échec alerte: {opp['pool_data']['name']}")
@@ -1071,7 +1162,7 @@ def scan_geckoterminal():
 
             time.sleep(1)
 
-    log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées")
+    log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées, {tokens_rejected} tokens rejetés (sécurité)")
     log("=" * 80)
 
 # ============================================
@@ -1079,6 +1170,8 @@ def scan_geckoterminal():
 # ============================================
 def main():
     """Boucle principale."""
+    global security_checker, alert_tracker
+
     log("🚀 Démarrage GeckoTerminal Scanner V2...")
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
     log(f"💧 Liquidité min: ${MIN_LIQUIDITY_USD:,}")
@@ -1086,6 +1179,12 @@ def main():
     log(f"⏰ Age max: {MAX_TOKEN_AGE_HOURS}h")
     log(f"🔄 Scan toutes les 5 minutes")
     log(f"🎯 Max {MAX_ALERTS_PER_SCAN} alertes par scan")
+
+    # Initialiser le système de sécurité et tracking
+    log("\n🔒 Initialisation du système de sécurité...")
+    security_checker = SecurityChecker()
+    alert_tracker = AlertTracker()
+    log("✅ Système de sécurité activé")
 
     while True:
         try:
@@ -1104,6 +1203,12 @@ def main():
             traceback.print_exc()
             log("⏳ Pause 60s avant retry...")
             time.sleep(60)
+
+    # Fermer proprement les connexions
+    if alert_tracker:
+        log("🔒 Fermeture de la base de données...")
+        alert_tracker.close()
+        log("✅ Base de données fermée")
 
 if __name__ == "__main__":
     main()
