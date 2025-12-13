@@ -1060,7 +1060,8 @@ def scan_geckoterminal():
         # ==========================================
         # VÉRIFICATION DE SÉCURITÉ
         # ==========================================
-        token_address = opp["pool_data"]["base_token_address"]
+        # Utiliser pool_address comme token_address (c'est l'adresse du pool/token)
+        token_address = opp["pool_data"]["pool_address"]
         network = opp["pool_data"]["network"]
 
         log(f"\n🔒 Vérification sécurité: {opp['pool_data']['name']}")
@@ -1122,14 +1123,14 @@ def scan_geckoterminal():
                         'base_score': opp["base_score"],
                         'momentum_bonus': opp["momentum_bonus"],
                         'confidence_score': security_result['security_score'],
-                        'volume_24h': opp["pool_data"].get("volume_24h_usd", 0),
-                        'volume_6h': opp["pool_data"].get("volume_6h_usd", 0),
-                        'volume_1h': opp["pool_data"].get("volume_1h_usd", 0),
-                        'liquidity': opp["pool_data"].get("liquidity_usd", 0),
-                        'buys_24h': opp["pool_data"].get("txns_24h_buys", 0),
-                        'sells_24h': opp["pool_data"].get("txns_24h_sells", 0),
+                        'volume_24h': opp["pool_data"].get("volume_24h", 0),
+                        'volume_6h': opp["pool_data"].get("volume_6h", 0),
+                        'volume_1h': opp["pool_data"].get("volume_1h", 0),
+                        'liquidity': opp["pool_data"].get("liquidity", 0),
+                        'buys_24h': opp["pool_data"].get("buys_24h", 0),
+                        'sells_24h': opp["pool_data"].get("sells_24h", 0),
                         'buy_ratio': opp["pool_data"].get("buy_ratio", 0),
-                        'total_txns': opp["pool_data"].get("txns_24h", 0),
+                        'total_txns': opp["pool_data"].get("total_txns", 0),
                         'age_hours': opp["pool_data"].get("age_hours", 0),
                         'entry_price': entry_price,
                         'stop_loss_price': stop_loss_price,
