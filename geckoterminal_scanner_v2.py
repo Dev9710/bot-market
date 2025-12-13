@@ -172,7 +172,7 @@ def get_new_pools(network: str, page: int = 1) -> Optional[List[Dict]]:
 # ============================================
 # PARSING & ENRICHISSEMENT
 # ============================================
-def parse_pool_data(pool: Dict) -> Optional[Dict]:
+def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
     """Parse données pool GeckoTerminal avec enrichissements."""
     try:
         attrs = pool.get("attributes", {})
@@ -219,18 +219,21 @@ def parse_pool_data(pool: Dict) -> Optional[Dict]:
         else:
             age_hours = 999999
 
-        # Réseau et adresse - Protection robuste
-        relationships = pool.get("relationships", {}) or {}
-        network_data = relationships.get("network", {}) or {}
-        network_inner = network_data.get("data", {}) or {}
-        network = network_inner.get("id", "unknown")
-
-        # Si network toujours unknown, essayer de l'extraire du type
+        # Réseau et adresse - Utiliser le paramètre network passé directement
+        # On garde le network passé en paramètre (fourni lors de l'appel de l'API)
+        # Si ce n'était pas fourni, on essaie de l'extraire des relationships
         if network == "unknown":
-            pool_type = pool.get("type", "")
-            # Format peut être "pool" ou "network-name-pool"
-            if "-" in pool_type:
-                network = pool_type.split("-")[0]
+            relationships = pool.get("relationships", {}) or {}
+            network_data = relationships.get("network", {}) or {}
+            network_inner = network_data.get("data", {}) or {}
+            network = network_inner.get("id", "unknown")
+
+            # Si network toujours unknown, essayer de l'extraire du type
+            if network == "unknown":
+                pool_type = pool.get("type", "")
+                # Format peut être "pool" ou "network-name-pool"
+                if "-" in pool_type:
+                    network = pool_type.split("-")[0]
 
         pool_address = attrs.get("address", "")
 
@@ -964,7 +967,7 @@ def scan_geckoterminal():
         if trending:
             log(f"   📊 {len(trending)} pools trending trouvés")
             for pool in trending:
-                pool_data = parse_pool_data(pool)
+                pool_data = parse_pool_data(pool, network)  # Passer le network en paramètre
                 if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
                     all_pools.append(pool_data)
 
@@ -975,7 +978,7 @@ def scan_geckoterminal():
         if new_pools:
             log(f"   🆕 {len(new_pools)} nouveaux pools trouvés")
             for pool in new_pools:
-                pool_data = parse_pool_data(pool)
+                pool_data = parse_pool_data(pool, network)  # Passer le network en paramètre
                 if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
                     all_pools.append(pool_data)
 
