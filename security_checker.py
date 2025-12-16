@@ -85,10 +85,11 @@ class SecurityChecker:
         lp_lock_result = self.check_lp_lock(token_address, network)
         results['checks']['lp_lock'] = lp_lock_result
 
+        # TEMPORAIREMENT MODIFIÉ : LP non lockée = HIGH au lieu de CRITICAL
         if not lp_lock_result['is_locked']:
             results['is_safe'] = False
-            results['risk_level'] = 'CRITICAL'
-            results['warnings'].append(f"⛔ LIQUIDITÉ NON VERROUILLÉE - Risque de rugpull!")
+            results['risk_level'] = 'HIGH'  # Changé de CRITICAL à HIGH pour permettre les alertes
+            results['warnings'].append(f"⚠️ LIQUIDITÉ NON VERROUILLÉE - Risque de rugpull!")
         elif lp_lock_result.get('lock_duration_days', 0) < 30:
             results['warnings'].append(f"⚠️ LP lockée seulement {lp_lock_result['lock_duration_days']} jours")
             if results['risk_level'] == 'LOW':
