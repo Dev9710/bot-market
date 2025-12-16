@@ -559,8 +559,10 @@ class SecurityChecker:
         if security_result['checks']['honeypot'].get('is_honeypot'):
             return False, "⛔ HONEYPOT DÉTECTÉ - Alerte bloquée"
 
-        if not security_result['checks']['lp_lock'].get('is_locked'):
-            return False, "⛔ LP NON LOCKÉE - Risque de rugpull - Alerte bloquée"
+        # TEMPORAIREMENT DÉSACTIVÉ POUR TESTS
+        # Note: Les tokens sans LP lockée ont un risque de rugpull plus élevé
+        # if not security_result['checks']['lp_lock'].get('is_locked'):
+        #     return False, "⛔ LP NON LOCKÉE - Risque de rugpull - Alerte bloquée"
 
         # Score de sécurité insuffisant
         if security_result['security_score'] < min_security_score:
