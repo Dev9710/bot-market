@@ -58,7 +58,7 @@ ACCELERATION_THRESHOLD = 0.05   # +5% en 1h
 VOLUME_SPIKE_THRESHOLD = 0.5    # +50% volume
 
 # Cooldown et limites
-COOLDOWN_SECONDS = 1800
+COOLDOWN_SECONDS = 300  # 5 minutes (réduit de 30 min pour plus d'alertes)
 MAX_ALERTS_PER_SCAN = 5
 
 # ============================================
@@ -1162,6 +1162,9 @@ def scan_geckoterminal():
                 break
 
             time.sleep(1)
+        else:
+            # Cooldown actif - alerte bloquée
+            log(f"⏰ Alerte bloquée (cooldown actif): {opp['pool_data']['name']} - Réessayez dans 5 min")
 
     log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées, {tokens_rejected} tokens rejetés (sécurité)")
     log("=" * 80)
