@@ -499,13 +499,13 @@ class SecurityChecker:
         if results['checks']['honeypot'].get('is_honeypot'):
             return 0
 
-        # LP non lockée = -50 points
-        if not results['checks']['lp_lock'].get('is_locked'):
-            score -= 50
+        # TEMPORAIREMENT DÉSACTIVÉ : LP non lockée ne pénalise plus le score
+        # if not results['checks']['lp_lock'].get('is_locked'):
+        #     score -= 50
 
-        # LP lockée moins de 30 jours = -20 points
-        elif results['checks']['lp_lock'].get('lock_duration_days', 0) < 30:
-            score -= 20
+        # LP lockée moins de 30 jours = -20 points (désactivé aussi)
+        # elif results['checks']['lp_lock'].get('lock_duration_days', 0) < 30:
+        #     score -= 20
 
         # Ownership non renoncée = -15 points
         if not results['checks']['contract'].get('is_renounced'):
