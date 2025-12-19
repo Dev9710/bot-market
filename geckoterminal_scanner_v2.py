@@ -1248,6 +1248,10 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
             prix_max_atteint = max(prix_max_db, current_price)
             # Note: On prend le max car le prix actuel peut être > que le dernier tracking
 
+    # DEBUG: Log pour comprendre détection TP
+    if alert_id > 0:
+        log(f"   🔍 DEBUG TP: prix_max={prix_max_atteint:.8f}, tp1={tp1_price:.8f}, tp2={tp2_price:.8f}, tp3={tp3_price:.8f}")
+
     # Vérification des TP basée sur le prix MAX atteint (historique + actuel)
     if prix_max_atteint >= tp3_price and tp3_price > 0:
         tp_hit.extend(["TP1", "TP2", "TP3"])
