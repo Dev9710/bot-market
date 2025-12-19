@@ -61,6 +61,11 @@ VOLUME_SPIKE_THRESHOLD = 0.5    # +50% volume
 COOLDOWN_SECONDS = 0  # DÉSACTIVÉ pour backtesting - collecte toutes les occurrences
 MAX_ALERTS_PER_SCAN = 5
 
+# NOUVEAU: Paramètres de re-alerting intelligent (Bug #1 fix)
+MIN_PRICE_CHANGE_PERCENT = 5.0  # Re-alerter si variation ±5% depuis entry
+MIN_TIME_HOURS_FOR_REALERT = 4.0  # Re-alerter après 4h même sans changement
+ENABLE_SMART_REALERT = True  # Activer le système intelligent (vs spam)
+
 # ============================================
 # CACHE SIMPLIFIÉ
 # ============================================
@@ -122,7 +127,7 @@ def extract_base_token(pool_name: str) -> str:
     return pool_name.strip()
 
 def check_cooldown(alert_key: str) -> bool:
-    """Vérifie si alerte en cooldown."""
+    """Vérifie si alerte en cooldown (LEGACY - utiliser should_send_alert à la place)."""
     now = time.time()
     if alert_key in alert_cooldown:
         elapsed = now - alert_cooldown[alert_key]
@@ -130,6 +135,79 @@ def check_cooldown(alert_key: str) -> bool:
             return False
     alert_cooldown[alert_key] = now
     return True
+
+
+def should_send_alert(token_address: str, current_price: float, tracker, regle5_data: Dict = None) -> Tuple[bool, str]:
+    """
+    Détermine si une alerte doit être envoyée pour un token (FIX BUG #1 - SPAM).
+
+    Logique intelligente:
+    - 1ère alerte: TOUJOURS envoyer
+    - Alertes suivantes: SEULEMENT si:
+        * TP atteint (TP1/TP2/TP3) OU
+        * Prix a varié de ±5% depuis entry OU
+        * 4h se sont écoulées depuis dernière alerte OU
+        * Pump parabolique détecté (vélocité >100%/h)
+
+    Returns:
+        (should_send: bool, reason: str)
+    """
+    # Vérifier si c'est la première alerte pour ce token
+    if not tracker.token_already_alerted(token_address):
+        return True, "Première alerte pour ce token"
+
+    # Si système intelligent désactivé, toujours envoyer
+    if not ENABLE_SMART_REALERT:
+        return True, "Smart re-alert désactivé"
+
+    # Récupérer la dernière alerte pour ce token
+    previous_alert = tracker.get_last_alert_for_token(token_address)
+    if not previous_alert:
+        return True, "Pas d'alerte précédente trouvée"
+
+    # 1. Vérifier si un TP a été atteint
+    entry_price = previous_alert.get('entry_price', 0)
+    tp1_price = previous_alert.get('tp1_price', 0)
+    tp2_price = previous_alert.get('tp2_price', 0)
+    tp3_price = previous_alert.get('tp3_price', 0)
+
+    # Récupérer le prix MAX atteint (pas seulement le prix actuel)
+    alert_id = previous_alert.get('id', 0)
+    prix_max_atteint = current_price
+    if alert_id > 0:
+        prix_max_db = tracker.get_highest_price_for_alert(alert_id)
+        if prix_max_db:
+            prix_max_atteint = max(prix_max_db, current_price)
+
+    if prix_max_atteint >= tp1_price and tp1_price > 0:
+        return True, f"TP atteint (prix max: ${prix_max_atteint:.6f} >= TP1: ${tp1_price:.6f})"
+
+    # 2. Vérifier si le prix a varié de ±5% depuis entry
+    if entry_price > 0:
+        price_change_pct = abs((current_price - entry_price) / entry_price * 100)
+        if price_change_pct >= MIN_PRICE_CHANGE_PERCENT:
+            return True, f"Variation prix significative: {price_change_pct:.1f}% depuis entry"
+
+    # 3. Vérifier le temps écoulé depuis la dernière alerte
+    created_at_str = previous_alert.get('created_at', '')
+    if created_at_str:
+        try:
+            from datetime import datetime
+            created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+            now = datetime.now(created_at.tzinfo) if created_at.tzinfo else datetime.now()
+            elapsed = (now - created_at).total_seconds() / 3600  # En heures
+
+            if elapsed >= MIN_TIME_HOURS_FOR_REALERT:
+                return True, f"Temps écoulé suffisant: {elapsed:.1f}h"
+        except Exception as e:
+            log(f"⚠️ Erreur parsing date: {e}")
+
+    # 4. Vérifier si pump parabolique (RÈGLE 5)
+    if regle5_data and regle5_data.get('type_pump') == 'PARABOLIQUE':
+        return True, f"Pump PARABOLIQUE détecté - Alerte SORTIR urgente"
+
+    # Aucune raison de re-alerter → SPAM PREVENTION
+    return False, f"Pas de changement significatif (prix: ${current_price:.6f}, entry: ${entry_price:.6f})"
 
 # ============================================
 # API CALLS
@@ -654,19 +732,43 @@ def analyze_whale_activity(pool_data: Dict) -> Dict:
 
     # === DÉTECTION 1: WHALE MANIPULATION (Achat/Vente) ===
 
-    # Whale BUY: Beaucoup de buys mais peu de buyers → 1 whale achète massivement
-    if avg_buys_per_buyer > 5 and buyers_1h < 10:
-        signals.append("🐋 WHALE ACCUMULATION détectée (1 wallet achète massivement)")
+    # FIX BUG #2: Seuils plus réalistes pour détecter whale manipulation
+    # avg_buys_per_buyer élevé = concentration whale (même avec beaucoup de buyers)
+
+    # WHALE EXTREME: avg > 15 (whale très concentrée)
+    if avg_buys_per_buyer > 15:
+        signals.append("🐋🐋 WHALE MANIPULATION EXTRÊME détectée (avg: {:.1f}x buys/buyer)".format(avg_buys_per_buyer))
+        whale_score -= 20  # GROS MALUS
+        pattern = "WHALE_MANIPULATION"
+        concentration_risk = "HIGH"
+
+    # WHALE MODÉRÉE: avg > 10 (concentration significative)
+    elif avg_buys_per_buyer > 10:
+        signals.append("🐋 WHALE ACCUMULATION détectée (avg: {:.1f}x buys/buyer)".format(avg_buys_per_buyer))
         whale_score -= 15  # MALUS car whale peut dumper
         pattern = "WHALE_MANIPULATION"
         concentration_risk = "HIGH"
 
-    # Whale SELL: Beaucoup de sells mais peu de sellers → 1 whale vend
-    elif avg_sells_per_seller > 5 and sellers_1h < 10:
-        signals.append("🚨 WHALE DUMP détecté (1 wallet vend massivement)")
+    # WHALE SELL EXTREME: avg > 15 sells/seller
+    elif avg_sells_per_seller > 15:
+        signals.append("🚨🚨 WHALE DUMP EXTRÊME détecté (avg: {:.1f}x sells/seller)".format(avg_sells_per_seller))
+        whale_score -= 30  # ÉNORME MALUS
+        pattern = "WHALE_SELLING"
+        concentration_risk = "HIGH"
+
+    # WHALE SELL MODÉRÉE: avg > 10 sells/seller
+    elif avg_sells_per_seller > 10:
+        signals.append("🚨 WHALE DUMP détecté (avg: {:.1f}x sells/seller)".format(avg_sells_per_seller))
         whale_score -= 25  # GROS MALUS car dump imminent
         pattern = "WHALE_SELLING"
         concentration_risk = "HIGH"
+
+    # WHALE SELL FAIBLE: avg > 5 sells/seller (seulement si peu de sellers)
+    elif avg_sells_per_seller > 5 and sellers_1h < 50:
+        signals.append("⚠️ WHALE SELLING détectée (avg: {:.1f}x sells/seller)".format(avg_sells_per_seller))
+        whale_score -= 15
+        pattern = "WHALE_SELLING"
+        concentration_risk = "MEDIUM"
 
     # === DÉTECTION 2: ACCUMULATION DISTRIBUÉE (BULLISH) ===
 
@@ -971,21 +1073,35 @@ def evaluer_conditions_marche(pool_data: Dict, score: int, momentum: Dict,
         elif signal_1h in ["RALENTISSEMENT", "FORT_RALENTISSEMENT"]:
             reasons_bearish.append("🔴 PATTERN ÉVITER: Volume en chute")
 
-    # ===== 3. ANALYSE PRIX / MOMENTUM =====
+    # ===== 3. ANALYSE PRIX / MOMENTUM (FIX BUG #4 - Multi-TF Confluence) =====
+
     # Tendance prix 24h
     if pct_24h >= 20:
         reasons_bullish.append(f"Prix 24h en hausse forte (+{pct_24h:.1f}%)")
+    elif pct_24h >= 5:
+        reasons_bullish.append(f"Prix 24h en hausse (+{pct_24h:.1f}%)")
     elif pct_24h < -15:
         reasons_bearish.append(f"Prix 24h en baisse ({pct_24h:.1f}%)")
 
-    # Tendance prix court terme
-    if pct_1h >= 5:
+    # NOUVEAU: Multi-Timeframe Confluence (Quick Win #3)
+    # Détecter PULLBACK SAIN sur uptrend (buy the dip)
+    if pct_24h >= 5 and -8 < pct_1h < 0:
+        # Uptrend 24h + pullback léger 1h = BUY THE DIP
+        reasons_bullish.append(f"📊 PULLBACK SAIN: +{pct_24h:.1f}% 24h | {pct_1h:.1f}% 1h (buy the dip)")
+        reasons_bullish.append("✅ Multi-TF confluence: Opportunité d'entrée sur retracement")
+    # Détecter continuation haussière (multi-TF bullish)
+    elif pct_24h >= 5 and pct_6h >= 3 and pct_1h >= 2:
+        reasons_bullish.append(f"🚀 MULTI-TF BULLISH: Hausse confirmée sur 24h/6h/1h")
+    # Tendance prix court terme (si pas de pullback sain)
+    elif pct_1h >= 5:
         reasons_bullish.append(f"Momentum 1h positif (+{pct_1h:.1f}%)")
-    elif pct_1h <= -5:
-        reasons_bearish.append(f"Momentum 1h négatif ({pct_1h:.1f}%)")
+    elif pct_1h <= -10:
+        # Seulement considérer bearish si vraiment négatif (-10%)
+        reasons_bearish.append(f"Momentum 1h très négatif ({pct_1h:.1f}%)")
 
     # Analyse de la décélération (CRITIQUE pour sortie)
-    if pct_1h > 0 and pct_6h > 0:
+    # MODIFIÉ: Seulement si AUCUN pullback sain
+    if pct_1h > 0 and pct_6h > 0 and not (pct_24h >= 5 and -8 < pct_1h < 0):
         if pct_1h < pct_6h * 0.5:  # 1h fait moins de 50% du 6h = décélération
             reasons_bearish.append("Décélération: momentum 1h < 50% du 6h")
 
@@ -1016,34 +1132,51 @@ def evaluer_conditions_marche(pool_data: Dict, score: int, momentum: Dict,
     elif age < 1:
         reasons_neutral.append(f"Token très jeune ({age:.1f}h) - Volatilité extrême")
 
-    # ===== DÉCISION FINALE =====
+    # ===== DÉCISION FINALE (FIX BUG #6 - Score 70+ devrait donner BUY) =====
     score_bullish = len(reasons_bullish)
     score_bearish = len(reasons_bearish)
 
-    # Critères STRICTS pour BUY
-    has_critical_bullish = any("PATTERN IDÉAL" in r or "FORTE accélération" in r for r in reasons_bullish)
-    has_critical_bearish = any("PATTERN SORTIE" in r or "PATTERN ÉVITER" in r or "RALENTISSEMENT" in r for r in reasons_bearish)
+    # Détecter patterns critiques
+    has_critical_bullish = any("PATTERN IDÉAL" in r or "FORTE accélération" in r or "MULTI-TF BULLISH" in r or "PULLBACK SAIN" in r for r in reasons_bullish)
+    has_critical_bearish = any("PATTERN SORTIE" in r or "PATTERN ÉVITER" in r or "FORT RALENTISSEMENT" in r for r in reasons_bearish)
 
-    # BUY si:
-    # - Au moins 4 signaux bullish ET aucun signal critique bearish
-    # OU
-    # - Pattern idéal détecté + score >= 70 + pas de bearish critique
+    # NOUVELLE LOGIQUE:
+    # 1. Score 70+ avec multi-TF confluence → BUY
+    # 2. Pattern critique bearish → EXIT
+    # 3. Pattern critique bullish + score >= 65 → BUY
+    # 4. Score bullish dominant → BUY
+    # 5. Sinon → WAIT ou EXIT
+
     if has_critical_bearish:
+        # Bearish critique = SORTIR (même si score élevé)
         decision = "EXIT"
         should_enter = False
-    elif has_critical_bullish and score >= 70 and score_bearish < 2:
+    elif score >= 75 and score_bullish >= 3 and score_bearish <= 1:
+        # Score excellent + plusieurs signaux bullish = BUY
+        decision = "BUY"
+        should_enter = True
+    elif score >= 70 and (has_critical_bullish or score_bullish >= 2) and score_bearish <= 1:
+        # Score bon + signaux bullish = BUY
+        decision = "BUY"
+        should_enter = True
+    elif has_critical_bullish and score >= 65 and score_bearish <= 2:
+        # Pattern idéal/Multi-TF/Pullback sain + score OK = BUY
         decision = "BUY"
         should_enter = True
     elif score_bullish >= 4 and score_bearish <= 1:
+        # Beaucoup de signaux bullish = BUY
         decision = "BUY"
         should_enter = True
-    elif score_bearish >= 3:
+    elif score_bearish >= 3 or score < 60:
+        # Trop bearish ou score faible = EXIT
         decision = "EXIT"
         should_enter = False
     elif score_bullish >= 2 and score_bearish <= 2:
+        # Mitigé = WAIT
         decision = "WAIT"
         should_enter = False
     else:
+        # Défaut = EXIT
         decision = "EXIT"
         should_enter = False
 
@@ -1183,11 +1316,27 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
     decision = ""
     nouveaux_niveaux = {}
 
-    # CAS 1: Aucun TP atteint → Garder position initiale
+    # CAS 1: Aucun TP atteint → Évaluation selon conditions (FIX BUG #3)
     if not tp_hit:
-        decision = "MAINTENIR_POSITION_INITIALE"
-        raisons.append("Aucun TP atteint de l'alerte précédente")
-        raisons.append(f"Prix actuel: ${current_price:.8f} vs Entry: ${entry_price:.8f}")
+        # Évaluer si c'est toujours une bonne opportunité d'entrée
+        if conditions_favorables and score >= 70:
+            decision = "ENTRER"
+            raisons.append(f"Aucun TP atteint mais conditions excellentes (Score: {score})")
+            raisons.append(f"💡 Si pas en position: ENTRER maintenant")
+            raisons.append(f"💡 Si déjà en position: MAINTENIR (pas de TP atteint)")
+            raisons.extend(raisons_marche['bullish'][:3])
+        elif conditions_favorables and score >= 60:
+            decision = "ATTENDRE"
+            raisons.append(f"Aucun TP atteint, conditions moyennes (Score: {score})")
+            raisons.append(f"💡 Si pas en position: ATTENDRE meilleure entrée")
+            raisons.append(f"💡 Si déjà en position: MAINTENIR position initiale")
+        else:
+            decision = "EVITER"
+            raisons.append("Aucun TP atteint et conditions défavorables")
+            raisons.append(f"💡 Si pas en position: ÉVITER")
+            raisons.append(f"💡 Si en position: Considérer SORTIE si SL proche")
+            if raisons_marche['bearish']:
+                raisons.extend(raisons_marche['bearish'][:2])
 
     # CAS 2a: PUMP PARABOLIQUE → SORTIR IMMÉDIATEMENT (risque dump violent)
     elif pump_parabolique and tp_hit:
@@ -1382,32 +1531,48 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 
     txt += f"\n📊 Confiance: {confidence}% (fiabilité données)\n"
 
-    # NOUVEAU: Section WHALE ACTIVITY
-    if whale_analysis and whale_analysis['pattern'] != 'NORMAL':
-        pattern = whale_analysis['pattern']
-        concentration_risk = whale_analysis['concentration_risk']
-        buyers_1h = whale_analysis['buyers_1h']
-        sellers_1h = whale_analysis['sellers_1h']
-        avg_buys = whale_analysis['avg_buys_per_buyer']
+    # NOUVEAU: Section WHALE ACTIVITY (FIX BUG #5 - Toujours afficher si whale_score != 0)
+    if whale_analysis:
+        whale_score_val = whale_analysis.get('whale_score', 0)
+        pattern = whale_analysis.get('pattern', 'NORMAL')
+        signals = whale_analysis.get('signals', [])
 
-        # Emoji selon pattern
-        if pattern == 'WHALE_MANIPULATION':
-            pattern_emoji = "🐋"
-            pattern_label = "WHALE MANIPULATION"
-        elif pattern == 'DISTRIBUTED_BUYING':
-            pattern_emoji = "✅"
-            pattern_label = "ACCUMULATION DISTRIBUÉE"
-        elif pattern == 'DISTRIBUTED_SELLING':
-            pattern_emoji = "⚠️"
-            pattern_label = "SELLING PRESSURE"
-        else:
-            pattern_emoji = "📊"
-            pattern_label = pattern
+        # Afficher si whale_score != 0 OU si pattern != NORMAL OU si signals non vide
+        if whale_score_val != 0 or pattern != 'NORMAL' or signals:
+            concentration_risk = whale_analysis['concentration_risk']
+            buyers_1h = whale_analysis['buyers_1h']
+            sellers_1h = whale_analysis['sellers_1h']
+            avg_buys = whale_analysis['avg_buys_per_buyer']
+            avg_sells = whale_analysis.get('avg_sells_per_seller', 0)
 
-        txt += f"\n{pattern_emoji} *{pattern_label}*\n"
-        txt += f"   Buyers: {buyers_1h} | Sellers: {sellers_1h}\n"
-        txt += f"   Avg buys/buyer: {avg_buys:.1f}x\n"
-        txt += f"   Risque concentration: {concentration_risk}\n"
+            # Emoji selon pattern
+            if pattern == 'WHALE_MANIPULATION':
+                pattern_emoji = "🐋"
+                pattern_label = "WHALE MANIPULATION"
+            elif pattern == 'WHALE_SELLING':
+                pattern_emoji = "🚨"
+                pattern_label = "WHALE SELLING"
+            elif pattern == 'DISTRIBUTED_BUYING':
+                pattern_emoji = "✅"
+                pattern_label = "ACCUMULATION DISTRIBUÉE"
+            elif pattern == 'DISTRIBUTED_SELLING':
+                pattern_emoji = "⚠️"
+                pattern_label = "SELLING PRESSURE"
+            else:
+                # Pattern NORMAL mais whale_score != 0 (ex: concentration 24h)
+                pattern_emoji = "📊"
+                pattern_label = "WHALE ACTIVITY"
+
+            txt += f"\n{pattern_emoji} *{pattern_label}*\n"
+            txt += f"   Buyers: {buyers_1h} | Sellers: {sellers_1h}\n"
+            txt += f"   Avg buys/buyer: {avg_buys:.1f}x"
+            if avg_sells > 0:
+                txt += f" | Avg sells/seller: {avg_sells:.1f}x"
+            txt += f"\n   Risque concentration: {concentration_risk}\n"
+
+            # Afficher les signaux si disponibles
+            if signals:
+                txt += f"   Signaux: {', '.join(signals[:2])}\n"
 
     txt += "\n"
 
@@ -1999,24 +2164,36 @@ def scan_geckoterminal():
         # ==========================================
         # ENVOI DE L'ALERTE (après validation sécurité)
         # ==========================================
+
+        # Vérifier si c'est la première alerte pour ce token
+        is_first_alert = not alert_tracker.token_already_alerted(token_address)
+
+        # Générer le message d'alerte (pour récupérer regle5_data)
+        alert_msg, regle5_data = generer_alerte_complete(
+            opp["pool_data"],
+            opp["score"],
+            opp["base_score"],
+            opp["momentum_bonus"],
+            opp["momentum"],
+            opp["multi_pool_data"],
+            opp["signals"],
+            opp["resistance_data"],
+            opp.get("whale_analysis"),  # NOUVEAU: Passer analyse whale
+            is_first_alert,
+            alert_tracker  # Passer le tracker pour l'analyse TP
+        )
+
+        # NOUVEAU: Vérifier si on doit envoyer l'alerte (FIX BUG #1 - SPAM)
+        price = opp["pool_data"].get("price_usd", 0)
+        should_send, send_reason = should_send_alert(token_address, price, alert_tracker, regle5_data)
+
+        if not should_send:
+            log(f"⏸️ Alerte bloquée (anti-spam): {opp['pool_data']['name']}")
+            log(f"   Raison: {send_reason}")
+            continue
+
+        # Legacy cooldown check (pour compatibilité)
         if check_cooldown(alert_key):
-            # Vérifier si c'est la première alerte pour ce token
-            is_first_alert = not alert_tracker.token_already_alerted(token_address)
-
-            alert_msg, regle5_data = generer_alerte_complete(
-                opp["pool_data"],
-                opp["score"],
-                opp["base_score"],
-                opp["momentum_bonus"],
-                opp["momentum"],
-                opp["multi_pool_data"],
-                opp["signals"],
-                opp["resistance_data"],
-                opp.get("whale_analysis"),  # NOUVEAU: Passer analyse whale
-                is_first_alert,
-                alert_tracker  # Passer le tracker pour l'analyse TP
-            )
-
             # Ajouter les infos de sécurité à l'alerte
             security_info = security_checker.format_security_warning(security_result)
             alert_msg = alert_msg + "\n" + security_info
