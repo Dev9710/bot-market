@@ -750,6 +750,375 @@ def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
     return True, "✅ Opportunité valide"
 
 # ============================================
+# ÉVALUATION MARCHÉ POUR DÉCISION D'ENTRÉE
+# ============================================
+def evaluer_conditions_marche(pool_data: Dict, score: int, momentum: Dict,
+                              signal_1h: str = None, signal_6h: str = None) -> tuple:
+    """
+    Évalue TOUTES les conditions du marché pour décider si afficher ACTION RECOMMANDÉE.
+
+    Returns:
+        (bool, str, list): (should_enter, decision_type, reasons)
+        - should_enter: True = afficher Entry/SL/TP, False = afficher analyse de sortie
+        - decision_type: "BUY", "WAIT", "EXIT"
+        - reasons: Liste des raisons qui justifient la décision
+    """
+
+    reasons_bullish = []
+    reasons_bearish = []
+    reasons_neutral = []
+
+    # Extraire les données
+    pct_24h = pool_data.get("price_change_24h", 0)
+    pct_6h = pool_data.get("price_change_6h", 0)
+    pct_1h = pool_data.get("price_change_1h", 0)
+    vol_24h = pool_data.get("volume_24h", 0)
+    vol_6h = pool_data.get("volume_6h", 0)
+    vol_1h = pool_data.get("volume_1h", 0)
+    liq = pool_data.get("liquidity", 0)
+    buys = pool_data.get("buys_24h", 0)
+    sells = pool_data.get("sells_24h", 0)
+    buys_1h = pool_data.get("buys_1h", 0)
+    sells_1h = pool_data.get("sells_1h", 0)
+    age = pool_data.get("age_hours", 0)
+
+    buy_ratio_24h = buys / sells if sells > 0 else 1.0
+    buy_ratio_1h = buys_1h / sells_1h if sells_1h > 0 else 1.0
+
+    # ===== 1. ANALYSE DU SCORE =====
+    if score >= 80:
+        reasons_bullish.append("Score excellent (≥80)")
+    elif score >= 70:
+        reasons_bullish.append("Score bon (≥70)")
+    elif score < 60:
+        reasons_bearish.append(f"Score faible ({score})")
+
+    # ===== 2. ANALYSE VOLUME (CRITIQUE) =====
+    if vol_24h > 0 and vol_6h > 0 and vol_1h > 0:
+        vol_24h_avg = vol_24h / 24
+        vol_6h_avg = vol_6h / 6
+        ratio_1h_vs_6h = (vol_1h / vol_6h_avg) if vol_6h_avg > 0 else 0
+        ratio_6h_vs_24h = (vol_6h_avg / vol_24h_avg) if vol_24h_avg > 0 else 0
+
+        # Volume court terme (1h vs 6h)
+        if signal_1h == "FORTE_ACCELERATION":
+            reasons_bullish.append("Volume 1h en FORTE accélération")
+        elif signal_1h == "ACCELERATION":
+            reasons_bullish.append("Volume 1h en accélération")
+        elif signal_1h == "RALENTISSEMENT":
+            reasons_bearish.append("Volume 1h en RALENTISSEMENT")
+        elif signal_1h == "FORT_RALENTISSEMENT":
+            reasons_bearish.append("Volume 1h en FORT RALENTISSEMENT")
+
+        # Volume moyen terme (6h vs 24h)
+        if signal_6h == "PUMP_EN_COURS":
+            reasons_bullish.append("Pump confirmé sur 6h")
+        elif signal_6h == "HAUSSE_PROGRESSIVE":
+            reasons_bullish.append("Hausse progressive")
+        elif signal_6h == "BAISSE_TENDANCIELLE":
+            reasons_bearish.append("Baisse tendancielle sur 6h")
+
+        # PATTERNS CRITIQUES
+        if signal_1h in ["FORTE_ACCELERATION", "ACCELERATION"] and signal_6h == "PUMP_EN_COURS":
+            reasons_bullish.append("🎯 PATTERN IDÉAL: Pump actif + accélération")
+        elif signal_1h in ["RALENTISSEMENT", "FORT_RALENTISSEMENT"] and signal_6h == "PUMP_EN_COURS":
+            reasons_bearish.append("⚠️ PATTERN SORTIE: Essoufflement détecté")
+        elif signal_1h in ["RALENTISSEMENT", "FORT_RALENTISSEMENT"]:
+            reasons_bearish.append("🔴 PATTERN ÉVITER: Volume en chute")
+
+    # ===== 3. ANALYSE PRIX / MOMENTUM =====
+    # Tendance prix 24h
+    if pct_24h >= 20:
+        reasons_bullish.append(f"Prix 24h en hausse forte (+{pct_24h:.1f}%)")
+    elif pct_24h < -15:
+        reasons_bearish.append(f"Prix 24h en baisse ({pct_24h:.1f}%)")
+
+    # Tendance prix court terme
+    if pct_1h >= 5:
+        reasons_bullish.append(f"Momentum 1h positif (+{pct_1h:.1f}%)")
+    elif pct_1h <= -5:
+        reasons_bearish.append(f"Momentum 1h négatif ({pct_1h:.1f}%)")
+
+    # Analyse de la décélération (CRITIQUE pour sortie)
+    if pct_1h > 0 and pct_6h > 0:
+        if pct_1h < pct_6h * 0.5:  # 1h fait moins de 50% du 6h = décélération
+            reasons_bearish.append("Décélération: momentum 1h < 50% du 6h")
+
+    # ===== 4. ANALYSE PRESSION ACHAT/VENTE =====
+    ratio_change = buy_ratio_1h - buy_ratio_24h
+
+    if ratio_change > 0.15:  # Forte augmentation pression acheteuse
+        reasons_bullish.append(f"Pression acheteuse en hausse (+{ratio_change:.1%})")
+    elif ratio_change < -0.15:  # Forte augmentation pression vendeuse
+        reasons_bearish.append(f"Pression vendeuse en hausse ({ratio_change:.1%})")
+
+    if buy_ratio_1h >= 1.3:
+        reasons_bullish.append(f"Acheteurs dominent 1h (ratio {buy_ratio_1h:.2f})")
+    elif buy_ratio_1h <= 0.7:
+        reasons_bearish.append(f"Vendeurs dominent 1h (ratio {buy_ratio_1h:.2f})")
+
+    # ===== 5. ANALYSE LIQUIDITÉ =====
+    if liq < 150000:
+        reasons_bearish.append(f"Liquidité très faible (${liq/1000:.0f}K) - Risque rug élevé")
+    elif liq < 200000:
+        reasons_neutral.append(f"Liquidité faible (${liq/1000:.0f}K) - Prudence")
+    elif liq >= 500000:
+        reasons_bullish.append(f"Liquidité solide (${liq/1000:.0f}K)")
+
+    # ===== 6. ANALYSE ÂGE =====
+    if age > 48:
+        reasons_neutral.append(f"Token mature ({age:.0f}h) - Exit window peut être passée")
+    elif age < 1:
+        reasons_neutral.append(f"Token très jeune ({age:.1f}h) - Volatilité extrême")
+
+    # ===== DÉCISION FINALE =====
+    score_bullish = len(reasons_bullish)
+    score_bearish = len(reasons_bearish)
+
+    # Critères STRICTS pour BUY
+    has_critical_bullish = any("PATTERN IDÉAL" in r or "FORTE accélération" in r for r in reasons_bullish)
+    has_critical_bearish = any("PATTERN SORTIE" in r or "PATTERN ÉVITER" in r or "RALENTISSEMENT" in r for r in reasons_bearish)
+
+    # BUY si:
+    # - Au moins 4 signaux bullish ET aucun signal critique bearish
+    # OU
+    # - Pattern idéal détecté + score >= 70 + pas de bearish critique
+    if has_critical_bearish:
+        decision = "EXIT"
+        should_enter = False
+    elif has_critical_bullish and score >= 70 and score_bearish < 2:
+        decision = "BUY"
+        should_enter = True
+    elif score_bullish >= 4 and score_bearish <= 1:
+        decision = "BUY"
+        should_enter = True
+    elif score_bearish >= 3:
+        decision = "EXIT"
+        should_enter = False
+    elif score_bullish >= 2 and score_bearish <= 2:
+        decision = "WAIT"
+        should_enter = False
+    else:
+        decision = "EXIT"
+        should_enter = False
+
+    return should_enter, decision, {
+        'bullish': reasons_bullish,
+        'bearish': reasons_bearish,
+        'neutral': reasons_neutral
+    }
+
+# ============================================
+# ANALYSE ALERTE SUIVANTE (TP TRACKING)
+# ============================================
+def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_data: Dict,
+                             score: int, momentum: Dict, signal_1h: str = None,
+                             signal_6h: str = None) -> Dict:
+    """
+    Analyse une alerte suivante sur un token déjà alerté.
+    Vérifie si les TP ont été atteints et décide de la stratégie.
+
+    VERSION SIMPLE+ - 5 RÈGLES ESSENTIELLES:
+    1. Détection des TP atteints
+    2. Vérification du prix (pas trop élevé pour re-entry)
+    3. Réévaluation des conditions actuelles
+    4. Décision: NOUVEAUX_NIVEAUX / SECURISER_HOLD / SORTIR
+    5. Analyse vélocité du pump (protection pump parabolique)
+
+    Args:
+        previous_alert: Dernière alerte sur ce token (depuis DB)
+        current_price: Prix actuel du token
+        pool_data: Données actuelles du pool
+        score: Score actuel
+        momentum: Momentum actuel
+        signal_1h: Signal volume 1h vs 6h
+        signal_6h: Signal volume 6h vs 24h
+
+    Returns:
+        Dict avec:
+            - decision: "NOUVEAUX_NIVEAUX" / "SECURISER_HOLD" / "SORTIR"
+            - tp_hit: Liste des TP atteints ["TP1", "TP2", "TP3"]
+            - tp_gains: Dict avec les gains réalisés {"TP1": 5.0, ...}
+            - prix_trop_eleve: bool
+            - conditions_favorables: bool
+            - raisons: Liste des raisons de la décision
+            - nouveaux_niveaux: Dict (si applicable) avec entry/sl/tp
+            - velocite_pump: float (% par heure)
+            - type_pump: str (PARABOLIQUE / RAPIDE / NORMAL / LENT)
+    """
+
+    # RÈGLE 1: Détection des TP atteints
+    tp_hit = []
+    tp_gains = {}
+
+    tp1_price = previous_alert.get('tp1_price', 0)
+    tp2_price = previous_alert.get('tp2_price', 0)
+    tp3_price = previous_alert.get('tp3_price', 0)
+    entry_price = previous_alert.get('entry_price', previous_alert.get('price_at_alert', 0))
+
+    if current_price >= tp3_price and tp3_price > 0:
+        tp_hit.extend(["TP1", "TP2", "TP3"])
+        tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
+        tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
+        tp_gains["TP3"] = ((tp3_price - entry_price) / entry_price) * 100
+    elif current_price >= tp2_price and tp2_price > 0:
+        tp_hit.extend(["TP1", "TP2"])
+        tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
+        tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
+    elif current_price >= tp1_price and tp1_price > 0:
+        tp_hit.append("TP1")
+        tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
+
+    # RÈGLE 2: Vérifier si le prix est trop élevé pour re-entry (>20% depuis alerte initiale)
+    hausse_depuis_alerte = ((current_price - entry_price) / entry_price) * 100
+    prix_trop_eleve = hausse_depuis_alerte > 20.0
+
+    # RÈGLE 5: Analyser la vélocité du pump (protection pump parabolique)
+    from datetime import datetime
+
+    # Calculer le temps écoulé depuis l'alerte précédente
+    try:
+        if isinstance(previous_alert.get('created_at'), str):
+            created_at = datetime.strptime(previous_alert['created_at'], '%Y-%m-%d %H:%M:%S')
+        else:
+            created_at = previous_alert.get('created_at')
+
+        temps_ecoule_heures = (datetime.now() - created_at).total_seconds() / 3600
+    except:
+        # Si erreur de parsing, estimer à 1h par défaut
+        temps_ecoule_heures = 1.0
+
+    # Éviter division par zéro
+    if temps_ecoule_heures < 0.01:  # Moins de 36 secondes
+        temps_ecoule_heures = 0.01
+
+    # Calculer la vélocité: % de hausse par heure
+    velocite_pump = hausse_depuis_alerte / temps_ecoule_heures
+
+    # Classifier le type de pump
+    pump_parabolique = False
+    pump_tres_rapide = False
+    type_pump = ""
+
+    if velocite_pump > 100:  # >100% par heure = PARABOLIQUE
+        type_pump = "PARABOLIQUE"
+        pump_parabolique = True
+    elif velocite_pump > 50:  # >50% par heure = TRÈS RAPIDE
+        type_pump = "TRES_RAPIDE"
+        pump_tres_rapide = True
+    elif velocite_pump > 20:  # >20% par heure = RAPIDE
+        type_pump = "RAPIDE"
+    elif velocite_pump > 5:  # >5% par heure = NORMAL
+        type_pump = "NORMAL"
+    else:  # ≤5% par heure = LENT (sain)
+        type_pump = "LENT"
+
+    # RÈGLE 3: Réévaluer les conditions actuelles du marché
+    conditions_favorables, decision_marche, raisons_marche = evaluer_conditions_marche(
+        pool_data, score, momentum, signal_1h, signal_6h
+    )
+
+    # RÈGLE 4: Décision finale
+    raisons = []
+    decision = ""
+    nouveaux_niveaux = {}
+
+    # CAS 1: Aucun TP atteint → Garder position initiale
+    if not tp_hit:
+        decision = "MAINTENIR_POSITION_INITIALE"
+        raisons.append("Aucun TP atteint de l'alerte précédente")
+        raisons.append(f"Prix actuel: ${current_price:.8f} vs Entry: ${entry_price:.8f}")
+
+    # CAS 2a: PUMP PARABOLIQUE → SORTIR IMMÉDIATEMENT (risque dump violent)
+    elif pump_parabolique and tp_hit:
+        decision = "SORTIR"
+        raisons.append(f"✅ {', '.join(tp_hit)} atteint(s) (+{hausse_depuis_alerte:.1f}%)")
+        raisons.append(f"🚨 PUMP PARABOLIQUE détecté ({velocite_pump:.0f}%/h)")
+        raisons.append(f"⚠️ Risque de dump violent - SÉCURISER IMMÉDIATEMENT")
+        raisons.append("💰 Prendre les profits maintenant avant le retournement")
+
+    # CAS 2b: TP atteint(s) + prix trop élevé → Ne pas re-rentrer
+    elif prix_trop_eleve:
+        decision = "SORTIR"
+        raisons.append(f"✅ {', '.join(tp_hit)} atteint(s) (+{hausse_depuis_alerte:.1f}%)")
+        raisons.append(f"⚠️ Prix trop élevé pour re-entry (+{hausse_depuis_alerte:.1f}% depuis alerte initiale)")
+        raisons.append("💰 Sécuriser les gains déjà réalisés")
+
+    # CAS 3a: PUMP TRÈS RAPIDE + conditions favorables → Nouveaux niveaux TRÈS SERRÉS
+    elif pump_tres_rapide and conditions_favorables and tp_hit:
+        decision = "NOUVEAUX_NIVEAUX"
+        raisons.append(f"✅ {', '.join(tp_hit)} atteint(s)")
+        for tp_name, gain in tp_gains.items():
+            raisons.append(f"   {tp_name}: +{gain:.1f}%")
+        raisons.append(f"⚡ Pump très rapide ({velocite_pump:.0f}%/h)")
+        raisons.append(f"🚀 Conditions encore favorables ({decision_marche})")
+        raisons.append("⚠️ SL TRÈS SERRÉ (-3%) car pump rapide")
+
+        # SL TRÈS SERRÉ à 97% pour pump très rapide
+        nouveaux_niveaux = {
+            'entry_price': current_price,
+            'stop_loss_price': current_price * 0.97,  # -3% au lieu de -5%
+            'stop_loss_percent': -3.0,
+            'tp1_price': current_price * 1.05,
+            'tp1_percent': 5.0,
+            'tp2_price': current_price * 1.10,
+            'tp2_percent': 10.0,
+            'tp3_price': current_price * 1.15,
+            'tp3_percent': 15.0
+        }
+
+    # CAS 3b: TP atteint(s) + conditions favorables → Nouveaux niveaux
+    elif conditions_favorables:
+        decision = "NOUVEAUX_NIVEAUX"
+        raisons.append(f"✅ {', '.join(tp_hit)} atteint(s)")
+        for tp_name, gain in tp_gains.items():
+            raisons.append(f"   {tp_name}: +{gain:.1f}%")
+        raisons.append(f"🚀 Conditions encore favorables ({decision_marche})")
+        raisons.extend(raisons_marche['bullish'][:3])  # Top 3 raisons haussières
+
+        # Afficher type de pump
+        if type_pump == "LENT":
+            raisons.append(f"✅ Pump sain ({velocite_pump:.1f}%/h) - Progression stable")
+
+        # Calculer NOUVEAUX niveaux depuis le prix actuel
+        # SL plus serré à 95% (car déjà en profit)
+        nouveaux_niveaux = {
+            'entry_price': current_price,
+            'stop_loss_price': current_price * 0.95,
+            'stop_loss_percent': -5.0,
+            'tp1_price': current_price * 1.05,
+            'tp1_percent': 5.0,
+            'tp2_price': current_price * 1.10,
+            'tp2_percent': 10.0,
+            'tp3_price': current_price * 1.15,
+            'tp3_percent': 15.0
+        }
+
+    # CAS 4: TP atteint(s) + conditions neutres/baissières → Sécuriser
+    else:
+        decision = "SECURISER_HOLD"
+        raisons.append(f"✅ {', '.join(tp_hit)} atteint(s)")
+        for tp_name, gain in tp_gains.items():
+            raisons.append(f"   {tp_name}: +{gain:.1f}%")
+        raisons.append(f"⚠️ Conditions actuelles: {decision_marche}")
+        raisons.extend(raisons_marche['bearish'][:2])  # Top 2 raisons baissières
+        raisons.append("💡 Trailing stop à -5% recommandé pour sécuriser")
+
+    return {
+        'decision': decision,
+        'tp_hit': tp_hit,
+        'tp_gains': tp_gains,
+        'prix_trop_eleve': prix_trop_eleve,
+        'conditions_favorables': conditions_favorables,
+        'raisons': raisons,
+        'nouveaux_niveaux': nouveaux_niveaux,
+        'hausse_depuis_alerte': hausse_depuis_alerte,
+        'velocite_pump': velocite_pump,
+        'type_pump': type_pump,
+        'temps_ecoule_heures': temps_ecoule_heures
+    }
+
+# ============================================
 # GÉNÉRATION ALERTE COMPLÈTE
 # ============================================
 def format_price(price: float) -> str:
@@ -766,8 +1135,25 @@ def format_price(price: float) -> str:
 
 def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, momentum_bonus: int,
                             momentum: Dict, multi_pool_data: Dict, signals: List[str],
-                            resistance_data: Dict, is_first_alert: bool = True) -> str:
-    """Génère alerte ultra-complète avec toutes les données."""
+                            resistance_data: Dict, is_first_alert: bool = True,
+                            tracker: 'AlertTracker' = None) -> tuple:
+    """Génère alerte ultra-complète avec toutes les données.
+
+    Args:
+        tracker: Instance d'AlertTracker pour accéder à l'historique (optionnel)
+
+    Returns:
+        tuple: (message_texte, donnees_regle5_dict)
+    """
+
+    # Initialiser les données RÈGLE 5 par défaut
+    regle5_data = {
+        'velocite_pump': 0,
+        'type_pump': 'UNKNOWN',
+        'decision_tp_tracking': None,
+        'temps_depuis_alerte_precedente': 0,
+        'is_alerte_suivante': 0
+    }
 
     name = pool_data["name"]
     base_token = pool_data["base_token_name"]
@@ -792,6 +1178,10 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     buy_ratio_24h = buys / sells if sells > 0 else 1.0
     buy_ratio_1h = buys_1h / sells_1h if sells_1h > 0 else 1.0
 
+    # Initialiser les signaux volume (seront définis dans l'analyse volume)
+    signal_1h = None
+    signal_6h = None
+
     # Emojis score
     if score >= 80:
         score_emoji = "⭐️⭐️⭐️⭐️"
@@ -814,7 +1204,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     if is_first_alert:
         txt = f"\n🆕 *Nouvelle opportunité sur le token {base_token}*\n"
     else:
-        txt = f"\n🔄 *Nouvelle opportunité pour le token {base_token}*\n"
+        txt = f"\n🔄 *Nouvelle analyse sur le token {base_token}*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
     txt += f"💎 {name}\n"
     txt += f"⛓️ Blockchain: {network_display}\n\n"
@@ -824,6 +1214,104 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     txt += f"🎯 *SCORE: {score}/100 {score_emoji} {score_label}*\n"
     txt += f"   Base: {base_score} | Momentum: {momentum_bonus:+d}\n"
     txt += f"📊 Confiance: {confidence}% (fiabilité données)\n\n"
+
+    # ========== ANALYSE TP TRACKING (pour alertes suivantes) ==========
+    if not is_first_alert and tracker is not None:
+        token_address = pool_data.get("pool_address", "")
+        previous_alert = tracker.get_last_alert_for_token(token_address)
+
+        if previous_alert:
+            # Pré-calculer les signaux volume pour l'analyse
+            vol_24h_avg = vol_24h / 24
+            vol_6h_avg = vol_6h / 6 if vol_6h > 0 else 0
+            ratio_1h_vs_6h = (vol_1h / vol_6h_avg) if vol_6h_avg > 0 else 0
+            ratio_6h_vs_24h = (vol_6h_avg / vol_24h_avg) if vol_24h_avg > 0 else 0
+
+            # Déterminer signaux
+            if ratio_1h_vs_6h >= 2.0:
+                signal_1h = "FORTE_ACCELERATION"
+            elif ratio_1h_vs_6h >= 1.5:
+                signal_1h = "ACCELERATION"
+            elif ratio_1h_vs_6h <= 0.3:
+                signal_1h = "FORT_RALENTISSEMENT"
+            elif ratio_1h_vs_6h <= 0.5:
+                signal_1h = "RALENTISSEMENT"
+            else:
+                signal_1h = "STABLE"
+
+            if ratio_6h_vs_24h >= 1.8:
+                signal_6h = "PUMP_EN_COURS"
+            elif ratio_6h_vs_24h >= 1.3:
+                signal_6h = "HAUSSE_PROGRESSIVE"
+            elif ratio_6h_vs_24h <= 0.7:
+                signal_6h = "BAISSE_TENDANCIELLE"
+            else:
+                signal_6h = "STABLE"
+
+            # Analyser TP tracking
+            analyse_tp = analyser_alerte_suivante(
+                previous_alert, price, pool_data, score, momentum, signal_1h, signal_6h
+            )
+
+            # Mettre à jour les données RÈGLE 5
+            regle5_data = {
+                'velocite_pump': analyse_tp['velocite_pump'],
+                'type_pump': analyse_tp['type_pump'],
+                'decision_tp_tracking': analyse_tp['decision'],
+                'temps_depuis_alerte_precedente': analyse_tp['temps_ecoule_heures'],
+                'is_alerte_suivante': 1
+            }
+
+            # Afficher section TP TRACKING
+            txt += f"━━━ SUIVI ALERTE PRÉCÉDENTE ━━━\n"
+            entry_prev = previous_alert.get('entry_price', previous_alert.get('price_at_alert', 0))
+            txt += f"📍 Entry précédente: {format_price(entry_prev)}\n"
+            txt += f"💰 Prix actuel: {format_price(price)} ({analyse_tp['hausse_depuis_alerte']:+.1f}%)\n"
+
+            # Afficher vélocité du pump
+            temps_h = analyse_tp['temps_ecoule_heures']
+            velocite = analyse_tp['velocite_pump']
+            type_pump = analyse_tp['type_pump']
+
+            if temps_h < 1:
+                temps_display = f"{temps_h * 60:.0f} min"
+            else:
+                temps_display = f"{temps_h:.1f}h"
+
+            # Emoji selon type de pump
+            if type_pump == "PARABOLIQUE":
+                pump_emoji = "🚨"
+                pump_label = "PARABOLIQUE (DANGER)"
+            elif type_pump == "TRES_RAPIDE":
+                pump_emoji = "⚡"
+                pump_label = "TRÈS RAPIDE"
+            elif type_pump == "RAPIDE":
+                pump_emoji = "🔥"
+                pump_label = "RAPIDE"
+            elif type_pump == "NORMAL":
+                pump_emoji = "📈"
+                pump_label = "NORMAL"
+            else:  # LENT
+                pump_emoji = "✅"
+                pump_label = "SAIN"
+
+            txt += f"⏱️ Temps écoulé: {temps_display} | {pump_emoji} Vélocité: {velocite:.0f}%/h ({pump_label})\n"
+
+            # Afficher TP atteints
+            if analyse_tp['tp_hit']:
+                txt += f"✅ *TP ATTEINTS:* {', '.join(analyse_tp['tp_hit'])}\n"
+                for tp_name, gain in analyse_tp['tp_gains'].items():
+                    txt += f"   {tp_name}: +{gain:.1f}%\n"
+            else:
+                txt += f"⏳ Aucun TP atteint pour le moment\n"
+
+            txt += f"\n🎯 *DÉCISION: {analyse_tp['decision']}*\n"
+
+            # Afficher raisons
+            for raison in analyse_tp['raisons']:
+                txt += f"{raison}\n"
+
+            txt += "\n"
 
     # PRIX & MOMENTUM
     txt += f"━━━ PRIX & MOMENTUM ━━━\n"
@@ -1024,26 +1512,135 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             txt += f"{signal}\n"
         txt += "\n"
 
-    # ACTION RECOMMANDÉE
+    # ÉVALUATION DES CONDITIONS MARCHÉ POUR DÉCISION D'ENTRÉE
+    should_enter, decision, analysis_reasons = evaluer_conditions_marche(
+        pool_data, score, momentum, signal_1h, signal_6h
+    )
+
+    # ACTION RECOMMANDÉE - CONDITIONNELLE
     txt += f"━━━ ACTION RECOMMANDÉE ━━━\n"
 
-    # Entry avec limite MAX pour gérer le délai d'exécution
-    price_max = price * 1.05  # +5% max si tu arrives en retard
-    txt += f"⚡ Entry: {format_price(price)} 🎯\n"
-    txt += f"⚠️ Prix MAX: {format_price(price_max)} (si retard)\n"
+    # Vérifier si on a une analyse TP avec nouveaux niveaux (alerte suivante)
+    show_nouveaux_niveaux = (not is_first_alert and tracker is not None and
+                             'analyse_tp' in locals() and
+                             analyse_tp['decision'] == "NOUVEAUX_NIVEAUX")
 
-    # Stop loss
-    stop_loss = price * 0.90
-    txt += f"🛑 Stop loss: {format_price(stop_loss)} (-10%)\n"
+    if show_nouveaux_niveaux:
+        # ✅ NOUVEAUX NIVEAUX TP/SL (car TP précédents atteints + conditions favorables)
+        txt += f"🚀 NOUVEAUX NIVEAUX - TP précédents atteints !\n\n"
 
-    # Take profits
-    tp1 = price * 1.05
-    tp2 = price * 1.10
-    tp3 = price * 1.15
-    txt += f"🎯 TP1 (50%): {format_price(tp1)} (+5%)\n"
-    txt += f"🎯 TP2 (30%): {format_price(tp2)} (+10%)\n"
-    txt += f"🎯 TP3 (20%): {format_price(tp3)} (+15%)\n"
-    txt += f"🔄 Trail stop: -5% après TP1\n\n"
+        nouveaux = analyse_tp['nouveaux_niveaux']
+        entry_new = nouveaux['entry_price']
+        stop_loss_new = nouveaux['stop_loss_price']
+        tp1_new = nouveaux['tp1_price']
+        tp2_new = nouveaux['tp2_price']
+        tp3_new = nouveaux['tp3_price']
+
+        txt += f"⚡ Entry: {format_price(entry_new)} 🎯\n"
+        txt += f"⚠️ Prix MAX: {format_price(entry_new * 1.05)} (si retard)\n"
+        txt += f"🛑 Stop loss: {format_price(stop_loss_new)} (-5%) ⚡ SL SERRÉ\n"
+        txt += f"🎯 TP1 (50%): {format_price(tp1_new)} (+5%)\n"
+        txt += f"🎯 TP2 (30%): {format_price(tp2_new)} (+10%)\n"
+        txt += f"🎯 TP3 (20%): {format_price(tp3_new)} (+15%)\n"
+        txt += f"🔄 Trail stop: -5% après TP1\n\n"
+
+        txt += f"💡 NOTE: SL plus serré (-5%) car déjà en profit !\n\n"
+
+    elif should_enter and decision == "BUY":
+        # ✅ CONDITIONS FAVORABLES - Afficher Entry/SL/TP
+        txt += f"✅ SIGNAL D'ENTRÉE VALIDÉ\n\n"
+
+        # Afficher les raisons bullish
+        if analysis_reasons['bullish']:
+            txt += f"📈 Signaux haussiers:\n"
+            for reason in analysis_reasons['bullish']:
+                txt += f"   • {reason}\n"
+            txt += "\n"
+
+        # Entry avec limite MAX pour gérer le délai d'exécution
+        price_max = price * 1.05  # +5% max si tu arrives en retard
+        txt += f"⚡ Entry: {format_price(price)} 🎯\n"
+        txt += f"⚠️ Prix MAX: {format_price(price_max)} (si retard)\n"
+
+        # Stop loss
+        stop_loss = price * 0.90
+        txt += f"🛑 Stop loss: {format_price(stop_loss)} (-10%)\n"
+
+        # Take profits
+        tp1 = price * 1.05
+        tp2 = price * 1.10
+        tp3 = price * 1.15
+        txt += f"🎯 TP1 (50%): {format_price(tp1)} (+5%)\n"
+        txt += f"🎯 TP2 (30%): {format_price(tp2)} (+10%)\n"
+        txt += f"🎯 TP3 (20%): {format_price(tp3)} (+15%)\n"
+        txt += f"🔄 Trail stop: -5% après TP1\n\n"
+
+    elif decision == "WAIT":
+        # ⏸️ CONDITIONS INCERTAINES - Attendre
+        txt += f"⏸️ ATTENDRE - Conditions pas encore idéales\n\n"
+
+        # Afficher les raisons
+        if analysis_reasons['bearish']:
+            txt += f"⚠️ Signaux négatifs détectés:\n"
+            for reason in analysis_reasons['bearish']:
+                txt += f"   • {reason}\n"
+            txt += "\n"
+
+        if analysis_reasons['bullish']:
+            txt += f"✅ Signaux positifs:\n"
+            for reason in analysis_reasons['bullish']:
+                txt += f"   • {reason}\n"
+            txt += "\n"
+
+        txt += f"💡 RECOMMANDATION:\n"
+        txt += f"   • Surveiller l'évolution du volume et du prix\n"
+        txt += f"   • Attendre confirmation d'une tendance haussière claire\n"
+        txt += f"   • Entrer si le volume accélère et la pression acheteuse augmente\n"
+        txt += f"   • Risque modéré - Prudence recommandée\n\n"
+
+    else:  # EXIT
+        # 🚫 CONDITIONS DÉFAVORABLES - Ne pas entrer / Sortir
+        txt += f"🚫 PAS D'ENTRÉE - Sortie ou éviter le marché\n\n"
+
+        # Afficher les raisons bearish
+        if analysis_reasons['bearish']:
+            txt += f"🔴 Raisons de sortie/éviter:\n"
+            for reason in analysis_reasons['bearish']:
+                txt += f"   • {reason}\n"
+            txt += "\n"
+
+        # Afficher les points positifs s'il y en a
+        if analysis_reasons['bullish']:
+            txt += f"⚠️ Points positifs (insuffisants):\n"
+            for reason in analysis_reasons['bullish']:
+                txt += f"   • {reason}\n"
+            txt += "\n"
+
+        txt += f"💡 RECOMMANDATION:\n"
+
+        # Déterminer si c'est un pump qui s'essouffle ou un token à éviter
+        is_essoufflement = any("SORTIE" in r or "Essoufflement" in r or "Décélération" in r for r in analysis_reasons['bearish'])
+        is_volume_problem = any("ÉVITER" in r or "RALENTISSEMENT" in r or "chute" in r for r in analysis_reasons['bearish'])
+
+        if is_essoufflement:
+            txt += f"   • ⚠️ SORTIR si vous êtes en position (pump s'essouffle)\n"
+            txt += f"   • NE PAS ENTRER - Momentum en décélération\n"
+            txt += f"   • Attendre un éventuel rebound seulement si volume se stabilise\n"
+            txt += f"   • Risque élevé de correction\n"
+        elif is_volume_problem:
+            txt += f"   • 🔴 NE PAS ENTRER - Volume en chute\n"
+            txt += f"   • Éviter ce token pour le moment\n"
+            txt += f"   • Chercher d'autres opportunités avec volume sain\n"
+            txt += f"   • Rebound peu probable sans nouvelle impulsion\n"
+        else:
+            txt += f"   • 🚫 Conditions actuelles défavorables\n"
+            txt += f"   • NE PAS ENTRER tant que la situation ne s'améliore pas\n"
+            txt += f"   • Surveiller pour un éventuel rebound avec:\n"
+            txt += f"     - Reprise du volume\n"
+            txt += f"     - Augmentation de la pression acheteuse\n"
+            txt += f"     - Momentum redevenant positif\n"
+
+        txt += "\n"
 
     # RISQUES
     txt += f"━━━ RISQUES ━━━\n"
@@ -1064,7 +1661,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 
     txt += f"\n🔗 https://geckoterminal.com/{network_id.lower()}/pools/{pool_data['pool_address']}\n"
 
-    return txt
+    return txt, regle5_data
 
 # ============================================
 # SCAN PRINCIPAL
@@ -1199,7 +1796,7 @@ def scan_geckoterminal():
             # Vérifier si c'est la première alerte pour ce token
             is_first_alert = not alert_tracker.token_already_alerted(token_address)
 
-            alert_msg = generer_alerte_complete(
+            alert_msg, regle5_data = generer_alerte_complete(
                 opp["pool_data"],
                 opp["score"],
                 opp["base_score"],
@@ -1208,7 +1805,8 @@ def scan_geckoterminal():
                 opp["multi_pool_data"],
                 opp["signals"],
                 opp["resistance_data"],
-                is_first_alert
+                is_first_alert,
+                alert_tracker  # Passer le tracker pour l'analyse TP
             )
 
             # Ajouter les infos de sécurité à l'alerte
@@ -1259,7 +1857,13 @@ def scan_geckoterminal():
                         'tp2_percent': 10,
                         'tp3_price': tp3_price,
                         'tp3_percent': 15,
-                        'alert_message': alert_msg
+                        'alert_message': alert_msg,
+                        # RÈGLE 5: Données de vélocité du pump
+                        'velocite_pump': regle5_data['velocite_pump'],
+                        'type_pump': regle5_data['type_pump'],
+                        'decision_tp_tracking': regle5_data['decision_tp_tracking'],
+                        'temps_depuis_alerte_precedente': regle5_data['temps_depuis_alerte_precedente'],
+                        'is_alerte_suivante': regle5_data['is_alerte_suivante']
                     }
 
                     alert_id = alert_tracker.save_alert(alert_data)

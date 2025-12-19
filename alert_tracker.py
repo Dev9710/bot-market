@@ -148,6 +148,37 @@ class AlertTracker:
         except sqlite3.OperationalError:
             pass  # Colonne existe déjà
 
+        # Ajouter colonnes pour RÈGLE 5 - Vélocité du pump
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN velocite_pump REAL DEFAULT 0")
+            print("✅ Colonne velocite_pump ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN type_pump TEXT DEFAULT 'UNKNOWN'")
+            print("✅ Colonne type_pump ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN decision_tp_tracking TEXT DEFAULT NULL")
+            print("✅ Colonne decision_tp_tracking ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN temps_depuis_alerte_precedente REAL DEFAULT 0")
+            print("✅ Colonne temps_depuis_alerte_precedente ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN is_alerte_suivante INTEGER DEFAULT 0")
+            print("✅ Colonne is_alerte_suivante ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
         self.conn.commit()
         print("✅ Tables créées avec succès")
 
@@ -173,8 +204,10 @@ class AlertTracker:
                     entry_price, stop_loss_price, stop_loss_percent,
                     tp1_price, tp1_percent, tp2_price, tp2_percent,
                     tp3_price, tp3_percent, alert_message,
-                    volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h,
+                    velocite_pump, type_pump, decision_tp_tracking,
+                    temps_depuis_alerte_precedente, is_alerte_suivante
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 alert_data['token_name'],
                 alert_data['token_address'],
@@ -204,7 +237,12 @@ class AlertTracker:
                 alert_data['tp3_percent'],
                 alert_data.get('alert_message', ''),
                 alert_data.get('volume_acceleration_1h_vs_6h', 0),
-                alert_data.get('volume_acceleration_6h_vs_24h', 0)
+                alert_data.get('volume_acceleration_6h_vs_24h', 0),
+                alert_data.get('velocite_pump', 0),
+                alert_data.get('type_pump', 'UNKNOWN'),
+                alert_data.get('decision_tp_tracking', None),
+                alert_data.get('temps_depuis_alerte_precedente', 0),
+                alert_data.get('is_alerte_suivante', 0)
             ))
 
             self.conn.commit()
@@ -533,6 +571,56 @@ class AlertTracker:
 
         count = cursor.fetchone()[0]
         return count > 0
+
+    def get_last_alert_for_token(self, token_address: str) -> Optional[Dict]:
+        """
+        Récupère la dernière alerte pour un token donné.
+
+        Args:
+            token_address: Adresse du token
+
+        Returns:
+            Dict avec les données de la dernière alerte, ou None si aucune alerte
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT
+                id, token_name, token_address, network,
+                price_at_alert, score, base_score, momentum_bonus,
+                confidence_score, volume_24h, volume_6h, volume_1h,
+                liquidity, buys_24h, sells_24h, buy_ratio,
+                total_txns, age_hours, created_at,
+                entry_price, stop_loss_price, stop_loss_percent,
+                tp1_price, tp1_percent, tp2_price, tp2_percent,
+                tp3_price, tp3_percent,
+                volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h,
+                velocite_pump, type_pump, decision_tp_tracking,
+                temps_depuis_alerte_precedente, is_alerte_suivante
+            FROM alerts
+            WHERE token_address = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (token_address,))
+
+        row = cursor.fetchone()
+        if not row:
+            return None
+
+        columns = [
+            'id', 'token_name', 'token_address', 'network',
+            'price_at_alert', 'score', 'base_score', 'momentum_bonus',
+            'confidence_score', 'volume_24h', 'volume_6h', 'volume_1h',
+            'liquidity', 'buys_24h', 'sells_24h', 'buy_ratio',
+            'total_txns', 'age_hours', 'created_at',
+            'entry_price', 'stop_loss_price', 'stop_loss_percent',
+            'tp1_price', 'tp1_percent', 'tp2_price', 'tp2_percent',
+            'tp3_price', 'tp3_percent',
+            'volume_acceleration_1h_vs_6h', 'volume_acceleration_6h_vs_24h',
+            'velocite_pump', 'type_pump', 'decision_tp_tracking',
+            'temps_depuis_alerte_precedente', 'is_alerte_suivante'
+        ]
+
+        return dict(zip(columns, row))
 
     def get_token_history(self, token_name: str) -> List[Dict]:
         """
