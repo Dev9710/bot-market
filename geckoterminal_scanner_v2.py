@@ -1929,7 +1929,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
         tp3_new = nouveaux['tp3_price']
 
         txt += f"⚡ Entry: {format_price(entry_new)} 🎯\n"
-        txt += f"⚠️ Prix MAX: {format_price(entry_new * 1.05)} (si retard)\n"
+        txt += f"📍 Limite entrée: {format_price(entry_new * 1.03)} (max +3%)\n"
         txt += f"🛑 Stop loss: {format_price(stop_loss_new)} (-5%) ⚡ SL SERRÉ\n"
         txt += f"🎯 TP1 (50%): {format_price(tp1_new)} (+5%)\n"
         txt += f"🎯 TP2 (30%): {format_price(tp2_new)} (+10%)\n"
@@ -1950,9 +1950,10 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             txt += "\n"
 
         # Entry avec limite MAX pour gérer le délai d'exécution
-        price_max = price * 1.05  # +5% max si tu arrives en retard
+        # Note: Prix MAX entrée = Entry +3% (au-delà = entrée tardive, risque faible R:R)
+        price_max_entry = price * 1.03  # +3% max si tu arrives en retard
         txt += f"⚡ Entry: {format_price(price)} 🎯\n"
-        txt += f"⚠️ Prix MAX: {format_price(price_max)} (si retard)\n"
+        txt += f"📍 Limite entrée: {format_price(price_max_entry)} (max +3%)\n"
 
         # Stop loss
         stop_loss = price * 0.90
