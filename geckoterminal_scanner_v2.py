@@ -179,7 +179,17 @@ def should_send_alert(token_address: str, current_price: float, tracker, regle5_
         if prix_max_db:
             prix_max_atteint = max(prix_max_db, current_price)
 
-    if prix_max_atteint >= tp1_price and tp1_price > 0:
+    # FIX HARMONISATION: Tolérance 0.5% pour cohérence avec analyser_alerte_suivante()
+    TP_TOLERANCE_PERCENT = 0.5
+
+    def tp_reached_with_tolerance(prix: float, tp_target: float) -> bool:
+        """Vérifie si TP atteint avec tolérance pour arrondi."""
+        if tp_target <= 0:
+            return False
+        ecart_percent = ((prix - tp_target) / tp_target) * 100
+        return ecart_percent >= -TP_TOLERANCE_PERCENT
+
+    if tp_reached_with_tolerance(prix_max_atteint, tp1_price):
         return True, f"TP atteint (prix max: ${prix_max_atteint:.6f} >= TP1: ${tp1_price:.6f})"
 
     # 2. Vérifier si le prix a varié de ±5% depuis entry
@@ -1248,21 +1258,34 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
             prix_max_atteint = max(prix_max_db, current_price)
             # Note: On prend le max car le prix actuel peut être > que le dernier tracking
 
+    # FIX HARMONISATION: Tolérance 0.5% pour éviter problèmes d'arrondi
+    # Exemple: TP1=$0.1575, prix=$0.1574 → considéré comme atteint (écart 0.06%)
+    TP_TOLERANCE_PERCENT = 0.5  # 0.5% de tolérance
+
+    def tp_reached(prix: float, tp_target: float) -> bool:
+        """Vérifie si TP atteint avec tolérance pour arrondi."""
+        if tp_target <= 0:
+            return False
+        ecart_percent = ((prix - tp_target) / tp_target) * 100
+        # TP atteint si prix >= TP - 0.5%
+        return ecart_percent >= -TP_TOLERANCE_PERCENT
+
     # DEBUG: Log pour comprendre détection TP
     if alert_id > 0:
         log(f"   🔍 DEBUG TP: prix_max={prix_max_atteint:.8f}, tp1={tp1_price:.8f}, tp2={tp2_price:.8f}, tp3={tp3_price:.8f}")
 
     # Vérification des TP basée sur le prix MAX atteint (historique + actuel)
-    if prix_max_atteint >= tp3_price and tp3_price > 0:
+    # AVEC TOLÉRANCE pour éviter problèmes d'arrondi
+    if tp_reached(prix_max_atteint, tp3_price):
         tp_hit.extend(["TP1", "TP2", "TP3"])
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
         tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
         tp_gains["TP3"] = ((tp3_price - entry_price) / entry_price) * 100
-    elif prix_max_atteint >= tp2_price and tp2_price > 0:
+    elif tp_reached(prix_max_atteint, tp2_price):
         tp_hit.extend(["TP1", "TP2"])
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
         tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
-    elif prix_max_atteint >= tp1_price and tp1_price > 0:
+    elif tp_reached(prix_max_atteint, tp1_price):
         tp_hit.append("TP1")
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
 
@@ -1436,14 +1459,18 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
 # ============================================
 def format_price(price: float) -> str:
     """
-    Formate le prix de manière intelligente:
-    - Prix >= $0.01: 2 décimales (ex: $1.23)
-    - Prix < $0.01: garde plus de décimales significatives (ex: $0.00012345)
+    Formate le prix de manière intelligente et cohérente (FIX HARMONISATION):
+    - Prix >= $1: 2 décimales (ex: $1.23)
+    - Prix >= $0.01: 4 décimales (ex: $0.1574) - ÉVITE PROBLÈMES ARRONDI TP
+    - Prix < $0.01: 8 décimales (ex: $0.00012345)
     """
-    if price >= 0.01:
+    if price >= 1.0:
         return f"${price:.2f}"
+    elif price >= 0.01:
+        # 4 décimales pour précision TP (évite arrondi $0.1574 → $0.16)
+        return f"${price:.4f}"
     else:
-        # Pour les petits prix, garder 8 décimales
+        # Pour les très petits prix, garder 8 décimales
         return f"${price:.8f}"
 
 def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, momentum_bonus: int,
