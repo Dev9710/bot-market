@@ -217,6 +217,7 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         price_changes = attrs.get("price_change_percentage", {}) or {}
         price_change_24h = float(price_changes.get("h24") or 0)
         price_change_6h = float(price_changes.get("h6") or 0)
+        price_change_3h = float(price_changes.get("h3") or 0)
         price_change_1h = float(price_changes.get("h1") or 0)
 
         # Age du pool
@@ -249,6 +250,13 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         fdv_usd = float(attrs.get("fdv_usd") or 0)
         market_cap_usd = float(attrs.get("market_cap_usd") or 0)
 
+        # Calculer l'accélération du volume (NOUVEAU)
+        vol_24h_avg = volume_24h / 24 if volume_24h > 0 else 0
+        vol_6h_avg = volume_6h / 6 if volume_6h > 0 else 0
+
+        volume_acceleration_1h_vs_6h = (volume_1h / vol_6h_avg) if vol_6h_avg > 0 else 0
+        volume_acceleration_6h_vs_24h = (vol_6h_avg / vol_24h_avg) if vol_24h_avg > 0 else 0
+
         return {
             "name": name,
             "base_token_name": base_token_name,
@@ -266,12 +274,15 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
             "sells_1h": sells_1h,
             "price_change_24h": price_change_24h,
             "price_change_6h": price_change_6h,
+            "price_change_3h": price_change_3h,
             "price_change_1h": price_change_1h,
             "age_hours": age_hours,
             "network": network,
             "pool_address": pool_address,
             "fdv_usd": fdv_usd,
             "market_cap_usd": market_cap_usd,
+            "volume_acceleration_1h_vs_6h": volume_acceleration_1h_vs_6h,
+            "volume_acceleration_6h_vs_24h": volume_acceleration_6h_vs_24h,
         }
     except Exception as e:
         log(f"⚠️ Erreur parse pool: {e}")
@@ -322,11 +333,11 @@ def get_buy_ratio_change(base_token: str, pool_addr: str) -> Optional[float]:
 def get_price_momentum_from_api(pool_data: Dict) -> Dict[str, Optional[float]]:
     """
     SIMPLIFIÉ: Utilise directement les données de l'API au lieu de recalculer.
-    GeckoTerminal fournit déjà price_change_1h, price_change_6h !
+    GeckoTerminal fournit déjà price_change_1h, price_change_3h, price_change_6h !
     """
     return {
         "1h": pool_data.get("price_change_1h"),
-        "3h": None,  # Pas fourni par API, on estime
+        "3h": pool_data.get("price_change_3h"),
         "6h": pool_data.get("price_change_6h"),
     }
 
@@ -741,9 +752,21 @@ def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
 # ============================================
 # GÉNÉRATION ALERTE COMPLÈTE
 # ============================================
+def format_price(price: float) -> str:
+    """
+    Formate le prix de manière intelligente:
+    - Prix >= $0.01: 2 décimales (ex: $1.23)
+    - Prix < $0.01: garde plus de décimales significatives (ex: $0.00012345)
+    """
+    if price >= 0.01:
+        return f"${price:.2f}"
+    else:
+        # Pour les petits prix, garder 8 décimales
+        return f"${price:.8f}"
+
 def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, momentum_bonus: int,
                             momentum: Dict, multi_pool_data: Dict, signals: List[str],
-                            resistance_data: Dict) -> str:
+                            resistance_data: Dict, is_first_alert: bool = True) -> str:
     """Génère alerte ultra-complète avec toutes les données."""
 
     name = pool_data["name"]
@@ -755,6 +778,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     liq = pool_data["liquidity"]
     pct_24h = pool_data["price_change_24h"]
     pct_6h = pool_data["price_change_6h"]
+    pct_3h = pool_data["price_change_3h"]
     pct_1h = pool_data["price_change_1h"]
     age = pool_data["age_hours"]
     txns = pool_data["total_txns"]
@@ -786,7 +810,11 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
         score_label = "FAIBLE"
 
     # ========== CONSTRUCTION ALERTE ==========
-    txt = f"\n🆕 *NOUVEAU TOKEN DEX*\n"
+    # Titre différent selon s'il s'agit de la première alerte ou d'une mise à jour
+    if is_first_alert:
+        txt = f"\n🆕 *Nouvelle opportunité sur le token {base_token}*\n"
+    else:
+        txt = f"\n🔄 *Nouvelle opportunité pour le token {base_token}*\n"
     txt += f"━━━━━━━━━━━━━━━━\n"
     txt += f"💎 {name}\n"
     txt += f"⛓️ Blockchain: {network_display}\n\n"
@@ -799,33 +827,35 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 
     # PRIX & MOMENTUM
     txt += f"━━━ PRIX & MOMENTUM ━━━\n"
-    txt += f"💰 Prix: ${price:.8f}\n"
+    txt += f"💰 Prix: {format_price(price)}\n"
 
-    # Multi-timeframe
+    # Multi-timeframe avec analyse de tendance
     txt += f"📊 "
     txt += f"24h: {pct_24h:+.1f}% "
     if pct_6h != 0:
         txt += f"| 6h: {pct_6h:+.1f}% "
+    if pct_3h != 0:
+        txt += f"| 3h: {pct_3h:+.1f}% "
     if pct_1h != 0:
         emoji_1h = "🚀" if pct_1h > 5 else ("🟢" if pct_1h > 0 else "🔴")
         txt += f"| 1h: {pct_1h:+.1f}% {emoji_1h}"
     txt += "\n"
 
-    # Momentum calculé (historique)
-    if any(momentum.values()):
-        txt += f"📈 Momentum: "
-        parts = []
-        if momentum.get("1h") is not None:
-            parts.append(f"1h {momentum['1h']:+.1f}%")
-        if momentum.get("3h") is not None:
-            parts.append(f"3h {momentum['3h']:+.1f}%")
-        if momentum.get("6h") is not None:
-            parts.append(f"6h {momentum['6h']:+.1f}%")
-        txt += " | ".join(parts) + "\n"
+    # Analyse de la structure de tendance (NOUVEAU)
+    if pct_6h != 0 and pct_3h != 0 and pct_1h != 0:
+        # Déterminer si accélération haussière ou essoufflement
+        if pct_1h > pct_3h > pct_6h and pct_1h > 0:
+            txt += f"📈 Tendance: ACCÉLÉRATION HAUSSIÈRE 🔥\n"
+        elif pct_6h > pct_3h > pct_1h and pct_6h > 0:
+            txt += f"⚠️ Tendance: ESSOUFFLEMENT (sortie proche) 📉\n"
+        elif pct_1h < 0 < pct_3h < pct_6h:
+            txt += f"🔄 Tendance: REPRISE après correction (bon entry) ✅\n"
+        elif pct_1h < pct_3h < pct_6h and pct_1h < 0:
+            txt += f"🔴 Tendance: DÉCÉLÉRATION BAISSIÈRE ⚠️\n"
 
     # Résistance
     if resistance_data.get("resistance"):
-        txt += f"🎯 Résistance: ${resistance_data['resistance']:.8f} "
+        txt += f"🎯 Résistance: {format_price(resistance_data['resistance'])} "
         txt += f"(+{resistance_data['resistance_dist_pct']:.1f}%)\n"
 
     txt += "\n"
@@ -834,8 +864,80 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     txt += f"━━━ ACTIVITÉ ━━━\n"
     txt += f"📊 Vol 24h: ${vol_24h/1000:.0f}K\n"
 
+    # Analyse de l'évolution du volume MULTI-NIVEAUX (NOUVEAU)
+    if vol_24h > 0 and vol_6h > 0 and vol_1h > 0:
+        # Calculer les moyennes horaires
+        vol_24h_avg = vol_24h / 24  # Volume moyen par heure sur 24h
+        vol_6h_avg = vol_6h / 6     # Volume moyen par heure sur 6h
+
+        # Ratios d'accélération
+        ratio_1h_vs_6h = (vol_1h / vol_6h_avg) if vol_6h_avg > 0 else 0
+        ratio_6h_vs_24h = (vol_6h_avg / vol_24h_avg) if vol_24h_avg > 0 else 0
+
+        # ANALYSE DOUBLE NIVEAU pour détecter les meilleurs setups
+
+        # Niveau 1: Court terme (1h vs 6h)
+        if ratio_1h_vs_6h >= 2.0:
+            signal_1h = "FORTE_ACCELERATION"
+            emoji_1h = "🔥"
+            text_1h = f"FORTE ACCÉLÉRATION ({ratio_1h_vs_6h:.1f}x)"
+        elif ratio_1h_vs_6h >= 1.5:
+            signal_1h = "ACCELERATION"
+            emoji_1h = "📈"
+            text_1h = f"ACCÉLÉRATION ({ratio_1h_vs_6h:.1f}x)"
+        elif ratio_1h_vs_6h <= 0.5:
+            signal_1h = "RALENTISSEMENT"
+            emoji_1h = "⚠️"
+            text_1h = f"RALENTISSEMENT ({ratio_1h_vs_6h:.1f}x)"
+        elif ratio_1h_vs_6h <= 0.3:
+            signal_1h = "FORT_RALENTISSEMENT"
+            emoji_1h = "🔴"
+            text_1h = f"FORT RALENTISSEMENT ({ratio_1h_vs_6h:.1f}x)"
+        else:
+            signal_1h = "STABLE"
+            emoji_1h = "➡️"
+            text_1h = f"STABLE ({ratio_1h_vs_6h:.1f}x)"
+
+        # Niveau 2: Moyen terme (6h vs 24h)
+        if ratio_6h_vs_24h >= 1.8:
+            signal_6h = "PUMP_EN_COURS"
+            emoji_6h = "🚀"
+            text_6h = f"Pump en cours ({ratio_6h_vs_24h:.1f}x)"
+        elif ratio_6h_vs_24h >= 1.3:
+            signal_6h = "HAUSSE_PROGRESSIVE"
+            emoji_6h = "📊"
+            text_6h = f"Hausse progressive ({ratio_6h_vs_24h:.1f}x)"
+        elif ratio_6h_vs_24h <= 0.7:
+            signal_6h = "BAISSE_TENDANCIELLE"
+            emoji_6h = "📉"
+            text_6h = f"Baisse tendancielle ({ratio_6h_vs_24h:.1f}x)"
+        else:
+            signal_6h = "STABLE"
+            emoji_6h = "➡️"
+            text_6h = f"Normal ({ratio_6h_vs_24h:.1f}x)"
+
+        # VERDICT FINAL combinant les deux niveaux
+        txt += f"📊 Volume Multi-Timeframe:\n"
+        txt += f"   Court terme (1h): {emoji_1h} {text_1h}\n"
+        txt += f"   Moyen terme (6h): {emoji_6h} {text_6h}\n"
+
+        # PATTERN GAGNANTS (basé sur backtest)
+        if signal_1h in ["FORTE_ACCELERATION", "ACCELERATION"] and signal_6h == "PUMP_EN_COURS":
+            txt += f"✅ PATTERN: ENTRÉE IDÉALE - Pump actif + accélération récente 🎯\n"
+        elif signal_1h == "FORTE_ACCELERATION" and signal_6h in ["HAUSSE_PROGRESSIVE", "STABLE"]:
+            txt += f"✅ PATTERN: BON ENTRY - Nouveau pump qui démarre 🟢\n"
+        elif signal_1h in ["RALENTISSEMENT", "FORT_RALENTISSEMENT"] and signal_6h == "PUMP_EN_COURS":
+            txt += f"⚠️ PATTERN: SORTIE PROCHE - Volume qui faiblit (essoufflement) 🚪\n"
+        elif signal_1h == "STABLE" and signal_6h == "PUMP_EN_COURS":
+            txt += f"⏸️ PATTERN: CONSOLIDATION - Pause avant continuation possible\n"
+        elif signal_1h in ["RALENTISSEMENT", "FORT_RALENTISSEMENT"]:
+            txt += f"🔴 PATTERN: ÉVITER - Volume en chute libre ❌\n"
+
+        # Afficher détails volumes
+        txt += f"   Vol: 24h ${vol_24h/1000:.0f}K | 6h ${vol_6h/1000:.0f}K | 1h ${vol_1h/1000:.0f}K\n"
+
     # Volume spike ?
-    if vol_1h > 0:
+    elif vol_1h > 0:
         vol_1h_normalized = vol_1h * 24
         if vol_1h_normalized > vol_24h * 1.3:
             spike = ((vol_1h_normalized / vol_24h) - 1) * 100
@@ -882,13 +984,23 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
         else:
             txt += f" ⬆️\n"
 
-        if buy_ratio_1h > buy_ratio_24h and buy_ratio_1h >= 0.8:
-            txt += f"   ✅ ACHETEURS prennent le contrôle !\n"
-        elif buy_ratio_1h < buy_ratio_24h and buy_ratio_1h < 0.7:
-            txt += f"   ⚠️ VENDEURS prennent le contrôle !\n"
+        # Analyse de la tendance de pression (focus sur l'évolution, pas les absolus)
+        ratio_change = buy_ratio_1h - buy_ratio_24h
+
+        if ratio_change > 0.1:  # Pression acheteuse augmente significativement
+            txt += f"   ✅ ACHETEURS prennent le contrôle ! (+{ratio_change:.1%})\n"
+        elif ratio_change < -0.1:  # Pression vendeuse augmente significativement
+            txt += f"   ⚠️ VENDEURS prennent le contrôle ! ({ratio_change:.1%})\n"
+        else:  # Pression stable
+            if buy_ratio_1h >= 0.75:
+                txt += f"   ➡️ Pression ACHETEUSE stable ({buy_ratio_1h:.0%})\n"
+            elif buy_ratio_1h <= 0.55:
+                txt += f"   ➡️ Pression VENDEUSE stable ({buy_ratio_1h:.0%})\n"
+            else:
+                txt += f"   ➡️ Équilibre acheteurs/vendeurs ({buy_ratio_1h:.0%})\n"
 
     txt += f"\n⚡ Vol/Liq: {ratio_vol_liq:.0f}%\n"
-    txt += f"⏰ Age: {age:.0f}h\n\n"
+    txt += f"⏰ Créé il y a {age:.0f}h\n\n"
 
     # MULTI-POOL (si applicable)
     if multi_pool_data.get("is_multi_pool"):
@@ -915,22 +1027,22 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     # ACTION RECOMMANDÉE
     txt += f"━━━ ACTION RECOMMANDÉE ━━━\n"
 
-    # Entry zone
-    entry_low = price * 0.98
-    entry_high = price * 1.02
-    txt += f"⚡ Entry: ${entry_low:.8f} - ${entry_high:.8f}\n"
+    # Entry avec limite MAX pour gérer le délai d'exécution
+    price_max = price * 1.05  # +5% max si tu arrives en retard
+    txt += f"⚡ Entry: {format_price(price)} 🎯\n"
+    txt += f"⚠️ Prix MAX: {format_price(price_max)} (si retard)\n"
 
     # Stop loss
     stop_loss = price * 0.90
-    txt += f"🛑 Stop loss: ${stop_loss:.8f} (-10%)\n"
+    txt += f"🛑 Stop loss: {format_price(stop_loss)} (-10%)\n"
 
     # Take profits
     tp1 = price * 1.05
     tp2 = price * 1.10
     tp3 = price * 1.15
-    txt += f"🎯 TP1 (50%): ${tp1:.8f} (+5%)\n"
-    txt += f"🎯 TP2 (30%): ${tp2:.8f} (+10%)\n"
-    txt += f"🎯 TP3 (20%): ${tp3:.8f} (+15%)\n"
+    txt += f"🎯 TP1 (50%): {format_price(tp1)} (+5%)\n"
+    txt += f"🎯 TP2 (30%): {format_price(tp2)} (+10%)\n"
+    txt += f"🎯 TP3 (20%): {format_price(tp3)} (+15%)\n"
     txt += f"🔄 Trail stop: -5% après TP1\n\n"
 
     # RISQUES
@@ -1084,6 +1196,9 @@ def scan_geckoterminal():
         # ENVOI DE L'ALERTE (après validation sécurité)
         # ==========================================
         if check_cooldown(alert_key):
+            # Vérifier si c'est la première alerte pour ce token
+            is_first_alert = not alert_tracker.token_already_alerted(token_address)
+
             alert_msg = generer_alerte_complete(
                 opp["pool_data"],
                 opp["score"],
@@ -1092,7 +1207,8 @@ def scan_geckoterminal():
                 opp["momentum"],
                 opp["multi_pool_data"],
                 opp["signals"],
-                opp["resistance_data"]
+                opp["resistance_data"],
+                is_first_alert
             )
 
             # Ajouter les infos de sécurité à l'alerte
@@ -1132,6 +1248,8 @@ def scan_geckoterminal():
                         'buy_ratio': opp["pool_data"].get("buy_ratio", 0),
                         'total_txns': opp["pool_data"].get("total_txns", 0),
                         'age_hours': opp["pool_data"].get("age_hours", 0),
+                        'volume_acceleration_1h_vs_6h': opp["pool_data"].get("volume_acceleration_1h_vs_6h", 0),
+                        'volume_acceleration_6h_vs_24h': opp["pool_data"].get("volume_acceleration_6h_vs_24h", 0),
                         'entry_price': entry_price,
                         'stop_loss_price': stop_loss_price,
                         'stop_loss_percent': -10,

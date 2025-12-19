@@ -135,6 +135,19 @@ class AlertTracker:
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_alerts_timestamp ON alerts(timestamp)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_tracking_alert ON price_tracking(alert_id)")
 
+        # Ajouter les nouvelles colonnes pour l'accélération du volume (si elles n'existent pas)
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN volume_acceleration_1h_vs_6h REAL DEFAULT 0")
+            print("✅ Colonne volume_acceleration_1h_vs_6h ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN volume_acceleration_6h_vs_24h REAL DEFAULT 0")
+            print("✅ Colonne volume_acceleration_6h_vs_24h ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
         self.conn.commit()
         print("✅ Tables créées avec succès")
 
@@ -159,8 +172,9 @@ class AlertTracker:
                     buys_24h, sells_24h, buy_ratio, total_txns, age_hours,
                     entry_price, stop_loss_price, stop_loss_percent,
                     tp1_price, tp1_percent, tp2_price, tp2_percent,
-                    tp3_price, tp3_percent, alert_message
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    tp3_price, tp3_percent, alert_message,
+                    volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 alert_data['token_name'],
                 alert_data['token_address'],
@@ -188,7 +202,9 @@ class AlertTracker:
                 alert_data['tp2_percent'],
                 alert_data['tp3_price'],
                 alert_data['tp3_percent'],
-                alert_data.get('alert_message', '')
+                alert_data.get('alert_message', ''),
+                alert_data.get('volume_acceleration_1h_vs_6h', 0),
+                alert_data.get('volume_acceleration_6h_vs_24h', 0)
             ))
 
             self.conn.commit()
@@ -498,6 +514,25 @@ class AlertTracker:
 
         except Exception as e:
             print(f"❌ Erreur analyse alerte {alert_id}: {e}")
+
+    def token_already_alerted(self, token_address: str) -> bool:
+        """
+        Vérifie si un token a déjà reçu une alerte.
+
+        Args:
+            token_address: Adresse du token
+
+        Returns:
+            True si le token a déjà été alerté, False sinon
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT COUNT(*) FROM alerts
+            WHERE token_address = ?
+        """, (token_address,))
+
+        count = cursor.fetchone()[0]
+        return count > 0
 
     def get_token_history(self, token_name: str) -> List[Dict]:
         """
