@@ -64,7 +64,7 @@ MAX_ALERTS_PER_SCAN = 5
 # NOUVEAU: Paramètres de re-alerting intelligent (Bug #1 fix)
 MIN_PRICE_CHANGE_PERCENT = 5.0  # Re-alerter si variation ±5% depuis entry
 MIN_TIME_HOURS_FOR_REALERT = 4.0  # Re-alerter après 4h même sans changement
-ENABLE_SMART_REALERT = True  # Activer le système intelligent (vs spam)
+ENABLE_SMART_REALERT = False  # DÉSACTIVÉ pour phase backtesting (collecte max de données)
 
 # ============================================
 # CACHE SIMPLIFIÉ
