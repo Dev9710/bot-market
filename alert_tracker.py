@@ -622,6 +622,27 @@ class AlertTracker:
 
         return dict(zip(columns, row))
 
+    def get_highest_price_for_alert(self, alert_id: int) -> Optional[float]:
+        """
+        Récupère le prix MAX atteint depuis une alerte donnée (depuis price_tracking).
+
+        Args:
+            alert_id: ID de l'alerte
+
+        Returns:
+            Prix maximum atteint, ou None si pas de tracking disponible
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT MAX(highest_price) FROM price_tracking
+            WHERE alert_id = ?
+        """, (alert_id,))
+
+        result = cursor.fetchone()
+        if result and result[0]:
+            return float(result[0])
+        return None
+
     def get_token_history(self, token_name: str) -> List[Dict]:
         """
         Récupère l'historique complet d'un token.

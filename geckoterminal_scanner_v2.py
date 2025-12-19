@@ -211,6 +211,14 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         buys_1h = txns_1h.get("buys", 0)
         sells_1h = txns_1h.get("sells", 0)
 
+        # NOUVEAU: Wallets uniques (buyers/sellers) - FEATURE WHALE DETECTION
+        buyers_24h = txns_24h.get("buyers", 0)
+        sellers_24h = txns_24h.get("sellers", 0)
+        buyers_6h = txns_6h.get("buyers", 0)
+        sellers_6h = txns_6h.get("sellers", 0)
+        buyers_1h = txns_1h.get("buyers", 0)
+        sellers_1h = txns_1h.get("sellers", 0)
+
         total_txns = buys_24h + sells_24h
 
         # Variations prix (multi-timeframe depuis API) - Protéger contre None
@@ -272,6 +280,12 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
             "sells_6h": sells_6h,
             "buys_1h": buys_1h,
             "sells_1h": sells_1h,
+            "buyers_24h": buyers_24h,
+            "sellers_24h": sellers_24h,
+            "buyers_6h": buyers_6h,
+            "sellers_6h": sellers_6h,
+            "buyers_1h": buyers_1h,
+            "sellers_1h": sellers_1h,
             "price_change_24h": price_change_24h,
             "price_change_6h": price_change_6h,
             "price_change_3h": price_change_3h,
@@ -594,12 +608,143 @@ def calculate_momentum_bonus(pool_data: Dict, momentum: Dict, multi_pool_data: D
 
     return max(min(bonus, 30), -20)  # Max +30, Min -20
 
-def calculate_final_score(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Tuple[int, int, int]:
-    """Score final = base + momentum."""
+# ============================================
+# WHALE ACTIVITY ANALYSIS (NOUVEAU)
+# ============================================
+def analyze_whale_activity(pool_data: Dict) -> Dict:
+    """
+    Analyse l'activité des whales via unique buyers/sellers.
+
+    Détecte:
+    - Whale manipulation (peu de wallets, beaucoup de txns)
+    - Accumulation distribuée (beaucoup de wallets)
+    - Sentiment du marché (buyers vs sellers)
+
+    Returns:
+        {
+            'pattern': str,              # WHALE_MANIPULATION / DISTRIBUTED_BUYING / WHALE_SELLING / NORMAL
+            'whale_score': int,          # -20 à +20 (bonus/malus au score)
+            'avg_buys_per_buyer': float,
+            'avg_sells_per_seller': float,
+            'unique_wallet_ratio': float, # buyers / sellers
+            'concentration_risk': str,    # LOW / MEDIUM / HIGH
+            'signals': list               # Liste des signaux détectés
+        }
+    """
+    signals = []
+    whale_score = 0
+
+    # Récupérer les données 1h (plus récent = plus important)
+    buys_1h = pool_data.get('buys_1h', 0)
+    sells_1h = pool_data.get('sells_1h', 0)
+    buyers_1h = pool_data.get('buyers_1h', 0)
+    sellers_1h = pool_data.get('sellers_1h', 0)
+
+    # Récupérer 24h pour contexte
+    buys_24h = pool_data.get('buys_24h', 0)
+    buyers_24h = pool_data.get('buyers_24h', 0)
+    sellers_24h = pool_data.get('sellers_24h', 0)
+
+    # Calculer moyennes de transactions par wallet unique
+    avg_buys_per_buyer = buys_1h / buyers_1h if buyers_1h > 0 else 0
+    avg_sells_per_seller = sells_1h / sellers_1h if sellers_1h > 0 else 0
+
+    # Ratio unique wallets
+    unique_wallet_ratio = buyers_1h / sellers_1h if sellers_1h > 0 else 1.0
+
+    # === DÉTECTION 1: WHALE MANIPULATION (Achat/Vente) ===
+
+    # Whale BUY: Beaucoup de buys mais peu de buyers → 1 whale achète massivement
+    if avg_buys_per_buyer > 5 and buyers_1h < 10:
+        signals.append("🐋 WHALE ACCUMULATION détectée (1 wallet achète massivement)")
+        whale_score -= 15  # MALUS car whale peut dumper
+        pattern = "WHALE_MANIPULATION"
+        concentration_risk = "HIGH"
+
+    # Whale SELL: Beaucoup de sells mais peu de sellers → 1 whale vend
+    elif avg_sells_per_seller > 5 and sellers_1h < 10:
+        signals.append("🚨 WHALE DUMP détecté (1 wallet vend massivement)")
+        whale_score -= 25  # GROS MALUS car dump imminent
+        pattern = "WHALE_SELLING"
+        concentration_risk = "HIGH"
+
+    # === DÉTECTION 2: ACCUMULATION DISTRIBUÉE (BULLISH) ===
+
+    # Beaucoup de buyers uniques + ratio favorable
+    elif buyers_1h > sellers_1h * 1.5 and buyers_1h > 15:
+        signals.append("✅ ACCUMULATION DISTRIBUÉE (achat par many wallets)")
+        whale_score += 15  # BONUS car accumulation saine
+        pattern = "DISTRIBUTED_BUYING"
+        concentration_risk = "LOW"
+
+    # Buyers > sellers mais modéré
+    elif buyers_1h > sellers_1h * 1.2 and buyers_1h > 10:
+        signals.append("📈 Sentiment BULLISH (plus de buyers que sellers)")
+        whale_score += 10
+        pattern = "DISTRIBUTED_BUYING"
+        concentration_risk = "LOW"
+
+    # === DÉTECTION 3: DISTRIBUTION ÉQUILIBRÉE ===
+
+    elif 0.8 <= unique_wallet_ratio <= 1.2:
+        signals.append("⚖️ Marché équilibré (buyers ≈ sellers)")
+        whale_score += 0  # Neutre
+        pattern = "NORMAL"
+        concentration_risk = "MEDIUM"
+
+    # === DÉTECTION 4: SELLING PRESSURE ===
+
+    elif sellers_1h > buyers_1h * 1.3:
+        signals.append("⚠️ SELLING PRESSURE (plus de sellers que buyers)")
+        whale_score -= 10  # MALUS
+        pattern = "DISTRIBUTED_SELLING"
+        concentration_risk = "MEDIUM"
+
+    else:
+        pattern = "NORMAL"
+        concentration_risk = "MEDIUM"
+
+    # === VÉRIFICATION SUPPLÉMENTAIRE: Activité 24h ===
+
+    # Si buyers_24h faible malgré volume élevé → concentration whale
+    if buyers_24h > 0:
+        avg_buys_per_buyer_24h = buys_24h / buyers_24h
+        if avg_buys_per_buyer_24h > 8:
+            signals.append("⚠️ Concentration whale sur 24h (peu de wallets uniques)")
+            whale_score -= 8
+            concentration_risk = "HIGH"
+
+    return {
+        'pattern': pattern,
+        'whale_score': whale_score,
+        'avg_buys_per_buyer': round(avg_buys_per_buyer, 2),
+        'avg_sells_per_seller': round(avg_sells_per_seller, 2),
+        'unique_wallet_ratio': round(unique_wallet_ratio, 2),
+        'concentration_risk': concentration_risk,
+        'signals': signals,
+        'buyers_1h': buyers_1h,
+        'sellers_1h': sellers_1h
+    }
+
+def calculate_final_score(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Tuple[int, int, int, Dict]:
+    """
+    Score final = base + momentum + whale_score.
+
+    Returns:
+        (final_score, base_score, momentum_bonus, whale_analysis)
+    """
     base = calculate_base_score(pool_data)
     momentum_bonus = calculate_momentum_bonus(pool_data, momentum, multi_pool_data)
-    final = max(min(base + momentum_bonus, 100), 0)  # Entre 0 et 100
-    return final, base, momentum_bonus
+
+    # NOUVEAU: Analyse whale activity
+    whale_analysis = analyze_whale_activity(pool_data)
+    whale_score = whale_analysis['whale_score']
+
+    # Score final avec whale bonus/malus
+    final = base + momentum_bonus + whale_score
+    final = max(min(final, 100), 0)  # Entre 0 et 100
+
+    return final, base, momentum_bonus, whale_analysis
 
 def calculate_confidence_score(pool_data: Dict) -> int:
     """
@@ -913,7 +1058,7 @@ def evaluer_conditions_marche(pool_data: Dict, score: int, momentum: Dict,
 # ============================================
 def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_data: Dict,
                              score: int, momentum: Dict, signal_1h: str = None,
-                             signal_6h: str = None) -> Dict:
+                             signal_6h: str = None, tracker=None) -> Dict:
     """
     Analyse une alerte suivante sur un token déjà alerté.
     Vérifie si les TP ont été atteints et décide de la stratégie.
@@ -948,6 +1093,7 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
     """
 
     # RÈGLE 1: Détection des TP atteints
+    # IMPORTANT: On vérifie si les TP ont été atteints DANS LE PASSÉ (pas juste le prix actuel)
     tp_hit = []
     tp_gains = {}
 
@@ -956,16 +1102,30 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
     tp3_price = previous_alert.get('tp3_price', 0)
     entry_price = previous_alert.get('entry_price', previous_alert.get('price_at_alert', 0))
 
-    if current_price >= tp3_price and tp3_price > 0:
+    # Récupérer le prix MAX atteint depuis l'alerte précédente (depuis price_tracking)
+    # Si pas de tracking disponible, utiliser le prix actuel comme fallback
+    alert_id = previous_alert.get('id', 0)
+    prix_max_atteint = current_price  # Fallback par défaut
+
+    # Si le tracker est disponible, récupérer le VRAI prix MAX depuis la DB
+    if tracker is not None and alert_id > 0:
+        prix_max_db = tracker.get_highest_price_for_alert(alert_id)
+        if prix_max_db is not None:
+            # Comparer avec le prix actuel et prendre le max
+            prix_max_atteint = max(prix_max_db, current_price)
+            # Note: On prend le max car le prix actuel peut être > que le dernier tracking
+
+    # Vérification des TP basée sur le prix MAX atteint (historique + actuel)
+    if prix_max_atteint >= tp3_price and tp3_price > 0:
         tp_hit.extend(["TP1", "TP2", "TP3"])
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
         tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
         tp_gains["TP3"] = ((tp3_price - entry_price) / entry_price) * 100
-    elif current_price >= tp2_price and tp2_price > 0:
+    elif prix_max_atteint >= tp2_price and tp2_price > 0:
         tp_hit.extend(["TP1", "TP2"])
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
         tp_gains["TP2"] = ((tp2_price - entry_price) / entry_price) * 100
-    elif current_price >= tp1_price and tp1_price > 0:
+    elif prix_max_atteint >= tp1_price and tp1_price > 0:
         tp_hit.append("TP1")
         tp_gains["TP1"] = ((tp1_price - entry_price) / entry_price) * 100
 
@@ -1135,7 +1295,7 @@ def format_price(price: float) -> str:
 
 def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, momentum_bonus: int,
                             momentum: Dict, multi_pool_data: Dict, signals: List[str],
-                            resistance_data: Dict, is_first_alert: bool = True,
+                            resistance_data: Dict, whale_analysis: Dict = None, is_first_alert: bool = True,
                             tracker: 'AlertTracker' = None) -> tuple:
     """Génère alerte ultra-complète avec toutes les données.
 
@@ -1212,8 +1372,44 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
     # SCORE + CONFIANCE (NOUVEAU)
     confidence = calculate_confidence_score(pool_data)
     txt += f"🎯 *SCORE: {score}/100 {score_emoji} {score_label}*\n"
-    txt += f"   Base: {base_score} | Momentum: {momentum_bonus:+d}\n"
-    txt += f"📊 Confiance: {confidence}% (fiabilité données)\n\n"
+    txt += f"   Base: {base_score} | Momentum: {momentum_bonus:+d}"
+
+    # Afficher whale score si disponible
+    if whale_analysis:
+        whale_score = whale_analysis['whale_score']
+        if whale_score != 0:
+            txt += f" | Whale: {whale_score:+d}"
+
+    txt += f"\n📊 Confiance: {confidence}% (fiabilité données)\n"
+
+    # NOUVEAU: Section WHALE ACTIVITY
+    if whale_analysis and whale_analysis['pattern'] != 'NORMAL':
+        pattern = whale_analysis['pattern']
+        concentration_risk = whale_analysis['concentration_risk']
+        buyers_1h = whale_analysis['buyers_1h']
+        sellers_1h = whale_analysis['sellers_1h']
+        avg_buys = whale_analysis['avg_buys_per_buyer']
+
+        # Emoji selon pattern
+        if pattern == 'WHALE_MANIPULATION':
+            pattern_emoji = "🐋"
+            pattern_label = "WHALE MANIPULATION"
+        elif pattern == 'DISTRIBUTED_BUYING':
+            pattern_emoji = "✅"
+            pattern_label = "ACCUMULATION DISTRIBUÉE"
+        elif pattern == 'DISTRIBUTED_SELLING':
+            pattern_emoji = "⚠️"
+            pattern_label = "SELLING PRESSURE"
+        else:
+            pattern_emoji = "📊"
+            pattern_label = pattern
+
+        txt += f"\n{pattern_emoji} *{pattern_label}*\n"
+        txt += f"   Buyers: {buyers_1h} | Sellers: {sellers_1h}\n"
+        txt += f"   Avg buys/buyer: {avg_buys:.1f}x\n"
+        txt += f"   Risque concentration: {concentration_risk}\n"
+
+    txt += "\n"
 
     # ========== ANALYSE TP TRACKING (pour alertes suivantes) ==========
     if not is_first_alert and tracker is not None:
@@ -1248,9 +1444,9 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             else:
                 signal_6h = "STABLE"
 
-            # Analyser TP tracking
+            # Analyser TP tracking (passer le tracker pour vérifier le prix MAX atteint)
             analyse_tp = analyser_alerte_suivante(
-                previous_alert, price, pool_data, score, momentum, signal_1h, signal_6h
+                previous_alert, price, pool_data, score, momentum, signal_1h, signal_6h, tracker
             )
 
             # Mettre à jour les données RÈGLE 5
@@ -1727,8 +1923,14 @@ def scan_geckoterminal():
             # Résistance - SIMPLIFIÉ: calcul basique
             resistance_data = find_resistance_simple(pool_data)
 
-            # Score
-            score, base_score, momentum_bonus = calculate_final_score(pool_data, momentum, multi_pool_data)
+            # Score (avec analyse whale)
+            score, base_score, momentum_bonus, whale_analysis = calculate_final_score(pool_data, momentum, multi_pool_data)
+
+            # NOUVEAU: Rejeter immédiatement si WHALE DUMP détecté
+            if whale_analysis['pattern'] == 'WHALE_SELLING':
+                log(f"   🚨 {pool_data['name']}: WHALE DUMP détecté - REJETÉ")
+                tokens_rejected += 1
+                continue
 
             # Validation
             is_valid, reason = is_valid_opportunity(pool_data, score)
@@ -1737,11 +1939,16 @@ def scan_geckoterminal():
                 # Détecter signaux
                 signals = detect_signals(pool_data, momentum, multi_pool_data)
 
+                # Ajouter signaux whale aux signaux existants
+                if whale_analysis['signals']:
+                    signals.extend(whale_analysis['signals'])
+
                 opportunities.append({
                     "pool_data": pool_data,
                     "score": score,
                     "base_score": base_score,
                     "momentum_bonus": momentum_bonus,
+                    "whale_analysis": whale_analysis,  # NOUVEAU
                     "momentum": momentum,
                     "multi_pool_data": multi_pool_data,
                     "signals": signals,
@@ -1805,6 +2012,7 @@ def scan_geckoterminal():
                 opp["multi_pool_data"],
                 opp["signals"],
                 opp["resistance_data"],
+                opp.get("whale_analysis"),  # NOUVEAU: Passer analyse whale
                 is_first_alert,
                 alert_tracker  # Passer le tracker pour l'analyse TP
             )
