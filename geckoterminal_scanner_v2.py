@@ -2075,6 +2075,7 @@ def scan_geckoterminal():
 
     # Analyser chaque token
     opportunities = []
+    tokens_rejected = 0  # Initialiser ici pour éviter UnboundLocalError
 
     for base_token, pools in grouped.items():
         # Multi-pool analysis
@@ -2131,7 +2132,7 @@ def scan_geckoterminal():
 
     # Envoyer alertes
     alerts_sent = 0
-    tokens_rejected = 0
+    # tokens_rejected déjà initialisé ligne 2078
 
     for opp in opportunities:
         base_token = opp["pool_data"]["base_token_name"]
