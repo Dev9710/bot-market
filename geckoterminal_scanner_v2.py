@@ -989,8 +989,8 @@ def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
     if pool_data["age_hours"] > MAX_TOKEN_AGE_HOURS:
         return False, f"⏳ Token trop ancien: {pool_data['age_hours']:.0f}h"
 
-    # Check score minimum
-    if score < 55:
+    # Check score minimum (ASSOUPLI pour backtesting: 55 → 50)
+    if score < 50:
         return False, f"📉 Score trop faible: {score}/100"
 
     # Check ratio volume/liquidité
