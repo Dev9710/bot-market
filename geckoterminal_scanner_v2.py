@@ -1949,24 +1949,40 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
                 txt += f"   • {reason}\n"
             txt += "\n"
 
-        # Entry avec limite MAX pour gérer le délai d'exécution
-        # Note: Prix MAX entrée = Entry +3% (au-delà = entrée tardive, risque faible R:R)
-        price_max_entry = price * 1.03  # +3% max si tu arrives en retard
-        txt += f"⚡ Entry: {format_price(price)} 🎯\n"
-        txt += f"📍 Limite entrée: {format_price(price_max_entry)} (max +3%)\n"
+        # FIX COHÉRENCE TP: Si alerte suivante, utiliser TP de l'alerte ORIGINALE
+        if not is_first_alert and tracker is not None and 'previous_alert' in locals() and previous_alert:
+            # Utiliser les TP de la première alerte (COHÉRENCE)
+            entry_original = previous_alert.get('entry_price', price)
+            sl_original = previous_alert.get('stop_loss_price', price * 0.90)
+            tp1_original = previous_alert.get('tp1_price', price * 1.05)
+            tp2_original = previous_alert.get('tp2_price', price * 1.10)
+            tp3_original = previous_alert.get('tp3_price', price * 1.15)
 
-        # Stop loss
-        stop_loss = price * 0.90
-        txt += f"🛑 Stop loss: {format_price(stop_loss)} (-10%)\n"
+            txt += f"⚡ Entry (alerte initiale): {format_price(entry_original)} 🎯\n"
+            txt += f"📍 Limite entrée: {format_price(entry_original * 1.03)} (max +3%)\n"
+            txt += f"🛑 Stop loss: {format_price(sl_original)} (-10%)\n"
+            txt += f"🎯 TP1 (50%): {format_price(tp1_original)} (+5%)\n"
+            txt += f"🎯 TP2 (30%): {format_price(tp2_original)} (+10%)\n"
+            txt += f"🎯 TP3 (20%): {format_price(tp3_original)} (+15%)\n"
+            txt += f"🔄 Trail stop: -5% après TP1\n\n"
+        else:
+            # Première alerte: calculer nouveaux TP depuis prix actuel
+            price_max_entry = price * 1.03
+            txt += f"⚡ Entry: {format_price(price)} 🎯\n"
+            txt += f"📍 Limite entrée: {format_price(price_max_entry)} (max +3%)\n"
 
-        # Take profits
-        tp1 = price * 1.05
-        tp2 = price * 1.10
-        tp3 = price * 1.15
-        txt += f"🎯 TP1 (50%): {format_price(tp1)} (+5%)\n"
-        txt += f"🎯 TP2 (30%): {format_price(tp2)} (+10%)\n"
-        txt += f"🎯 TP3 (20%): {format_price(tp3)} (+15%)\n"
-        txt += f"🔄 Trail stop: -5% après TP1\n\n"
+            # Stop loss
+            stop_loss = price * 0.90
+            txt += f"🛑 Stop loss: {format_price(stop_loss)} (-10%)\n"
+
+            # Take profits
+            tp1 = price * 1.05
+            tp2 = price * 1.10
+            tp3 = price * 1.15
+            txt += f"🎯 TP1 (50%): {format_price(tp1)} (+5%)\n"
+            txt += f"🎯 TP2 (30%): {format_price(tp2)} (+10%)\n"
+            txt += f"🎯 TP3 (20%): {format_price(tp3)} (+15%)\n"
+            txt += f"🔄 Trail stop: -5% après TP1\n\n"
 
     elif decision == "WAIT":
         # ⏸️ CONDITIONS INCERTAINES - Attendre
