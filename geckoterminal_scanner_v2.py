@@ -40,8 +40,8 @@ GECKOTERMINAL_API = "https://api.geckoterminal.com/api/v2"
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
-# Réseaux à surveiller
-NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana"]
+# Réseaux à surveiller (ajout avalanche + polygon pour backtesting)
+NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana", "avalanche", "polygon"]
 
 # Seuils de détection (ASSOUPLIES POUR BACKTESTING - collecte max données)
 MIN_LIQUIDITY_USD = 100000      # Liquidité min (100K au lieu de 200K)
