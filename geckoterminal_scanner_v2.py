@@ -41,7 +41,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # Réseaux à surveiller (ajout avalanche + polygon pour backtesting)
-NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana", "avalanche", "polygon"]
+NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana", "avax", "polygon_pos"]
 
 # Seuils de détection (ASSOUPLIES POUR BACKTESTING - collecte max données)
 MIN_LIQUIDITY_USD = 100000      # Liquidité min (100K au lieu de 200K)
@@ -90,8 +90,8 @@ NETWORK_NAMES = {
     "arbitrum": "Arbitrum",
     "base": "Base",
     "solana": "Solana",
-    "polygon": "Polygon",
-    "avalanche": "Avalanche",
+    "polygon_pos": "Polygon",
+    "avax": "Avalanche",
     "optimism": "Optimism",
     "fantom": "Fantom",
 }
