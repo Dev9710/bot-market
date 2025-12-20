@@ -723,15 +723,16 @@ def analyze_whale_activity(pool_data: Dict) -> Dict:
     whale_score = 0
 
     # Récupérer les données 1h (plus récent = plus important)
-    buys_1h = pool_data.get('buys_1h', 0)
-    sells_1h = pool_data.get('sells_1h', 0)
-    buyers_1h = pool_data.get('buyers_1h', 0)
-    sellers_1h = pool_data.get('sellers_1h', 0)
+    # HOTFIX: Gérer None explicite de l'API (or 0 = fallback)
+    buys_1h = pool_data.get('buys_1h') or 0
+    sells_1h = pool_data.get('sells_1h') or 0
+    buyers_1h = pool_data.get('buyers_1h') or 0
+    sellers_1h = pool_data.get('sellers_1h') or 0
 
     # Récupérer 24h pour contexte
-    buys_24h = pool_data.get('buys_24h', 0)
-    buyers_24h = pool_data.get('buyers_24h', 0)
-    sellers_24h = pool_data.get('sellers_24h', 0)
+    buys_24h = pool_data.get('buys_24h') or 0
+    buyers_24h = pool_data.get('buyers_24h') or 0
+    sellers_24h = pool_data.get('sellers_24h') or 0
 
     # Calculer moyennes de transactions par wallet unique
     avg_buys_per_buyer = buys_1h / buyers_1h if buyers_1h > 0 else 0
