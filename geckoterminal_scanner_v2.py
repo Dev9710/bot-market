@@ -43,9 +43,9 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 # Réseaux à surveiller
 NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana"]
 
-# Seuils de détection
-MIN_LIQUIDITY_USD = 200000      # Liquidité min (sécurité)
-MIN_VOLUME_24H_USD = 100000     # Volume 24h min
+# Seuils de détection (ASSOUPLIES POUR BACKTESTING - collecte max données)
+MIN_LIQUIDITY_USD = 100000      # Liquidité min (100K au lieu de 200K)
+MIN_VOLUME_24H_USD = 50000      # Volume 24h min (50K au lieu de 100K)
 MIN_TXNS_24H = 100              # Nb transactions min
 MAX_TOKEN_AGE_HOURS = 72        # Max 3 jours
 VOLUME_LIQUIDITY_RATIO = 0.5    # Vol24h/Liquidité > 50%
@@ -59,7 +59,7 @@ VOLUME_SPIKE_THRESHOLD = 0.5    # +50% volume
 
 # Cooldown et limites
 COOLDOWN_SECONDS = 0  # DÉSACTIVÉ pour backtesting - collecte toutes les occurrences
-MAX_ALERTS_PER_SCAN = 5
+MAX_ALERTS_PER_SCAN = 10  # Augmenté de 5 à 10 pour collecte max
 
 # NOUVEAU: Paramètres de re-alerting intelligent (Bug #1 fix)
 MIN_PRICE_CHANGE_PERCENT = 5.0  # Re-alerter si variation ±5% depuis entry
