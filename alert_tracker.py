@@ -622,6 +622,40 @@ class AlertTracker:
 
         return dict(zip(columns, row))
 
+    def get_active_alerts(self, max_age_hours: int = 24) -> List[Dict]:
+        """
+        Récupère toutes les alertes actives (créées dans les dernières X heures).
+        Utilisé pour le tracking actif des pools alertés.
+
+        Args:
+            max_age_hours: Age maximum en heures (défaut: 24h)
+
+        Returns:
+            Liste de Dict contenant les données des alertes actives
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT
+                id, token_name, token_address, network,
+                price_at_alert, score, entry_price,
+                tp1_price, tp2_price, tp3_price,
+                stop_loss_price, created_at
+            FROM alerts
+            WHERE datetime(created_at) >= datetime('now', ? || ' hours')
+            ORDER BY created_at DESC
+        """, (f'-{max_age_hours}',))
+
+        rows = cursor.fetchall()
+
+        columns = [
+            'id', 'token_name', 'token_address', 'network',
+            'price_at_alert', 'score', 'entry_price',
+            'tp1_price', 'tp2_price', 'tp3_price',
+            'stop_loss_price', 'created_at'
+        ]
+
+        return [dict(zip(columns, row)) for row in rows]
+
     def update_price_max_realtime(self, alert_id: int, current_price: float):
         """
         Met à jour le prix MAX en temps réel à chaque scan (toutes les 2 min).

@@ -66,6 +66,11 @@ MIN_PRICE_CHANGE_PERCENT = 5.0  # Re-alerter si variation ±5% depuis entry
 MIN_TIME_HOURS_FOR_REALERT = 4.0  # Re-alerter après 4h même sans changement
 ENABLE_SMART_REALERT = False  # DÉSACTIVÉ pour phase backtesting (collecte max de données)
 
+# TRACKING ACTIF: Paramètres pour suivre les pools alertés (BACKTESTING)
+ENABLE_ACTIVE_TRACKING = True  # Activer le tracking actif des pools alertés
+ACTIVE_TRACKING_MAX_AGE_HOURS = 24  # Suivre les alertes des dernières 24h
+ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES = 15  # Cooldown 15min entre mises à jour
+
 # ============================================
 # CACHE SIMPLIFIÉ
 # ============================================
@@ -263,6 +268,42 @@ def get_new_pools(network: str, page: int = 1) -> Optional[List[Dict]]:
         return data.get("data", [])
     except Exception as e:
         log(f"❌ Erreur get_new_pools {network}: {e}")
+        return None
+
+def get_pool_by_address(network: str, pool_address: str) -> Optional[Dict]:
+    """
+    Récupère les données d'un pool spécifique via son adresse.
+    Utilisé pour le tracking actif des alertes.
+
+    Args:
+        network: Réseau (eth, bsc, solana, etc.)
+        pool_address: Adresse du pool
+
+    Returns:
+        Dict avec les données du pool, ou None si erreur
+    """
+    try:
+        url = f"{GECKOTERMINAL_API}/networks/{network}/pools/{pool_address}"
+        headers = {"Accept": "application/json"}
+        response = requests.get(url, headers=headers, timeout=15)
+
+        if response.status_code == 429:
+            log(f"⚠️ Rate limit atteint pour pool {pool_address[:8]}...")
+            time.sleep(60)
+            return None
+        if response.status_code != 200:
+            log(f"⚠️ Pool {pool_address[:8]} non trouvé (status {response.status_code})")
+            return None
+
+        data = response.json()
+        pool_data = data.get("data")
+
+        if pool_data:
+            return parse_pool_data(pool_data, network)
+        return None
+
+    except Exception as e:
+        log(f"❌ Erreur get_pool_by_address {pool_address[:8]}: {e}")
         return None
 
 # ============================================
@@ -2348,6 +2389,92 @@ def scan_geckoterminal():
         else:
             # Cooldown actif - alerte bloquée (ne devrait jamais arriver avec COOLDOWN_SECONDS = 0)
             log(f"⏰ Alerte bloquée (cooldown actif): {opp['pool_data']['name']}")
+
+    # ==========================================
+    # TRACKING ACTIF DES ALERTES (BACKTESTING)
+    # ==========================================
+    if ENABLE_ACTIVE_TRACKING and alert_tracker is not None:
+        log(f"\n📡 TRACKING ACTIF: Vérification des pools alertés...")
+
+        active_alerts = alert_tracker.get_active_alerts(max_age_hours=ACTIVE_TRACKING_MAX_AGE_HOURS)
+        log(f"   🔍 {len(active_alerts)} alertes actives à tracker (< {ACTIVE_TRACKING_MAX_AGE_HOURS}h)")
+
+        updates_sent = 0
+        for alert in active_alerts:
+            try:
+                alert_id = alert['id']
+                token_name = alert['token_name']
+                pool_address = alert['token_address']
+                network = alert['network']
+                created_at_str = alert['created_at']
+
+                # Vérifier cooldown (éviter spam)
+                from datetime import datetime
+                created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                now = datetime.now(created_at.tzinfo) if created_at.tzinfo else datetime.now()
+                minutes_elapsed = (now - created_at).total_seconds() / 60
+
+                # Vérifier si dernière mise à jour était il y a moins de COOLDOWN minutes
+                # Pour simplifier, on considère que si l'alerte a moins de COOLDOWN minutes, on skip
+                if minutes_elapsed < ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES:
+                    continue  # Trop récent, skip
+
+                # Récupérer données actuelles du pool
+                pool_data = get_pool_by_address(network, pool_address)
+
+                if not pool_data:
+                    # Pool plus disponible (delisted, erreur API, etc.)
+                    continue
+
+                current_price = pool_data.get('price_usd', 0)
+
+                if current_price <= 0:
+                    continue
+
+                # Mettre à jour le prix MAX en temps réel
+                alert_tracker.update_price_max_realtime(alert_id, current_price)
+
+                # Vérifier si on doit envoyer une mise à jour Telegram
+                should_send, reason = should_send_alert(pool_address, current_price, alert_tracker, None)
+
+                if should_send:
+                    log(f"   🔄 Mise à jour: {token_name} - {reason}")
+
+                    # Récupérer momentum et multi-pool (optionnel pour mises à jour)
+                    momentum = calculate_momentum_signal(pool_data, {})
+                    multi_pool_data = {}  # Optionnel pour updates
+
+                    # Calculer score et whale analysis
+                    score, base_score, momentum_bonus, whale_analysis = calculate_final_score(pool_data, momentum, multi_pool_data)
+
+                    # Générer message d'alerte (is_first_alert = False)
+                    alert_msg, regle5_data = generer_alerte_complete(
+                        pool_data, score, base_score, momentum_bonus, momentum,
+                        multi_pool_data, [], None, whale_analysis,
+                        is_first_alert=False,  # C'est une mise à jour
+                        tracker=alert_tracker
+                    )
+
+                    # Envoyer via Telegram
+                    success = send_telegram_alert(alert_msg, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+
+                    if success:
+                        updates_sent += 1
+                        log(f"   ✅ Mise à jour envoyée pour {token_name}")
+
+                        # Limiter le nombre de mises à jour par scan
+                        if updates_sent >= 5:  # Max 5 mises à jour par scan
+                            log(f"   ⚠️ Limite 5 mises à jour atteinte")
+                            break
+                    else:
+                        log(f"   ❌ Échec envoi mise à jour: {token_name}")
+
+                    time.sleep(1)  # Pause entre mises à jour
+
+            except Exception as e:
+                log(f"   ❌ Erreur tracking {alert.get('token_name', 'unknown')}: {e}")
+
+        log(f"   📊 Tracking terminé: {updates_sent} mises à jour envoyées")
 
     log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées, {tokens_rejected} tokens rejetés (sécurité)")
     log("=" * 80)
