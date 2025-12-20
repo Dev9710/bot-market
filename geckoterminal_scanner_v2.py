@@ -1690,7 +1690,18 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 
             txt += f"⏱️ Temps écoulé: {temps_display} | {pump_emoji} Vélocité: {velocite:.0f}%/h ({pump_label})\n"
 
-            # Afficher TP atteints
+            # Afficher Prix MAX atteint (CRITIQUE pour comprendre détection TP)
+            if tracker is not None and 'previous_alert' in locals() and previous_alert:
+                alert_id = previous_alert.get('id', 0)
+                prix_max_db = tracker.get_highest_price_for_alert(alert_id) if alert_id > 0 else None
+                prix_max_display = max(prix_max_db or 0, current_price)
+
+                if prix_max_display > 0:
+                    entry_price_ref = previous_alert.get('entry_price', current_price)
+                    gain_max = ((prix_max_display - entry_price_ref) / entry_price_ref) * 100
+                    txt += f"📈 Prix MAX atteint: {format_price(prix_max_display)} (+{gain_max:.1f}%)\n"
+
+            # Afficher TP atteints (basé sur Prix MAX, pas prix actuel)
             if analyse_tp['tp_hit']:
                 txt += f"✅ *TP ATTEINTS:* {', '.join(analyse_tp['tp_hit'])}\n"
                 for tp_name, gain in analyse_tp['tp_gains'].items():
@@ -2116,6 +2127,21 @@ def scan_geckoterminal():
     # Mettre à jour historique (seulement buy ratio)
     for pool_data in all_pools:
         update_buy_ratio_history(pool_data)
+
+    # NOUVEAU: Mettre à jour le prix MAX en temps réel pour TOUS les tokens trackés
+    # CRITIQUE pour backtesting : capture les pics de prix entre chaque scan
+    if alert_tracker is not None:
+        for pool_data in all_pools:
+            token_address = pool_data.get('token_address')
+            current_price = pool_data.get('price', 0)
+
+            if token_address and current_price > 0:
+                # Vérifier si ce token a une alerte active
+                previous_alert = alert_tracker.get_last_alert_for_token(token_address)
+                if previous_alert:
+                    alert_id = previous_alert.get('id')
+                    # Mettre à jour le prix MAX en DB
+                    alert_tracker.update_price_max_realtime(alert_id, current_price)
 
     # Grouper par token
     grouped = group_pools_by_token(all_pools)

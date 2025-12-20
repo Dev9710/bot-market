@@ -622,6 +622,84 @@ class AlertTracker:
 
         return dict(zip(columns, row))
 
+    def update_price_max_realtime(self, alert_id: int, current_price: float):
+        """
+        Met à jour le prix MAX en temps réel à chaque scan (toutes les 2 min).
+        CRITIQUE pour backtesting précis : capture TOUS les pics de prix.
+
+        Args:
+            alert_id: ID de l'alerte
+            current_price: Prix actuel du token
+
+        Returns:
+            True si update réussi, False sinon
+        """
+        try:
+            cursor = self.conn.cursor()
+
+            # Récupérer l'entry price pour calculer ROI
+            cursor.execute("SELECT entry_price FROM alerts WHERE id = ?", (alert_id,))
+            result = cursor.fetchone()
+            if not result:
+                return False
+
+            entry_price = result[0]
+
+            # Calculer combien de minutes depuis l'alerte
+            cursor.execute("""
+                SELECT CAST((julianday('now') - julianday(created_at)) * 1440 AS INTEGER) as minutes_elapsed
+                FROM alerts WHERE id = ?
+            """, (alert_id,))
+            minutes_elapsed = cursor.fetchone()[0]
+
+            # Récupérer le prix MAX actuel depuis price_tracking
+            cursor.execute("""
+                SELECT MAX(highest_price) FROM price_tracking
+                WHERE alert_id = ?
+            """, (alert_id,))
+
+            current_max = cursor.fetchone()[0]
+
+            # Déterminer le nouveau prix MAX
+            if current_max is None:
+                new_max = current_price
+            else:
+                new_max = max(float(current_max), current_price)
+
+            # Calculer ROI
+            roi = ((current_price - entry_price) / entry_price) * 100
+
+            # Insérer ou mettre à jour le tracking temps réel
+            # Note: On utilise minutes_elapsed = 0 pour les updates temps réel
+            # Les updates schedulés (15min, 1h, etc.) utilisent leurs propres minutes
+            cursor.execute("""
+                INSERT INTO price_tracking (
+                    alert_id, minutes_after_alert, price, roi_percent,
+                    highest_price, lowest_price, timestamp
+                )
+                VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+                ON CONFLICT(alert_id, minutes_after_alert) DO UPDATE SET
+                    price = excluded.price,
+                    roi_percent = excluded.roi_percent,
+                    highest_price = MAX(highest_price, excluded.highest_price),
+                    lowest_price = MIN(COALESCE(lowest_price, 999999), excluded.price),
+                    timestamp = excluded.timestamp
+            """, (
+                alert_id,
+                minutes_elapsed,  # Minutes exactes depuis création
+                current_price,
+                roi,
+                new_max,
+                current_price  # lowest_price initialisé au prix actuel
+            ))
+
+            self.conn.commit()
+            return True
+
+        except Exception as e:
+            print(f"❌ Erreur update prix_max realtime pour alerte {alert_id}: {e}")
+            return False
+
     def get_highest_price_for_alert(self, alert_id: int) -> Optional[float]:
         """
         Récupère le prix MAX atteint depuis une alerte donnée (depuis price_tracking).
