@@ -1735,10 +1735,10 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             if tracker is not None and 'previous_alert' in locals() and previous_alert:
                 alert_id = previous_alert.get('id', 0)
                 prix_max_db = tracker.get_highest_price_for_alert(alert_id) if alert_id > 0 else None
-                prix_max_display = max(prix_max_db or 0, current_price)
+                prix_max_display = max(prix_max_db or 0, price)
 
                 if prix_max_display > 0:
-                    entry_price_ref = previous_alert.get('entry_price', current_price)
+                    entry_price_ref = previous_alert.get('entry_price', price)
                     gain_max = ((prix_max_display - entry_price_ref) / entry_price_ref) * 100
                     txt += f"📈 Prix MAX atteint: {format_price(prix_max_display)} (+{gain_max:.1f}%)\n"
 
