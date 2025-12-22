@@ -2497,7 +2497,11 @@ def main():
     # Initialiser le système de sécurité et tracking
     log("\n🔒 Initialisation du système de sécurité...")
     security_checker = SecurityChecker()
-    alert_tracker = AlertTracker()
+
+    # Chemin DB : volume persistant Railway (/data) ou local
+    db_path = os.getenv("DB_PATH", "/data/alerts_history.db")
+    alert_tracker = AlertTracker(db_path=db_path)
+    log(f"💾 Base de données: {db_path}")
     log("✅ Système de sécurité activé")
 
     while True:
