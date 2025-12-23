@@ -2580,12 +2580,18 @@ def scan_geckoterminal():
                     score, base_score, momentum_bonus, whale_analysis = calculate_final_score(pool_data, momentum, multi_pool_data)
 
                     # Générer message d'alerte (is_first_alert = False)
-                    alert_msg, regle5_data = generer_alerte_complete(
-                        pool_data, score, base_score, momentum_bonus, momentum,
-                        multi_pool_data, [], None, whale_analysis,
-                        is_first_alert=False,  # C'est une mise à jour
-                        tracker=alert_tracker
-                    )
+                    try:
+                        alert_msg, regle5_data = generer_alerte_complete(
+                            pool_data, score, base_score, momentum_bonus, momentum,
+                            multi_pool_data, [], None, whale_analysis,
+                            is_first_alert=False,  # C'est une mise à jour
+                            tracker=alert_tracker
+                        )
+                    except Exception as gen_error:
+                        log(f"   ❌ Erreur génération alerte pour {token_name}: {gen_error}")
+                        import traceback
+                        log(f"   Traceback: {traceback.format_exc()}")
+                        continue  # Skip cette alerte
 
                     # Envoyer via Telegram
                     success = send_telegram_alert(alert_msg, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
