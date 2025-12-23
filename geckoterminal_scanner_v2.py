@@ -1807,9 +1807,14 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             analyse_tp = analyser_alerte_suivante(
                 previous_alert, price, pool_data, score, momentum, signal_1h, signal_6h, tracker
             )
+            log(f"   🔍 DEBUG RETOUR analyser_alerte_suivante: decision={analyse_tp.get('decision') if analyse_tp else None}, type={type(analyse_tp)}")
 
-            # Vérifier si l'analyse a échoué (decision == 'ERROR')
-            if analyse_tp['decision'] == 'ERROR':
+            # VALIDATION: Vérifier que analyse_tp est un dict valide
+            if not analyse_tp or not isinstance(analyse_tp, dict):
+                log(f"   ⚠️ analyse_tp invalide: {type(analyse_tp)}")
+                # Ne pas afficher la section TP tracking si erreur
+            elif analyse_tp['decision'] == 'ERROR':
+                # Vérifier si l'analyse a échoué (decision == 'ERROR')
                 log(f"   ⚠️ Analyse TP tracking échouée, skip section suivi")
                 # Ne pas afficher la section TP tracking si erreur
             else:
