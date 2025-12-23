@@ -1493,9 +1493,11 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
         type_pump = "LENT"
 
     # RÈGLE 3: Réévaluer les conditions actuelles du marché
+    log(f"   🔍 DEBUG avant evaluer_conditions_marche: pool_data={type(pool_data)}, score={score}, momentum={type(momentum)}, signal_1h={signal_1h}, signal_6h={signal_6h}")
     conditions_favorables, decision_marche, raisons_marche = evaluer_conditions_marche(
         pool_data, score, momentum, signal_1h, signal_6h
     )
+    log(f"   🔍 DEBUG après evaluer_conditions_marche: raisons_marche={type(raisons_marche)}")
 
     # RÈGLE 4: Décision finale
     raisons = []
