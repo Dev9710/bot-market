@@ -43,19 +43,62 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 # Réseaux à surveiller (ajout avalanche + polygon pour backtesting)
 NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana", "avax", "polygon_pos"]
 
-# Seuils de détection (ASSOUPLIES POUR BACKTESTING - collecte max données)
-MIN_LIQUIDITY_USD = 100000      # Liquidité min (100K au lieu de 200K)
-MIN_VOLUME_24H_USD = 50000      # Volume 24h min (50K au lieu de 100K)
-MIN_TXNS_24H = 100              # Nb transactions min
+# ============================================
+# SEUILS PAR RÉSEAU - Configuration centralisée
+# ============================================
+NETWORK_THRESHOLDS = {
+    # Réseaux avec historique de performance (seuils stricts validés)
+    "solana": {
+        "min_liquidity": 100000,   # $100K - Validé: 270 alertes, 87.5% win rate
+        "min_volume": 50000,       # $50K
+        "min_txns": 100            # 100 txns
+    },
+    "bsc": {
+        "min_liquidity": 100000,   # $100K - Validé: 91 alertes générées
+        "min_volume": 50000,       # $50K
+        "min_txns": 100            # 100 txns
+    },
+    "eth": {
+        "min_liquidity": 100000,   # $100K - Validé: 14 alertes générées
+        "min_volume": 50000,       # $50K
+        "min_txns": 100            # 100 txns
+    },
+    "base": {
+        "min_liquidity": 100000,   # $100K - Validé: 1 alerte générée
+        "min_volume": 50000,       # $50K
+        "min_txns": 100            # 100 txns
+    },
+
+    # Arbitrum - Seuils équilibrés (calibrés pour nouveaux pools)
+    "arbitrum": {
+        "min_liquidity": 2000,     # $2K - Calibré: TOP 15 new pools
+        "min_volume": 400,         # $400
+        "min_txns": 10             # 10 txns
+    },
+
+    # Réseaux secondaires (avalanche, polygon)
+    "avax": {
+        "min_liquidity": 100000,
+        "min_volume": 50000,
+        "min_txns": 100
+    },
+    "polygon_pos": {
+        "min_liquidity": 100000,
+        "min_volume": 50000,
+        "min_txns": 100
+    },
+
+    # Défaut pour tout réseau non spécifié
+    "default": {
+        "min_liquidity": 100000,
+        "min_volume": 50000,
+        "min_txns": 100
+    }
+}
+
+# Seuils globaux (hérités, conservés pour compatibilité)
 MAX_TOKEN_AGE_HOURS = 72        # Max 3 jours
 VOLUME_LIQUIDITY_RATIO = 0.5    # Vol24h/Liquidité > 50%
-
-# Seuils spécifiques Arbitrum (équilibrés pour capturer opportunités)
-ARBITRUM_THRESHOLDS = {
-    'min_liquidity': 2000,      # $2K (vs $100K global)
-    'min_volume': 400,          # $400 (vs $50K global)
-    'min_txns': 10,             # 10 txns (vs 100 global)
-}
 
 # Seuils pour signaux avancés
 TRADERS_SPIKE_THRESHOLD = 0.5   # +50% traders
@@ -1021,17 +1064,13 @@ def detect_signals(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Li
 def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
     """Vérifie si pool est une opportunité valide."""
 
-    # Seuils adaptés par réseau
+    # Récupérer seuils par réseau (avec fallback sur default)
     network = pool_data.get("network", "")
+    thresholds = NETWORK_THRESHOLDS.get(network, NETWORK_THRESHOLDS["default"])
 
-    if network == "arbitrum":
-        min_liq = ARBITRUM_THRESHOLDS['min_liquidity']
-        min_vol = ARBITRUM_THRESHOLDS['min_volume']
-        min_txns = ARBITRUM_THRESHOLDS['min_txns']
-    else:
-        min_liq = MIN_LIQUIDITY_USD
-        min_vol = MIN_VOLUME_24H_USD
-        min_txns = MIN_TXNS_24H
+    min_liq = thresholds["min_liquidity"]
+    min_vol = thresholds["min_volume"]
+    min_txns = thresholds["min_txns"]
 
     # Check liquidité min
     if pool_data["liquidity"] < min_liq:
