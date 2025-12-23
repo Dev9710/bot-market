@@ -1512,7 +1512,9 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
             raisons.append(f"Aucun TP atteint mais conditions excellentes (Score: {score})")
             raisons.append(f"💡 Si pas en position: ENTRER maintenant")
             raisons.append(f"💡 Si déjà en position: MAINTENIR (pas de TP atteint)")
+            log(f"   🔍 DEBUG AVANT extend bullish: raisons_marche type={type(raisons_marche)}, bullish type={type(raisons_marche.get('bullish') if isinstance(raisons_marche, dict) else 'N/A')}")
             raisons.extend(raisons_marche['bullish'][:3])
+            log(f"   🔍 DEBUG APRÈS extend bullish")
         elif conditions_favorables and score >= 60:
             decision = "ATTENDRE"
             raisons.append(f"Aucun TP atteint, conditions moyennes (Score: {score})")
