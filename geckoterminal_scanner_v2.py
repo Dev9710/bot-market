@@ -1918,7 +1918,7 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
             txt += f"🔴 Tendance: DÉCÉLÉRATION BAISSIÈRE ⚠️\n"
 
     # Résistance
-    if resistance_data.get("resistance"):
+    if resistance_data and resistance_data.get("resistance"):
         txt += f"🎯 Résistance: {format_price(resistance_data['resistance'])} "
         txt += f"(+{resistance_data['resistance_dist_pct']:.1f}%)\n"
 
