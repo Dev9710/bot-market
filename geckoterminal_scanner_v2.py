@@ -2546,8 +2546,9 @@ def main():
 
     log("🚀 Démarrage GeckoTerminal Scanner V2...")
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
-    log(f"💧 Liquidité min: ${MIN_LIQUIDITY_USD:,}")
-    log(f"📊 Volume 24h min: ${MIN_VOLUME_24H_USD:,}")
+    log(f"📋 Seuils par réseau (liq/vol/txns):")
+    log(f"   • Solana/BSC/ETH/Base: $100K / $50K / 100 txns")
+    log(f"   • Arbitrum: $2K / $400 / 10 txns")
     log(f"⏰ Age max: {MAX_TOKEN_AGE_HOURS}h")
     log(f"🔄 Scan toutes les 5 minutes")
     log(f"🎯 Max {MAX_ALERTS_PER_SCAN} alertes par scan")
