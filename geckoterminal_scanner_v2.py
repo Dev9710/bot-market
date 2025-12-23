@@ -2460,7 +2460,7 @@ def scan_geckoterminal():
                     log(f"   🔄 Mise à jour: {token_name} - {reason}")
 
                     # Récupérer momentum et multi-pool (optionnel pour mises à jour)
-                    momentum = calculate_momentum_signal(pool_data, {})
+                    momentum = get_price_momentum_from_api(pool_data)
                     multi_pool_data = {}  # Optionnel pour updates
 
                     # Calculer score et whale analysis
