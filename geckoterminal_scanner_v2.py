@@ -2594,7 +2594,7 @@ def scan_geckoterminal():
                         continue  # Skip cette alerte
 
                     # Envoyer via Telegram
-                    success = send_telegram_alert(alert_msg, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+                    success = send_telegram(alert_msg)
 
                     if success:
                         updates_sent += 1
