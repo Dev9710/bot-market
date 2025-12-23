@@ -50,6 +50,13 @@ MIN_TXNS_24H = 100              # Nb transactions min
 MAX_TOKEN_AGE_HOURS = 72        # Max 3 jours
 VOLUME_LIQUIDITY_RATIO = 0.5    # Vol24h/Liquidité > 50%
 
+# Seuils spécifiques Arbitrum (équilibrés pour capturer opportunités)
+ARBITRUM_THRESHOLDS = {
+    'min_liquidity': 2000,      # $2K (vs $100K global)
+    'min_volume': 400,          # $400 (vs $50K global)
+    'min_txns': 10,             # 10 txns (vs 100 global)
+}
+
 # Seuils pour signaux avancés
 TRADERS_SPIKE_THRESHOLD = 0.5   # +50% traders
 BUY_RATIO_THRESHOLD = 0.8       # 80% buy ratio
@@ -1014,16 +1021,28 @@ def detect_signals(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Li
 def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
     """Vérifie si pool est une opportunité valide."""
 
+    # Seuils adaptés par réseau
+    network = pool_data.get("network", "")
+
+    if network == "arbitrum":
+        min_liq = ARBITRUM_THRESHOLDS['min_liquidity']
+        min_vol = ARBITRUM_THRESHOLDS['min_volume']
+        min_txns = ARBITRUM_THRESHOLDS['min_txns']
+    else:
+        min_liq = MIN_LIQUIDITY_USD
+        min_vol = MIN_VOLUME_24H_USD
+        min_txns = MIN_TXNS_24H
+
     # Check liquidité min
-    if pool_data["liquidity"] < MIN_LIQUIDITY_USD:
+    if pool_data["liquidity"] < min_liq:
         return False, f"❌ Liquidité trop faible: ${pool_data['liquidity']:,.0f}"
 
     # Check volume min
-    if pool_data["volume_24h"] < MIN_VOLUME_24H_USD:
+    if pool_data["volume_24h"] < min_vol:
         return False, f"⚠️ Volume trop faible: ${pool_data['volume_24h']:,.0f}"
 
     # Check transactions min
-    if pool_data["total_txns"] < MIN_TXNS_24H:
+    if pool_data["total_txns"] < min_txns:
         return False, f"⚠️ Pas assez de txns: {pool_data['total_txns']}"
 
     # Check age
