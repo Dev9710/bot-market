@@ -1335,6 +1335,39 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
             - type_pump: str (PARABOLIQUE / RAPIDE / NORMAL / LENT)
     """
 
+    # VALIDATION: Vérifier que previous_alert et pool_data sont valides
+    if not previous_alert or not isinstance(previous_alert, dict):
+        log(f"   ⚠️ previous_alert invalide: {type(previous_alert)}")
+        return {
+            'decision': 'ERROR',
+            'tp_hit': [],
+            'tp_gains': {},
+            'prix_trop_eleve': False,
+            'conditions_favorables': False,
+            'raisons': ["Données d'alerte précédente invalides"],
+            'nouveaux_niveaux': {},
+            'hausse_depuis_alerte': 0,
+            'velocite_pump': 0,
+            'type_pump': 'UNKNOWN',
+            'temps_ecoule_heures': 0
+        }
+
+    if not pool_data or not isinstance(pool_data, dict):
+        log(f"   ⚠️ pool_data invalide dans analyser_alerte_suivante: {type(pool_data)}")
+        return {
+            'decision': 'ERROR',
+            'tp_hit': [],
+            'tp_gains': {},
+            'prix_trop_eleve': False,
+            'conditions_favorables': False,
+            'raisons': ["Données de pool invalides"],
+            'nouveaux_niveaux': {},
+            'hausse_depuis_alerte': 0,
+            'velocite_pump': 0,
+            'type_pump': 'UNKNOWN',
+            'temps_ecoule_heures': 0
+        }
+
     # RÈGLE 1: Détection des TP atteints
     # IMPORTANT: On vérifie si les TP ont été atteints DANS LE PASSÉ (pas juste le prix actuel)
     tp_hit = []
@@ -1745,76 +1778,81 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
                 previous_alert, price, pool_data, score, momentum, signal_1h, signal_6h, tracker
             )
 
-            # Mettre à jour les données RÈGLE 5
-            regle5_data = {
-                'velocite_pump': analyse_tp['velocite_pump'],
-                'type_pump': analyse_tp['type_pump'],
-                'decision_tp_tracking': analyse_tp['decision'],
-                'temps_depuis_alerte_precedente': analyse_tp['temps_ecoule_heures'],
-                'is_alerte_suivante': 1
-            }
-
-            # Afficher section TP TRACKING
-            txt += f"━━━ SUIVI ALERTE PRÉCÉDENTE ━━━\n"
-            entry_prev = previous_alert.get('entry_price', previous_alert.get('price_at_alert', 0))
-            txt += f"📍 Entry précédente: {format_price(entry_prev)}\n"
-            txt += f"💰 Prix actuel: {format_price(price)} ({analyse_tp['hausse_depuis_alerte']:+.1f}%)\n"
-
-            # Afficher vélocité du pump
-            temps_h = analyse_tp['temps_ecoule_heures']
-            velocite = analyse_tp['velocite_pump']
-            type_pump = analyse_tp['type_pump']
-
-            if temps_h < 1:
-                temps_display = f"{temps_h * 60:.0f} min"
+            # Vérifier si l'analyse a échoué (decision == 'ERROR')
+            if analyse_tp['decision'] == 'ERROR':
+                log(f"   ⚠️ Analyse TP tracking échouée, skip section suivi")
+                # Ne pas afficher la section TP tracking si erreur
             else:
-                temps_display = f"{temps_h:.1f}h"
+                # Mettre à jour les données RÈGLE 5
+                regle5_data = {
+                    'velocite_pump': analyse_tp['velocite_pump'],
+                    'type_pump': analyse_tp['type_pump'],
+                    'decision_tp_tracking': analyse_tp['decision'],
+                    'temps_depuis_alerte_precedente': analyse_tp['temps_ecoule_heures'],
+                    'is_alerte_suivante': 1
+                }
 
-            # Emoji selon type de pump
-            if type_pump == "PARABOLIQUE":
-                pump_emoji = "🚨"
-                pump_label = "PARABOLIQUE (DANGER)"
-            elif type_pump == "TRES_RAPIDE":
-                pump_emoji = "⚡"
-                pump_label = "TRÈS RAPIDE"
-            elif type_pump == "RAPIDE":
-                pump_emoji = "🔥"
-                pump_label = "RAPIDE"
-            elif type_pump == "NORMAL":
-                pump_emoji = "📈"
-                pump_label = "NORMAL"
-            else:  # LENT
-                pump_emoji = "✅"
-                pump_label = "SAIN"
+                # Afficher section TP TRACKING
+                txt += f"━━━ SUIVI ALERTE PRÉCÉDENTE ━━━\n"
+                entry_prev = previous_alert.get('entry_price', previous_alert.get('price_at_alert', 0))
+                txt += f"📍 Entry précédente: {format_price(entry_prev)}\n"
+                txt += f"💰 Prix actuel: {format_price(price)} ({analyse_tp['hausse_depuis_alerte']:+.1f}%)\n"
 
-            txt += f"⏱️ Temps écoulé: {temps_display} | {pump_emoji} Vélocité: {velocite:.0f}%/h ({pump_label})\n"
+                # Afficher vélocité du pump
+                temps_h = analyse_tp['temps_ecoule_heures']
+                velocite = analyse_tp['velocite_pump']
+                type_pump = analyse_tp['type_pump']
 
-            # Afficher Prix MAX atteint (CRITIQUE pour comprendre détection TP)
-            if tracker is not None and 'previous_alert' in locals() and previous_alert:
-                alert_id = previous_alert.get('id', 0)
-                prix_max_db = tracker.get_highest_price_for_alert(alert_id) if alert_id > 0 else None
-                prix_max_display = max(prix_max_db or 0, price)
+                if temps_h < 1:
+                    temps_display = f"{temps_h * 60:.0f} min"
+                else:
+                    temps_display = f"{temps_h:.1f}h"
 
-                if prix_max_display > 0:
-                    entry_price_ref = previous_alert.get('entry_price', price)
-                    gain_max = ((prix_max_display - entry_price_ref) / entry_price_ref) * 100
-                    txt += f"📈 Prix MAX atteint: {format_price(prix_max_display)} (+{gain_max:.1f}%)\n"
+                # Emoji selon type de pump
+                if type_pump == "PARABOLIQUE":
+                    pump_emoji = "🚨"
+                    pump_label = "PARABOLIQUE (DANGER)"
+                elif type_pump == "TRES_RAPIDE":
+                    pump_emoji = "⚡"
+                    pump_label = "TRÈS RAPIDE"
+                elif type_pump == "RAPIDE":
+                    pump_emoji = "🔥"
+                    pump_label = "RAPIDE"
+                elif type_pump == "NORMAL":
+                    pump_emoji = "📈"
+                    pump_label = "NORMAL"
+                else:  # LENT
+                    pump_emoji = "✅"
+                    pump_label = "SAIN"
 
-            # Afficher TP atteints (basé sur Prix MAX, pas prix actuel)
-            if analyse_tp['tp_hit']:
-                txt += f"✅ *TP ATTEINTS:* {', '.join(analyse_tp['tp_hit'])}\n"
-                for tp_name, gain in analyse_tp['tp_gains'].items():
-                    txt += f"   {tp_name}: +{gain:.1f}%\n"
-            else:
-                txt += f"⏳ Aucun TP atteint pour le moment\n"
+                txt += f"⏱️ Temps écoulé: {temps_display} | {pump_emoji} Vélocité: {velocite:.0f}%/h ({pump_label})\n"
 
-            txt += f"\n🎯 *DÉCISION: {analyse_tp['decision']}*\n"
+                # Afficher Prix MAX atteint (CRITIQUE pour comprendre détection TP)
+                if tracker is not None and 'previous_alert' in locals() and previous_alert:
+                    alert_id = previous_alert.get('id', 0)
+                    prix_max_db = tracker.get_highest_price_for_alert(alert_id) if alert_id > 0 else None
+                    prix_max_display = max(prix_max_db or 0, price)
 
-            # Afficher raisons
-            for raison in analyse_tp['raisons']:
-                txt += f"{raison}\n"
+                    if prix_max_display > 0:
+                        entry_price_ref = previous_alert.get('entry_price', price)
+                        gain_max = ((prix_max_display - entry_price_ref) / entry_price_ref) * 100
+                        txt += f"📈 Prix MAX atteint: {format_price(prix_max_display)} (+{gain_max:.1f}%)\n"
 
-            txt += "\n"
+                # Afficher TP atteints (basé sur Prix MAX, pas prix actuel)
+                if analyse_tp['tp_hit']:
+                    txt += f"✅ *TP ATTEINTS:* {', '.join(analyse_tp['tp_hit'])}\n"
+                    for tp_name, gain in analyse_tp['tp_gains'].items():
+                        txt += f"   {tp_name}: +{gain:.1f}%\n"
+                else:
+                    txt += f"⏳ Aucun TP atteint pour le moment\n"
+
+                txt += f"\n🎯 *DÉCISION: {analyse_tp['decision']}*\n"
+
+                # Afficher raisons
+                for raison in analyse_tp['raisons']:
+                    txt += f"{raison}\n"
+
+                txt += "\n"
 
     # PRIX & MOMENTUM
     txt += f"━━━ PRIX & MOMENTUM ━━━\n"
@@ -2480,8 +2518,9 @@ def scan_geckoterminal():
                 # Récupérer données actuelles du pool
                 pool_data = get_pool_by_address(network, pool_address)
 
-                if not pool_data:
+                if not pool_data or not isinstance(pool_data, dict):
                     # Pool plus disponible (delisted, erreur API, etc.)
+                    log(f"   ⚠️ Pool data invalide pour {token_name}: {type(pool_data)}")
                     continue
 
                 current_price = pool_data.get('price_usd', 0)
