@@ -709,6 +709,11 @@ def calculate_momentum_bonus(pool_data: Dict, momentum: Dict, multi_pool_data: D
     Bonus momentum INTELLIGENT (dynamique actuelle).
     Corrigé pour ALMANAK: distingue bon spike (accumulation) vs mauvais spike (panic sell).
     """
+    # VALIDATION: Vérifier que momentum est un dict valide
+    if not momentum or not isinstance(momentum, dict):
+        log(f"   ⚠️ momentum invalide dans calculate_momentum_bonus: {type(momentum)}")
+        return 0  # Pas de bonus si momentum invalide
+
     bonus = 0
 
     # === Prix 1h (max 15 points) ===
@@ -995,6 +1000,11 @@ def detect_signals(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Li
     Détecte tous les signaux importants.
     Corrigé pour ALMANAK: ajoute warnings pour dead cat bounce et panic sell.
     """
+    # VALIDATION: Vérifier que momentum est un dict valide
+    if not momentum or not isinstance(momentum, dict):
+        log(f"   ⚠️ momentum invalide dans detect_signals: {type(momentum)}")
+        return []  # Pas de signaux si momentum invalide
+
     signals = []
 
     price_1h = momentum.get("1h", 0)
@@ -1361,6 +1371,22 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
             'prix_trop_eleve': False,
             'conditions_favorables': False,
             'raisons': ["Données de pool invalides"],
+            'nouveaux_niveaux': {},
+            'hausse_depuis_alerte': 0,
+            'velocite_pump': 0,
+            'type_pump': 'UNKNOWN',
+            'temps_ecoule_heures': 0
+        }
+
+    if not momentum or not isinstance(momentum, dict):
+        log(f"   ⚠️ momentum invalide dans analyser_alerte_suivante: {type(momentum)}")
+        return {
+            'decision': 'ERROR',
+            'tp_hit': [],
+            'tp_gains': {},
+            'prix_trop_eleve': False,
+            'conditions_favorables': False,
+            'raisons': ["Données de momentum invalides"],
             'nouveaux_niveaux': {},
             'hausse_depuis_alerte': 0,
             'velocite_pump': 0,
