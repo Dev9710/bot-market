@@ -189,7 +189,7 @@ def analyze_advanced_patterns():
         win_rate = (winners_count / total * 100) if total > 0 else 0
         avg_roi = mean([a['roi'] for a in ratio_alerts]) if ratio_alerts else 0
 
-        print(f"{min_ratio:.1f}-{max_ratio:.1f:<9} {total:8} {winners_count:8} {win_rate:9.1f}% {avg_roi:9.1f}%")
+        print(f"{min_ratio:.1f}-{max_ratio:.1f} {total:>8} {winners_count:>8} {win_rate:>9.1f}% {avg_roi:>9.1f}%")
 
     print("\n" + "=" * 100)
     print("5. ANALYSE PAR VÉLOCITÉ DE PUMP")
