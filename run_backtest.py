@@ -13,11 +13,11 @@ import backtest_network_comparison
 
 if __name__ == "__main__":
     print("\n" + "="*80)
-    print("🚀 LANCEMENT BACKTEST SUR RAILWAY")
+    print("LANCEMENT BACKTEST SUR RAILWAY")
     print("="*80 + "\n")
 
     backtest_network_comparison.analyze_network_performance()
 
     print("\n" + "="*80)
-    print("✅ BACKTEST TERMINÉ")
+    print("BACKTEST TERMINE")
     print("="*80 + "\n")
