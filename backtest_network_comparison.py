@@ -2,14 +2,20 @@
 """
 BACKTESTING COMPLET - Comparaison performances par réseau
 Analyse des 3,233+ alertes pour valider seuils Arbitrum vs autres réseaux
+
+USAGE:
+    python backtest_network_comparison.py [db_path]
+
+    Si db_path non fourni, utilise /data/alerts_history.db (Railway)
 """
 import sqlite3
 import os
+import sys
 from datetime import datetime
 from collections import defaultdict
 
 # Configuration
-DB_PATH = os.getenv("DB_PATH", "/data/alerts_history.db")
+DB_PATH = sys.argv[1] if len(sys.argv) > 1 else os.getenv("DB_PATH", "/data/alerts_history.db")
 
 # Seuils configurés
 NETWORK_THRESHOLDS = {
