@@ -64,16 +64,16 @@ NETWORK_THRESHOLDS = {
         "min_txns": 100            # 100 txns
     },
     "base": {
-        "min_liquidity": 100000,   # $100K - Validé: 1 alerte générée
-        "min_volume": 50000,       # $50K
-        "min_txns": 100            # 100 txns
+        "min_liquidity": 300000,   # $100K - Validé: 1 alerte générée
+        "min_volume": 1000000,       # $50K
+        "min_txns": 150            # 100 txns
     },
 
     # Arbitrum - Seuils équilibrés (calibrés pour nouveaux pools)
     "arbitrum": {
-        "min_liquidity": 2000,     # $2K - Calibré: TOP 15 new pools
-        "min_volume": 400,         # $400
-        "min_txns": 10             # 10 txns
+        "min_liquidity": 100000,     # $2K - Calibré: TOP 15 new pools
+        "min_volume": 50000,         # $400
+        "min_txns": 100             # 10 txns
     },
 
     # Réseaux secondaires (avalanche, polygon)

@@ -11,11 +11,19 @@ import time
 import threading
 
 class AlertTracker:
-    def __init__(self, db_path='alerts_history.db'):
+    def __init__(self, db_path='alerts_history.db', version='v2'):
+        """
+        Initialise AlertTracker avec support de versioning.
+
+        Args:
+            db_path: Chemin vers la base de données SQLite
+            version: Version du bot ('v2' ou 'v3') pour différencier les alertes
+        """
         self.db_path = db_path
+        self.version = version
         self.conn = sqlite3.connect(db_path, check_same_thread=False)
         self.create_tables()
-        print(f"✅ AlertTracker initialisé - DB: {db_path}")
+        print(f"✅ AlertTracker initialisé - DB: {db_path} - Version: {version}")
 
     def create_tables(self):
         """Crée les tables de la base de données."""
@@ -179,6 +187,13 @@ class AlertTracker:
         except sqlite3.OperationalError:
             pass  # Colonne existe déjà
 
+        # Ajouter colonne version (V2 vs V3)
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN version TEXT DEFAULT 'v2'")
+            print("✅ Colonne version ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
         self.conn.commit()
         print("✅ Tables créées avec succès")
 
@@ -206,8 +221,8 @@ class AlertTracker:
                     tp3_price, tp3_percent, alert_message,
                     volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h,
                     velocite_pump, type_pump, decision_tp_tracking,
-                    temps_depuis_alerte_precedente, is_alerte_suivante
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    temps_depuis_alerte_precedente, is_alerte_suivante, version
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 alert_data['token_name'],
                 alert_data['token_address'],
@@ -242,7 +257,8 @@ class AlertTracker:
                 alert_data.get('type_pump', 'UNKNOWN'),
                 alert_data.get('decision_tp_tracking', None),
                 alert_data.get('temps_depuis_alerte_precedente', 0),
-                alert_data.get('is_alerte_suivante', 0)
+                alert_data.get('is_alerte_suivante', 0),
+                alert_data.get('version', self.version)  # Utilise version de l'instance
             ))
 
             self.conn.commit()
@@ -809,54 +825,93 @@ class AlertTracker:
 
         return results
 
-    def get_performance_stats(self) -> Dict:
+    def get_performance_stats(self, version: Optional[str] = None) -> Dict:
         """
         Retourne les statistiques globales de performance.
+
+        Args:
+            version: Filtrer par version ('v2', 'v3', ou None pour toutes)
 
         Returns:
             Dict avec les stats
         """
         cursor = self.conn.cursor()
 
+        # Clause WHERE pour filtrage version
+        version_filter = ""
+        version_params = []
+        if version:
+            version_filter = "WHERE a.version = ?"
+            version_params = [version]
+
         # Total alertes
-        cursor.execute("SELECT COUNT(*) FROM alerts")
+        if version:
+            cursor.execute("SELECT COUNT(*) FROM alerts WHERE version = ?", (version,))
+        else:
+            cursor.execute("SELECT COUNT(*) FROM alerts")
         total_alerts = cursor.fetchone()[0]
 
         # Alertes analysées (24h passées)
-        cursor.execute("SELECT COUNT(*) FROM alert_analysis")
+        if version:
+            cursor.execute("""
+                SELECT COUNT(*) FROM alert_analysis an
+                JOIN alerts a ON an.alert_id = a.id
+                WHERE a.version = ?
+            """, (version,))
+        else:
+            cursor.execute("SELECT COUNT(*) FROM alert_analysis")
         analyzed_alerts = cursor.fetchone()[0]
 
         # Taux de cohérence
-        cursor.execute("SELECT COUNT(*) FROM alert_analysis WHERE was_coherent = 1")
+        if version:
+            cursor.execute("""
+                SELECT COUNT(*) FROM alert_analysis an
+                JOIN alerts a ON an.alert_id = a.id
+                WHERE a.version = ? AND an.was_coherent = 1
+            """, (version,))
+        else:
+            cursor.execute("SELECT COUNT(*) FROM alert_analysis WHERE was_coherent = 1")
         coherent_count = cursor.fetchone()[0]
         coherence_rate = (coherent_count / analyzed_alerts * 100) if analyzed_alerts > 0 else 0
 
         # ROI moyen par tranche de score
-        cursor.execute("""
+        query = f"""
             SELECT
                 CAST(a.score / 10 AS INTEGER) * 10 as score_range,
                 AVG(an.roi_at_4h) as avg_roi_4h,
                 COUNT(*) as count
             FROM alerts a
             JOIN alert_analysis an ON a.id = an.alert_id
+            {version_filter}
             GROUP BY score_range
             ORDER BY score_range
-        """)
+        """
+        if version:
+            cursor.execute(query, (version,))
+        else:
+            cursor.execute(query)
         roi_by_score = {f"{row[0]}-{row[0]+9}": {'avg_roi': row[1], 'count': row[2]}
                        for row in cursor.fetchall()}
 
         # Taux de succès par niveau
-        cursor.execute("""
+        query = f"""
             SELECT
                 SUM(CASE WHEN tp1_was_hit THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as tp1_rate,
                 SUM(CASE WHEN tp2_was_hit THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as tp2_rate,
                 SUM(CASE WHEN tp3_was_hit THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as tp3_rate,
                 SUM(CASE WHEN sl_was_hit THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as sl_rate
-            FROM alert_analysis
-        """)
+            FROM alert_analysis an
+            JOIN alerts a ON an.alert_id = a.id
+            {version_filter}
+        """
+        if version:
+            cursor.execute(query, (version,))
+        else:
+            cursor.execute(query)
         tp_rates = cursor.fetchone()
 
         return {
+            'version': version or 'all',
             'total_alerts': total_alerts,
             'analyzed_alerts': analyzed_alerts,
             'coherence_rate': coherence_rate,
@@ -867,12 +922,139 @@ class AlertTracker:
             'sl_hit_rate': tp_rates[3] if tp_rates else 0
         }
 
-    def print_stats(self):
-        """Affiche les statistiques dans la console."""
-        stats = self.get_performance_stats()
+    def get_alerts(self, version: Optional[str] = None, limit: int = 100) -> List[Dict]:
+        """
+        Récupère les alertes avec filtrage optionnel par version.
+
+        Args:
+            version: Filtrer par version ('v2', 'v3', ou None pour toutes)
+            limit: Nombre maximum d'alertes à retourner
+
+        Returns:
+            Liste de Dict contenant les alertes
+        """
+        cursor = self.conn.cursor()
+
+        if version:
+            cursor.execute("""
+                SELECT id, token_name, token_address, network, price_at_alert,
+                       score, base_score, momentum_bonus, liquidity, age_hours,
+                       entry_price, tp1_price, tp2_price, tp3_price,
+                       stop_loss_price, created_at, version
+                FROM alerts
+                WHERE version = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (version, limit))
+        else:
+            cursor.execute("""
+                SELECT id, token_name, token_address, network, price_at_alert,
+                       score, base_score, momentum_bonus, liquidity, age_hours,
+                       entry_price, tp1_price, tp2_price, tp3_price,
+                       stop_loss_price, created_at, version
+                FROM alerts
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (limit,))
+
+        columns = [
+            'id', 'token_name', 'token_address', 'network', 'price_at_alert',
+            'score', 'base_score', 'momentum_bonus', 'liquidity', 'age_hours',
+            'entry_price', 'tp1_price', 'tp2_price', 'tp3_price',
+            'stop_loss_price', 'created_at', 'version'
+        ]
+
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    def compare_versions(self) -> Dict:
+        """
+        Compare les performances de V2 vs V3.
+
+        Returns:
+            Dict avec comparaison détaillée
+        """
+        stats_v2 = self.get_performance_stats('v2')
+        stats_v3 = self.get_performance_stats('v3')
+
+        comparison = {
+            'v2': stats_v2,
+            'v3': stats_v3,
+            'improvements': {}
+        }
+
+        # Calculer les améliorations
+        if stats_v2['analyzed_alerts'] > 0 and stats_v3['analyzed_alerts'] > 0:
+            # Win rate = TP1 hit rate comme proxy
+            wr_v2 = stats_v2['tp1_hit_rate'] or 0
+            wr_v3 = stats_v3['tp1_hit_rate'] or 0
+            wr_improvement = ((wr_v3 - wr_v2) / wr_v2 * 100) if wr_v2 > 0 else 0
+
+            comparison['improvements'] = {
+                'win_rate_v2': wr_v2,
+                'win_rate_v3': wr_v3,
+                'win_rate_improvement_pct': wr_improvement,
+                'coherence_rate_improvement': stats_v3['coherence_rate'] - stats_v2['coherence_rate'],
+                'alert_count_v2': stats_v2['total_alerts'],
+                'alert_count_v3': stats_v3['total_alerts'],
+                'alert_reduction_pct': ((stats_v2['total_alerts'] - stats_v3['total_alerts']) / stats_v2['total_alerts'] * 100) if stats_v2['total_alerts'] > 0 else 0
+            }
+
+        return comparison
+
+    def print_comparison(self):
+        """Affiche une comparaison V2 vs V3 dans la console."""
+        comp = self.compare_versions()
 
         print("\n" + "="*80)
-        print("📊 STATISTIQUES DE PERFORMANCE")
+        print("📊 COMPARAISON V2 vs V3")
+        print("="*80)
+
+        if comp['improvements']:
+            imp = comp['improvements']
+
+            print(f"\n🔢 NOMBRE D'ALERTES:")
+            print(f"  V2: {imp['alert_count_v2']} alertes")
+            print(f"  V3: {imp['alert_count_v3']} alertes")
+            print(f"  Réduction: {imp['alert_reduction_pct']:+.1f}% (filtrage plus strict)")
+
+            print(f"\n📈 WIN RATE (TP1):")
+            print(f"  V2: {imp['win_rate_v2']:.1f}%")
+            print(f"  V3: {imp['win_rate_v3']:.1f}%")
+            print(f"  Amélioration: {imp['win_rate_improvement_pct']:+.1f}%")
+
+            print(f"\n🎯 COHÉRENCE:")
+            print(f"  V2: {comp['v2']['coherence_rate']:.1f}%")
+            print(f"  V3: {comp['v3']['coherence_rate']:.1f}%")
+            print(f"  Amélioration: {imp['coherence_rate_improvement']:+.1f}%")
+
+            print(f"\n🎲 TAUX TP/SL V2:")
+            print(f"  TP1: {comp['v2']['tp1_hit_rate']:.1f}% | TP2: {comp['v2']['tp2_hit_rate']:.1f}% | TP3: {comp['v2']['tp3_hit_rate']:.1f}%")
+            print(f"  SL: {comp['v2']['sl_hit_rate']:.1f}%")
+
+            print(f"\n🎲 TAUX TP/SL V3:")
+            print(f"  TP1: {comp['v3']['tp1_hit_rate']:.1f}% | TP2: {comp['v3']['tp2_hit_rate']:.1f}% | TP3: {comp['v3']['tp3_hit_rate']:.1f}%")
+            print(f"  SL: {comp['v3']['sl_hit_rate']:.1f}%")
+
+        else:
+            print("\n⚠️ Pas assez de données pour comparer V2 et V3")
+            print(f"   V2: {comp['v2']['analyzed_alerts']} alertes analysées")
+            print(f"   V3: {comp['v3']['analyzed_alerts']} alertes analysées")
+
+        print("="*80 + "\n")
+
+    def print_stats(self, version: Optional[str] = None):
+        """
+        Affiche les statistiques dans la console.
+
+        Args:
+            version: Filtrer par version ('v2', 'v3', ou None pour toutes)
+        """
+        stats = self.get_performance_stats(version)
+
+        version_label = f" - Version {version.upper()}" if version else " - TOUTES VERSIONS"
+
+        print("\n" + "="*80)
+        print(f"📊 STATISTIQUES DE PERFORMANCE{version_label}")
         print("="*80)
         print(f"Total alertes envoyées: {stats['total_alerts']}")
         print(f"Alertes analysées (24h+): {stats['analyzed_alerts']}")
@@ -895,8 +1077,11 @@ class AlertTracker:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    # Initialiser le tracker
-    tracker = AlertTracker()
+    # Initialiser le tracker avec version
+    # Pour V2:
+    # tracker = AlertTracker(version='v2')
+    # Pour V3:
+    tracker = AlertTracker(version='v3')
 
     # Exemple: sauvegarder une alerte
     alert_data = {
@@ -926,14 +1111,26 @@ if __name__ == "__main__":
         'tp2_percent': 10,
         'tp3_price': 0.00000123 * 1.15,
         'tp3_percent': 15,
-        'alert_message': "Texte complet de l'alerte..."
+        'alert_message': "Texte complet de l'alerte...",
+        'version': 'v3'  # Optionnel, sinon utilise version de l'instance
     }
 
     alert_id = tracker.save_alert(alert_data)
     print(f"Alerte créée avec ID: {alert_id}")
 
-    # Afficher les stats (sera vide au début)
+    # Afficher les stats globales
     tracker.print_stats()
+
+    # Afficher les stats par version
+    tracker.print_stats(version='v2')
+    tracker.print_stats(version='v3')
+
+    # Comparer V2 vs V3
+    tracker.print_comparison()
+
+    # Récupérer les alertes par version
+    alerts_v3 = tracker.get_alerts(version='v3', limit=10)
+    print(f"\n{len(alerts_v3)} dernières alertes V3")
 
     # Récupérer l'historique d'un token
     history = tracker.get_token_history("PEPE")
