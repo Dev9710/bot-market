@@ -12,7 +12,7 @@ from datetime import datetime
 
 # Import des fonctions des bots
 import run_binance_bot
-import geckoterminal_scanner_v2 as geckoterminal_scanner  # Utilise la V2 avec améliorations LAVA
+import geckoterminal_scanner_v3 as geckoterminal_scanner  # Utilise la V3 avec améliorations backtest
 
 
 # =========================
@@ -251,10 +251,10 @@ def main():
     log("   - DASH, XRP, SOL, etc.")
     log("   - Volume temps reel, liquidations, OI")
     log("")
-    log("🦎 Bot 2: GeckoTerminal Scanner V2 (nouveaux tokens DEX)")
+    log("🦎 Bot 2: GeckoTerminal Scanner V3 (nouveaux tokens DEX)")
     log("   - Nouveaux tokens Ethereum, BSC, Base, Arbitrum, Solana")
     log("   - Detection pumps recents avec liquidite suffisante")
-    log("   - Score min 55/100, multi-pool, momentum avancé")
+    log("   - Score min 60/100, optimisations backtest 35-50% WR")
     log("")
     log("=" * 80)
     log("")
