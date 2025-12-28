@@ -8,3 +8,7 @@ python-dotenv==1.0.1
 streamlit==1.29.0
 plotly==5.18.0
 pandas==2.1.4
+
+# Dashboard API Flask
+flask==3.0.0
+flask-cors==4.0.0
