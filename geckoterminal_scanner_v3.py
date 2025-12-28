@@ -34,6 +34,7 @@ from collections import defaultdict
 # Système de sécurité et tracking
 from security_checker import SecurityChecker
 from alert_tracker import AlertTracker
+from json_alert_writer import JSONAlertWriter
 
 # UTF-8 pour emojis Windows
 if sys.platform == "win32":
@@ -134,37 +135,37 @@ def build_network_thresholds(mode_config):
     }
 
 # ============================================
-# V3.1: CONFIGURATION DASHBOARD - Volume optimal (5 alertes/jour)
+# V3.1: CONFIGURATION ULTRA_RENTABLE - Qualité maximale (2.7 alertes/jour)
 # ============================================
-# Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois
+# Objectif: 2.7 alertes/jour | Score 95.9 | WR 55-70% | ROI +10-15%/mois
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 DASHBOARD - Configuration active")
-print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
+print("V3.1 ULTRA_RENTABLE - Configuration active")
+print("Objectif: 2.7 alertes/jour | Score 95.9 | WR 55-70% | ROI +10-15%/mois")
 print("=" * 80)
 
-# Configuration DASHBOARD
-DASHBOARD_CONFIG = {
-    'MIN_VELOCITE_PUMP': 5.0,
+# Configuration ULTRA_RENTABLE
+ULTRA_RENTABLE_CONFIG = {
+    'MIN_VELOCITE_PUMP': 10.0,
     'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 78, 'min_velocity': 5},
-        'base': {'min_score': 82, 'min_velocity': 8},
-        'bsc': {'min_score': 80, 'min_velocity': 6},
-        'solana': {'min_score': 72, 'min_velocity': 5},
+        'eth': {'min_score': 85, 'min_velocity': 10},
+        'base': {'min_score': 90, 'min_velocity': 15},
+        'bsc': {'min_score': 88, 'min_velocity': 12},
+        'solana': {'min_score': 85, 'min_velocity': 10},
     },
     'LIQUIDITY': {
-        'eth': (80000, 600000),
-        'base': (250000, 2500000),
-        'bsc': (400000, 6000000),
-        'solana': (80000, 300000),
+        'eth': (100000, 500000),
+        'base': (300000, 2000000),
+        'bsc': (500000, 5000000),
+        'solana': (100000, 250000),
     }
 }
 
 # Appliquer la configuration
-MIN_VELOCITE_PUMP = DASHBOARD_CONFIG['MIN_VELOCITE_PUMP']
-NETWORK_SCORE_FILTERS = DASHBOARD_CONFIG['NETWORK_SCORE_FILTERS']
-NETWORK_THRESHOLDS = build_network_thresholds(DASHBOARD_CONFIG)
+MIN_VELOCITE_PUMP = ULTRA_RENTABLE_CONFIG['MIN_VELOCITE_PUMP']
+NETWORK_SCORE_FILTERS = ULTRA_RENTABLE_CONFIG['NETWORK_SCORE_FILTERS']
+NETWORK_THRESHOLDS = build_network_thresholds(ULTRA_RENTABLE_CONFIG)
 
 # ============================================
 # V3: NOUVEAUX FILTRES (Backtest Phase 2)
@@ -238,6 +239,7 @@ alert_cooldown = {}
 # Système de sécurité et tracking (initialisés dans main())
 security_checker = None
 alert_tracker = None
+json_writer = None  # Pour exposer alertes via API REST
 
 # ============================================
 # UTILITAIRES
@@ -2780,7 +2782,7 @@ def scan_geckoterminal():
     """Scan GeckoTerminal avec analyse avancée."""
 
     log("=" * 80)
-    log("🦎 GECKOTERMINAL SCANNER V2 - Analyse Avancée")
+    log("🦎 GECKOTERMINAL SCANNER V3.1 - ULTRA_RENTABLE")
     log("=" * 80)
 
     all_pools = []
@@ -3019,6 +3021,13 @@ def scan_geckoterminal():
                     alert_id = alert_tracker.save_alert(alert_data)
                     if alert_id > 0:
                         log(f"   💾 Sauvegardé en DB (ID: {alert_id}) - Tracking auto démarré")
+
+                        # Sauvegarder aussi dans JSON pour API dashboard
+                        if json_writer is not None:
+                            try:
+                                json_writer.add_alert(alert_data)
+                            except Exception as je:
+                                log(f"   ⚠️ Erreur sauvegarde JSON: {je}")
                     else:
                         log(f"   ⚠️ Échec sauvegarde DB (token déjà existant?)")
 
@@ -3139,9 +3148,9 @@ def scan_geckoterminal():
 # ============================================
 def main():
     """Boucle principale."""
-    global security_checker, alert_tracker
+    global security_checker, alert_tracker, json_writer
 
-    log("🚀 Démarrage GeckoTerminal Scanner V2...")
+    log("🚀 Démarrage GeckoTerminal Scanner V3...")
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
     log(f"📋 Seuils par réseau (liq/vol/txns):")
     log(f"   • Solana/BSC/ETH/Base: $100K / $50K / 100 txns")
@@ -3158,6 +3167,11 @@ def main():
     db_path = os.getenv("DB_PATH", "/data/alerts_history.db")
     alert_tracker = AlertTracker(db_path=db_path)
     log(f"💾 Base de données: {db_path}")
+
+    # Initialiser JSON writer pour API dashboard
+    json_writer = JSONAlertWriter('alerts_live.json')
+    log(f"📄 JSON writer initialisé: alerts_live.json")
+
     log("✅ Système de sécurité activé")
 
     while True:
