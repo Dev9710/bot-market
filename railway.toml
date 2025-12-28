@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "bash start_combined.sh"
+startCommand = "python start_all.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
