@@ -34,7 +34,6 @@ from collections import defaultdict
 # Système de sécurité et tracking
 from security_checker import SecurityChecker
 from alert_tracker import AlertTracker
-from json_alert_writer import JSONAlertWriter
 
 # UTF-8 pour emojis Windows
 if sys.platform == "win32":
@@ -239,7 +238,6 @@ alert_cooldown = {}
 # Système de sécurité et tracking (initialisés dans main())
 security_checker = None
 alert_tracker = None
-json_writer = None  # Pour exposer alertes via API REST
 
 # ============================================
 # UTILITAIRES
@@ -3021,13 +3019,6 @@ def scan_geckoterminal():
                     alert_id = alert_tracker.save_alert(alert_data)
                     if alert_id > 0:
                         log(f"   💾 Sauvegardé en DB (ID: {alert_id}) - Tracking auto démarré")
-
-                        # Sauvegarder aussi dans JSON pour API dashboard
-                        if json_writer is not None:
-                            try:
-                                json_writer.add_alert(alert_data)
-                            except Exception as je:
-                                log(f"   ⚠️ Erreur sauvegarde JSON: {je}")
                     else:
                         log(f"   ⚠️ Échec sauvegarde DB (token déjà existant?)")
 
@@ -3148,7 +3139,7 @@ def scan_geckoterminal():
 # ============================================
 def main():
     """Boucle principale."""
-    global security_checker, alert_tracker, json_writer
+    global security_checker, alert_tracker
 
     log("🚀 Démarrage GeckoTerminal Scanner V3...")
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
@@ -3167,10 +3158,6 @@ def main():
     db_path = os.getenv("DB_PATH", "/data/alerts_history.db")
     alert_tracker = AlertTracker(db_path=db_path)
     log(f"💾 Base de données: {db_path}")
-
-    # Initialiser JSON writer pour API dashboard
-    json_writer = JSONAlertWriter('alerts_live.json')
-    log(f"📄 JSON writer initialisé: alerts_live.json")
 
     log("✅ Système de sécurité activé")
 
