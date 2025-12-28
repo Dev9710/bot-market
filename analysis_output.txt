@@ -1,0 +1,277 @@
+
+==========================================================================================
+   ANALYSE APPROFONDIE RAILWAY - 4252 ALERTES
+   Detection de patterns, correlations, insights cachés
+==========================================================================================
+
+Dataset: 4252 alertes analysees
+
+==========================================================================================
+SECTION 1: PROFIL MULTI-DIMENSIONNEL DES ALERTES
+------------------------------------------------------------------------------------------
+
+SCORE (0-100):
+  Count:      4252
+  Moyenne:    74.4
+  Mediane:    70.0
+  Std Dev:    17.4
+  Min:        50.0
+  Q1 (25%):   58.0
+  Q2 (50%):   70.0
+  Q3 (75%):   90.0
+  Max:        100.0
+
+VELOCITE PUMP:
+  Count:      4252
+  Moyenne:    7.17
+  Mediane:    0.00
+  Std Dev:    213.09
+  Min:        -975.62
+  Q1 (25%):   -6.85
+  Q2 (50%):   0.00
+  Q3 (75%):   6.87
+  Max:        12953.03
+
+AGE TOKEN (heures):
+  Count:      4252
+  Moyenne:    30.5
+  Mediane:    25.8
+  Std Dev:    24.2
+  Min:        0.0
+  Q1 (25%):   12.7
+  Q2 (50%):   25.8
+  Q3 (75%):   45.2
+  Max:        153.1
+
+LIQUIDITE ($):
+  Count:      4252
+  Moyenne:    421088
+  Mediane:    134832
+  Std Dev:    664884
+  Min:        2011
+  Q1 (25%):   103710
+  Q2 (50%):   134832
+  Q3 (75%):   214752
+  Max:        2266138
+
+BUY RATIO (0-1):
+  Count:      4252
+  Moyenne:    0.000
+  Mediane:    0.000
+  Std Dev:    0.000
+  Min:        0.000
+  Q1 (25%):   0.000
+  Q2 (50%):   0.000
+  Q3 (75%):   0.000
+  Max:        0.000
+
+==========================================================================================
+SECTION 2: PATTERNS PAR RESEAU - CARACTERISTIQUES DISTINCTES
+------------------------------------------------------------------------------------------
+
+ARBITRUM (1127 alertes - 26.5%):
+  --------------------------------------------------------------------------------
+  Score moyen:        60.9
+  Velocite moyenne:   2.68 (mediane: 0.00)
+  Velocite >10:       62/1127 (5.5%)
+  Age moyen:          14.4h
+  Liquidite moyenne:  $63,287
+  Buy ratio moyen:    0.000
+  Type pump dominant: LENT (1019/1127 = 90.4%)
+
+BASE (1327 alertes - 31.2%):
+  --------------------------------------------------------------------------------
+  Score moyen:        81.6
+  Velocite moyenne:   0.65 (mediane: 0.00)
+  Velocite >10:       313/1327 (23.6%)
+  Age moyen:          29.4h
+  Liquidite moyenne:  $1,008,245
+  Buy ratio moyen:    0.000
+  Type pump dominant: LENT (873/1327 = 65.8%)
+
+BSC (249 alertes - 5.9%):
+  --------------------------------------------------------------------------------
+  Score moyen:        85.6
+  Velocite moyenne:   19.48 (mediane: 0.00)
+  Velocite >10:       45/249 (18.1%)
+  Age moyen:          22.2h
+  Liquidite moyenne:  $575,542
+  Buy ratio moyen:    0.000
+  Type pump dominant: UNKNOWN (124/249 = 49.8%)
+
+ETH (398 alertes - 9.4%):
+  --------------------------------------------------------------------------------
+  Score moyen:        90.3
+  Velocite moyenne:   43.13 (mediane: 0.00)
+  Velocite >10:       138/398 (34.7%)
+  Age moyen:          45.2h
+  Liquidite moyenne:  $177,152
+  Buy ratio moyen:    0.000
+  Type pump dominant: LENT (216/398 = 54.3%)
+
+SOLANA (1151 alertes - 27.1%):
+  --------------------------------------------------------------------------------
+  Score moyen:        71.3
+  Velocite moyenne:   3.99 (mediane: 0.00)
+  Velocite >10:       390/1151 (33.9%)
+  Age moyen:          44.3h
+  Liquidite moyenne:  $145,423
+  Buy ratio moyen:    0.000
+  Type pump dominant: LENT (671/1151 = 58.3%)
+
+==========================================================================================
+SECTION 3: ANALYSE PAR ZONE D'AGE - RECHERCHE DE SWEET SPOTS
+------------------------------------------------------------------------------------------
+
+Zone Age                  |  Count | % Total |  Score |  Velocite |    Liquidite
+--------------------------+--------+---------+--------+-----------+-------------
+0-6h (nouveau-ne)         |    557 |   13.1% |   75.9 |     24.07 | $    111,660
+6-12h (tres jeune)        |    471 |   11.1% |   70.2 |      5.02 | $    255,407
+12-18h (jeune)            |    433 |   10.2% |   67.8 |      1.58 | $    308,084
+18-24h (1 jour)           |    487 |   11.5% |   67.3 |      2.23 | $    369,373
+24-36h (1.5 jour)         |    808 |   19.0% |   73.0 |      1.98 | $    490,211
+36-48h (2 jours)          |    549 |   12.9% |   76.9 |      1.32 | $    549,317
+48-60h (2.5 jours)        |    470 |   11.1% |   81.2 |     27.06 | $    653,316
+60-72h (3 jours)          |    402 |    9.5% |   79.6 |      5.94 | $    695,663
+72-96h (3-4 jours)        |     21 |    0.5% |  100.0 |    122.37 | $    188,517
+>96h (mature)             |     54 |    1.3% |  100.0 |      1.88 | $    117,577
+
+==========================================================================================
+SECTION 4: SEGMENTATION PAR VELOCITE - IDENTIFICATION DES WINNERS
+------------------------------------------------------------------------------------------
+
+Zone Velocite             |  Count | % Total |  Score |  Age (h) |    Liquidite
+--------------------------+--------+---------+--------+----------+-------------
+Negatif (<0)              |   1691 |   39.8% |   74.7 |     35.0 | $    499,654
+Stagnant (0-1)            |    974 |   22.9% |   68.8 |     16.5 | $    225,686
+Lent (1-3)                |    287 |    6.7% |   69.6 |     26.5 | $    402,510
+Modere (3-5)              |    119 |    2.8% |   78.4 |     35.8 | $    656,909
+Actif (5-10)              |    233 |    5.5% |   83.3 |     38.1 | $    864,254
+Rapide (10-20)            |    228 |    5.4% |   78.3 |     35.7 | $    601,186
+Tres rapide (20-50)       |    346 |    8.1% |   79.1 |     38.0 | $    345,608
+Explosif (50-100)         |    237 |    5.6% |   75.1 |     36.9 | $    212,271
+Parabolique (>100)        |    137 |    3.2% |   81.5 |     28.1 | $    173,061
+
+==========================================================================================
+SECTION 5: ANALYSE TRIDIMENSIONNELLE - SCORE × VELOCITE × AGE
+------------------------------------------------------------------------------------------
+
+Distribution 3D (Top 20 combinaisons):
+Score    | Velocite     | Age           |  Count | % Total
+---------+--------------+---------------+--------+--------
+<60      | Vel<5        | Age<24h       |    496 |  11.67%
+80+      | Vel<5        | Age<24h       |    256 |   6.02%
+80+      | Vel>10       | Age<24h       |    186 |   4.37%
+60-69    | Vel<5        | Age<24h       |    153 |   3.60%
+80+      | Vel>10       | Age>48h       |    143 |   3.36%
+80+      | Vel>10       | Age 24-48h    |    129 |   3.03%
+60-69    | Vel<5        | Age 24-48h    |    108 |   2.54%
+80+      | Vel<5        | Age>48h       |    105 |   2.47%
+60-69    | Vel>10       | Age 24-48h    |     92 |   2.16%
+80+      | Vel<5        | Age 24-48h    |     80 |   1.88%
+70-79    | Vel>10       | Age 24-48h    |     75 |   1.76%
+60-69    | Vel>10       | Age>48h       |     68 |   1.60%
+70-79    | Vel<5        | Age<24h       |     63 |   1.48%
+80+      | Vel 5-10     | Age>48h       |     62 |   1.46%
+60-69    | Vel>10       | Age<24h       |     61 |   1.43%
+<60      | Vel>10       | Age 24-48h    |     60 |   1.41%
+80+      | Vel 5-10     | Age<24h       |     45 |   1.06%
+<60      | Vel<5        | Age 24-48h    |     45 |   1.06%
+70-79    | Vel>10       | Age<24h       |     43 |   1.01%
+80+      | Vel 5-10     | Age 24-48h    |     41 |   0.96%
+
+==========================================================================================
+SECTION 6: ANALYSE LIQUIDITE - SWEET SPOTS PAR RESEAU
+------------------------------------------------------------------------------------------
+
+Reseau       |  Count |      Moyenne |      Mediane |           Q1 |           Q3
+-------------+--------+--------------+--------------+--------------+-------------
+arbitrum     |   1127 | $     63,287 | $     58,985 | $      6,680 | $     97,066
+base         |   1327 | $  1,008,245 | $    240,770 | $    149,114 | $  1,977,359
+bsc          |    249 | $    575,542 | $    122,729 | $    107,707 | $    720,086
+eth          |    398 | $    177,152 | $    168,228 | $    148,691 | $    188,658
+solana       |   1151 | $    145,423 | $    128,812 | $    109,062 | $    174,930
+
+==========================================================================================
+SECTION 7: ANALYSE PAR TYPE DE PUMP - CARACTERISTIQUES
+------------------------------------------------------------------------------------------
+
+Type Pump       |  Count |      % |  Score |  Velocite |  Age (h) |    Liquidite
+----------------+--------+--------+--------+-----------+----------+-------------
+LENT            |   2851 |  67.1% |   71.4 |    -15.18 |     30.3 | $    430,248
+NORMAL          |    461 |  10.8% |   80.9 |     10.88 |     36.9 | $    734,147
+RAPIDE          |    346 |   8.1% |   79.1 |     32.55 |     38.0 | $    345,608
+TRES_RAPIDE     |    237 |   5.6% |   75.1 |     69.82 |     36.9 | $    212,271
+UNKNOWN         |    220 |   5.2% |   86.9 |      0.00 |      3.2 | $    144,492
+PARABOLIQUE     |    137 |   3.2% |   81.5 |    298.92 |     28.1 | $    173,061
+
+==========================================================================================
+SECTION 8: ANALYSE BUY RATIO - SENTIMENT DU MARCHE
+------------------------------------------------------------------------------------------
+
+Zone Buy Ratio         |  Count |      % |  Score |  Velocite |    Liquidite
+-----------------------+--------+--------+--------+-----------+-------------
+Bearish (<0.45)        |   4252 | 100.0% |   74.4 |      8.53 | $    421,088
+
+==========================================================================================
+SECTION 9: DETECTION DE PATTERNS GAGNANTS POTENTIELS
+------------------------------------------------------------------------------------------
+
+Patterns identifies:
+
+1. PATTERN 'GOLDEN' (Score>=75 + Vel>10 + Age 24-72h):
+   Count: 303 (7.13%)
+   Score moyen: 89.8
+   Velocite moyenne: 93.0
+
+2. PATTERN 'BULLISH MOMENTUM' (Buy ratio>0.60 + Liq>50k):
+   Count: 0 (0.00%)
+
+3. PATTERN 'EXPLOSIVE MAJORS' (ETH/SOL + Vel>20):
+   Count: 435 (10.23%)
+   Distribution: {'solana': 325, 'eth': 110}
+
+4. PATTERN 'HIGH CONFIDENCE' (Score>=85):
+   Count: 1466 (34.48%)
+   Velocite moyenne: 19.2
+
+5. PATTERN 'EARLY ROCKET' (Age<12h + Vel>15 + Buy ratio>0.65):
+   Count: 0 (0.00%)
+
+6. PATTERN 'STABLE GROWTH' (Age>48h + Vel>5 + Liq>100k):
+   Count: 349 (8.21%)
+   Age moyen: 65.9h
+
+==========================================================================================
+SECTION 10: INSIGHTS & PATTERNS CACHES DETECTES
+------------------------------------------------------------------------------------------
+
+INSIGHTS CLES:
+1. Reseau avec meilleur score moyen: ETH (90.3)
+2. Zone d'age avec meilleur score: 72-96h (3-4 jours) (score moyen: 100.0)
+3. Zone velocite avec meilleur score: Actif (5-10) (score moyen: 83.3)
+4. Type pump avec meilleur score: UNKNOWN (86.9)
+5. Buy ratio optimal: Bearish (<0.45) (score moyen: 74.4)
+6. Pattern le plus selectif: GOLDEN (303 alertes = 7.13%)
+
+RECOMMANDATIONS STRATEGIQUES BASEES SUR LES DONNEES:
+
+1. FOCUS RESEAU:
+   - ETH: score moyen 90.3
+   - BSC: score moyen 85.6
+   - BASE: score moyen 81.6
+
+2. FENETRE TEMPORELLE OPTIMALE:
+   - 72-96h (3-4 jours): score 100.0, velocite 122.37
+   - >96h (mature): score 100.0, velocite 1.88
+   - 48-60h (2.5 jours): score 81.2, velocite 27.06
+
+3. SEUILS DE VELOCITE:
+   - Zones avec score moyen >80: Actif (5-10), Parabolique (>100)
+
+4. PATTERNS A PRIVILEGIER:
+
+==========================================================================================
+ANALYSE APPROFONDIE TERMINEE
+==========================================================================================
+

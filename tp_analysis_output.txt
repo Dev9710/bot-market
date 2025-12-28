@@ -1,0 +1,181 @@
+
+====================================================================================================
+   ANALYSE PERFORMANCE PAR BLOCKCHAIN - TP ATTEINTS
+====================================================================================================
+
+Total alertes analysees: 4252
+
+====================================================================================================
+SECTION 1: ANALYSE GLOBALE DES TP ATTEINTS
+----------------------------------------------------------------------------------------------------
+
+ATTENTION: Pas de donnees de tracking trouvees dans l'export.
+Les alertes semblent ne pas avoir ete trackees apres emission.
+
+Analyse basee sur les metriques disponibles au moment de l'alerte:
+- Prix d'entree vs TP cibles
+- Ratios risque/recompense
+- Metriques de qualite (score, velocite, etc.)
+
+
+====================================================================================================
+SECTION 2: PERFORMANCE PAR BLOCKCHAIN
+----------------------------------------------------------------------------------------------------
+
+Blockchain   |  Alertes |  % Total |  Score Moy |    Vel Moy |     Liq Moyenne
+-------------+----------+----------+------------+------------+----------------
+base         |     1327 |   31.21% |      81.64 |       0.65 | $     1,008,245
+solana       |     1151 |   27.07% |      71.33 |       3.99 | $       145,423
+arbitrum     |     1127 |   26.51% |      60.89 |       2.68 | $        63,287
+eth          |      398 |    9.36% |      90.28 |      43.13 | $       177,152
+bsc          |      249 |    5.86% |      85.59 |      19.48 | $       575,542
+
+====================================================================================================
+SECTION 3: OBJECTIFS DE PROFIT PAR BLOCKCHAIN
+----------------------------------------------------------------------------------------------------
+
+BASE - 1327 alertes:
+  ------------------------------------------------------------------------------------------
+  TP1 moyen:    5.00% (mediane:   5.00%)
+  TP2 moyen:   10.00% (mediane:  10.00%)
+  TP3 moyen:   15.00% (mediane:  15.00%)
+  SL moyen:    10.00% (mediane:  10.00%)
+  Ratio R/R:  TP1=0.50x | TP2=1.00x | TP3=1.50x
+
+SOLANA - 1151 alertes:
+  ------------------------------------------------------------------------------------------
+  TP1 moyen:    5.00% (mediane:   5.00%)
+  TP2 moyen:   10.00% (mediane:  10.00%)
+  TP3 moyen:   15.00% (mediane:  15.00%)
+  SL moyen:    10.00% (mediane:  10.00%)
+  Ratio R/R:  TP1=0.50x | TP2=1.00x | TP3=1.50x
+
+ARBITRUM - 1127 alertes:
+  ------------------------------------------------------------------------------------------
+  TP1 moyen:    5.00% (mediane:   5.00%)
+  TP2 moyen:   10.00% (mediane:  10.00%)
+  TP3 moyen:   15.00% (mediane:  15.00%)
+  SL moyen:    10.00% (mediane:  10.00%)
+  Ratio R/R:  TP1=0.50x | TP2=1.00x | TP3=1.50x
+
+ETH - 398 alertes:
+  ------------------------------------------------------------------------------------------
+  TP1 moyen:    5.00% (mediane:   5.00%)
+  TP2 moyen:   10.00% (mediane:  10.00%)
+  TP3 moyen:   15.00% (mediane:  15.00%)
+  SL moyen:    10.00% (mediane:  10.00%)
+  Ratio R/R:  TP1=0.50x | TP2=1.00x | TP3=1.50x
+
+BSC - 249 alertes:
+  ------------------------------------------------------------------------------------------
+  TP1 moyen:    5.00% (mediane:   5.00%)
+  TP2 moyen:   10.00% (mediane:  10.00%)
+  TP3 moyen:   15.00% (mediane:  15.00%)
+  SL moyen:    10.00% (mediane:  10.00%)
+  Ratio R/R:  TP1=0.50x | TP2=1.00x | TP3=1.50x
+
+====================================================================================================
+SECTION 5: DISTRIBUTION DES TYPES DE PUMP PAR BLOCKCHAIN
+----------------------------------------------------------------------------------------------------
+
+BASE:
+  LENT           :  873 (65.79%)
+  NORMAL         :  230 (17.33%)
+  RAPIDE         :  119 ( 8.97%)
+  TRES_RAPIDE    :   61 ( 4.60%)
+  PARABOLIQUE    :   30 ( 2.26%)
+  UNKNOWN        :   14 ( 1.06%)
+
+SOLANA:
+  LENT           :  671 (58.30%)
+  RAPIDE         :  140 (12.16%)
+  TRES_RAPIDE    :  133 (11.56%)
+  NORMAL         :  109 ( 9.47%)
+  PARABOLIQUE    :   52 ( 4.52%)
+  UNKNOWN        :   46 ( 4.00%)
+
+ARBITRUM:
+  LENT           : 1019 (90.42%)
+  NORMAL         :   53 ( 4.70%)
+  UNKNOWN        :   17 ( 1.51%)
+  TRES_RAPIDE    :   15 ( 1.33%)
+  RAPIDE         :   13 ( 1.15%)
+  PARABOLIQUE    :   10 ( 0.89%)
+
+ETH:
+  LENT           :  216 (54.27%)
+  RAPIDE         :   56 (14.07%)
+  NORMAL         :   53 (13.32%)
+  PARABOLIQUE    :   29 ( 7.29%)
+  TRES_RAPIDE    :   25 ( 6.28%)
+  UNKNOWN        :   19 ( 4.77%)
+
+BSC:
+  UNKNOWN        :  124 (49.80%)
+  LENT           :   72 (28.92%)
+  RAPIDE         :   18 ( 7.23%)
+  NORMAL         :   16 ( 6.43%)
+  PARABOLIQUE    :   16 ( 6.43%)
+  TRES_RAPIDE    :    3 ( 1.20%)
+
+====================================================================================================
+SECTION 6: CLASSEMENT DES BLOCKCHAINS - SYNTHESE
+----------------------------------------------------------------------------------------------------
+
+Classement (Score composite = qualite + performance):
+
+Rang  | Blockchain   |    Score |  Qualite |   Velocite |  Win Rate |  Alertes
+------+--------------+----------+----------+------------+-----------+---------
+1    | eth          |    53.94 |    90.28 |      43.13 |    45.14% |      398
+2    | bsc          |    47.27 |    85.59 |      19.48 |    42.79% |      249
+3    | base         |    41.95 |    81.64 |       0.65 |    40.82% |     1327
+4     | solana       |    36.61 |    71.33 |       3.99 |    35.66% |     1151
+5     | arbitrum     |    31.04 |    60.89 |       2.68 |    30.44% |     1127
+
+====================================================================================================
+SECTION 7: RECOMMANDATIONS STRATEGIQUES PAR BLOCKCHAIN
+----------------------------------------------------------------------------------------------------
+
+BLOCKCHAIN LA PLUS RENTABLE: ETH
+  Score composite: 53.94
+  Score qualite:   90.28
+  Velocite moy:    43.13
+  Win rate:        45.14%
+  Liquidite moy:   $177,152
+  Nombre alertes:  398
+
+BLOCKCHAIN LA MOINS PERFORMANTE: ARBITRUM
+  Score composite: 31.04
+  Score qualite:   60.89
+  Win rate:        30.44%
+  => RECOMMENDATION: Filtrer agressivement ou eviter
+
+RECOMMANDATIONS PAR RANG:
+  1. ETH         : FOCUS PRINCIPAL - Qualite maximale
+  2. BSC         : EXCELLENT CHOIX - Bon equilibre
+  3. BASE        : BON POTENTIEL - A surveiller
+  4. SOLANA      : ACCEPTABLE - Filtrage necessaire
+  5. ARBITRUM    : EVITER ou filtrage tres agressif
+
+FORCES/FAIBLESSES PAR BLOCKCHAIN:
+
+  ETH:
+    Forces:     Score eleve, Velocite forte, Win rate eleve
+
+  BSC:
+    Forces:     Score eleve, Liquidite excellente, Win rate eleve
+
+  BASE:
+    Forces:     Score eleve, Liquidite excellente, Win rate eleve
+    Faiblesses: Velocite faible
+
+  SOLANA:
+    Faiblesses: Velocite faible
+
+  ARBITRUM:
+    Faiblesses: Score faible, Velocite faible, Liquidite faible
+
+====================================================================================================
+ANALYSE TERMINEE
+====================================================================================================
+

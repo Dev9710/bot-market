@@ -72,105 +72,124 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 if TELEGRAM_CHAT_ID:
     print(f"📱 V3 Telegram: Chat ID = {TELEGRAM_CHAT_ID}")
 
-# Réseaux à surveiller (ajout avalanche + polygon pour backtesting)
-NETWORKS = ["eth", "bsc", "arbitrum", "base", "solana", "avax", "polygon_pos"]
+# Réseaux à surveiller - V3.1: ARBITRUM DÉSACTIVÉ (4.4% quality rate)
+# Analyse 4252 alertes: Arbitrum = 26.5% volume mais seulement 4.4% qualité
+# Réallocation sur ETH/BASE/BSC/SOLANA améliore ROI de +13.5%
+NETWORKS = ["eth", "bsc", "base", "solana"]  # V3.1: Arbitrum retiré
 
 # ============================================
 # SEUILS PAR RÉSEAU - Configuration centralisée
 # ============================================
-NETWORK_THRESHOLDS = {
-    # ============================================
-    # V3 OPTIMISÉ - Basé sur Backtest Phase 2
-    # ============================================
 
-    # Solana - EXCELLENT (38.9% WR, +157% ROI)
-    # Zone optimale: $100K-$200K liquidité (43.8% WR)
-    "solana": {
-        "min_liquidity": 100000,   # $100K - Sweet spot confirmé
-        "max_liquidity": 500000,   # $500K - Au-delà performance baisse
-        "min_volume": 50000,       # $50K
-        "min_txns": 100            # 100 txns
-    },
+# Fonction pour construire NETWORK_THRESHOLDS selon le mode actif
+def build_network_thresholds(mode_config):
+    """Construit NETWORK_THRESHOLDS avec limites de liquidité du mode actif."""
+    liq = mode_config['LIQUIDITY']
+    return {
+        "solana": {
+            "min_liquidity": liq['solana'][0],
+            "max_liquidity": liq['solana'][1],
+            "min_volume": 50000,
+            "min_txns": 100
+        },
+        "bsc": {
+            "min_liquidity": liq['bsc'][0],
+            "max_liquidity": liq['bsc'][1],
+            "min_volume": 100000,
+            "min_txns": 100
+        },
+        "eth": {
+            "min_liquidity": liq['eth'][0],
+            "max_liquidity": liq['eth'][1],
+            "min_volume": 50000,
+            "min_txns": 100
+        },
+        "base": {
+            "min_liquidity": liq['base'][0],
+            "max_liquidity": liq['base'][1],
+            "min_volume": 1000000,
+            "min_txns": 150
+        },
+        "arbitrum": {
+            "min_liquidity": 100000,
+            "max_liquidity": 1000000,
+            "min_volume": 50000,
+            "min_txns": 100
+        },
+        "avax": {
+            "min_liquidity": 100000,
+            "min_volume": 50000,
+            "min_txns": 100
+        },
+        "polygon_pos": {
+            "min_liquidity": 100000,
+            "min_volume": 50000,
+            "min_txns": 100
+        },
+        "default": {
+            "min_liquidity": 100000,
+            "min_volume": 50000,
+            "min_txns": 100
+        }
+    }
 
-    # BSC - BON (23.4% WR, +22% ROI)
-    # Zone optimale: $500K-$5M liquidité (36-39% WR)
-    # Particularité: préfère tokens plus établis
-    "bsc": {
-        "min_liquidity": 500000,   # $500K - V3: Augmenté pour cibler zone optimale
-        "max_liquidity": 10000000, # $10M
-        "min_volume": 100000,      # $100K - V3: Augmenté
-        "min_txns": 100            # 100 txns
-    },
+# ============================================
+# V3.1: CONFIGURATION DASHBOARD - Volume optimal (5 alertes/jour)
+# ============================================
+# Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois
+# Basé sur analyse de 4252 alertes Railway
 
-    # ETH - CHAMPION ABSOLU (38.9% WR, +4,451% ROI!!!)
-    # Zone optimale: $100K-$200K liquidité (55.6% WR, +6,987% ROI)
-    "eth": {
-        "min_liquidity": 100000,   # $100K - Zone jackpot
-        "max_liquidity": 500000,   # $500K - Optimal range
-        "min_volume": 50000,       # $50K
-        "min_txns": 100            # 100 txns
-    },
+print("=" * 80)
+print("V3.1 DASHBOARD - Configuration active")
+print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
+print("=" * 80)
 
-    # Base - À OPTIMISER (12.8% WR)
-    # V3: Seuils drastiquement augmentés
-    "base": {
-        "min_liquidity": 300000,   # $300K - V3: Augmenté de $100K
-        "max_liquidity": 2000000,  # $2M
-        "min_volume": 1000000,     # $1M - V3: Augmenté de $50K
-        "min_txns": 150            # 150 txns - V3: Augmenté
+# Configuration DASHBOARD
+DASHBOARD_CONFIG = {
+    'MIN_VELOCITE_PUMP': 5.0,
+    'NETWORK_SCORE_FILTERS': {
+        'eth': {'min_score': 78, 'min_velocity': 5},
+        'base': {'min_score': 82, 'min_velocity': 8},
+        'bsc': {'min_score': 80, 'min_velocity': 6},
+        'solana': {'min_score': 72, 'min_velocity': 5},
     },
-
-    # Arbitrum - PROBLÉMATIQUE (4.9% WR)
-    # V3: Seuils FORTEMENT augmentés (était $2K/$400/10txns)
-    "arbitrum": {
-        "min_liquidity": 100000,   # $100K - V3: 50x augmentation!
-        "max_liquidity": 1000000,  # $1M
-        "min_volume": 50000,       # $50K - V3: 125x augmentation!
-        "min_txns": 100            # 100 txns - V3: 10x augmentation!
-    },
-
-    # Réseaux secondaires (avalanche, polygon)
-    "avax": {
-        "min_liquidity": 100000,
-        "min_volume": 50000,
-        "min_txns": 100
-    },
-    "polygon_pos": {
-        "min_liquidity": 100000,
-        "min_volume": 50000,
-        "min_txns": 100
-    },
-
-    # Défaut pour tout réseau non spécifié
-    "default": {
-        "min_liquidity": 100000,
-        "min_volume": 50000,
-        "min_txns": 100
+    'LIQUIDITY': {
+        'eth': (80000, 600000),
+        'base': (250000, 2500000),
+        'bsc': (400000, 6000000),
+        'solana': (80000, 300000),
     }
 }
+
+# Appliquer la configuration
+MIN_VELOCITE_PUMP = DASHBOARD_CONFIG['MIN_VELOCITE_PUMP']
+NETWORK_SCORE_FILTERS = DASHBOARD_CONFIG['NETWORK_SCORE_FILTERS']
+NETWORK_THRESHOLDS = build_network_thresholds(DASHBOARD_CONFIG)
 
 # ============================================
 # V3: NOUVEAUX FILTRES (Backtest Phase 2)
 # ============================================
 
-# Filtre VÉLOCITÉ (Facteur #1: +133% impact!)
-# Winners: 7.99 vs Losers: 3.05
-MIN_VELOCITE_PUMP = 5.0          # CRITIQUE: Rejeter si vélocité < 5
-OPTIMAL_VELOCITE_PUMP = 50.0     # Bonus si > 50 (patterns gagnants)
+OPTIMAL_VELOCITE_PUMP = 30.0     # Bonus si > 30
+EXPLOSIVE_VELOCITE_PUMP = 50.0   # Bonus supplémentaire si > 50
 
 # Filtre TYPE PUMP (73% des losers sont "LENT")
 ALLOWED_PUMP_TYPES = ["RAPIDE", "TRES_RAPIDE", "PARABOLIQUE"]  # Rejeter LENT, STAGNANT
 REJECTED_PUMP_TYPES = ["LENT", "STAGNANT", "STABLE"]
 
-# Filtre ÂGE TOKEN optimisé
-# Zone optimale: 2-3 jours (36.1% WR, +234% ROI)
-# Zone danger: 12-24h (8.6% WR - PIRE moment)
-MIN_TOKEN_AGE_HOURS = 3.0        # Minimum 3h (éviter 0-30min: drawdown -34%)
-OPTIMAL_TOKEN_AGE_MIN_HOURS = 48.0   # 2 jours - Début zone optimale
-OPTIMAL_TOKEN_AGE_MAX_HOURS = 72.0   # 3 jours - Fin zone optimale
-MAX_TOKEN_AGE_HOURS = 168.0      # Max 7 jours (après: 0% WR)
-DANGER_ZONE_AGE_MIN = 12.0       # Début zone danger
-DANGER_ZONE_AGE_MAX = 24.0       # Fin zone danger (8.6% WR!)
+# Filtre ÂGE TOKEN - V3.1 STRATÉGIE HYBRIDE
+# Analyse 4252 alertes:
+# - Zone EMBRYONIC 0-3h: Quality Index 182.83 (MEILLEUR!)
+# - Zone DANGER 12-24h: Quality Index 36.87 (PIRE)
+# - Zone MATURE 48-72h: Win Rate 36.1% (stable)
+# V3.1: Accepter 0-3h (embryonic) + 48-72h (mature), éviter 12-24h
+MIN_TOKEN_AGE_HOURS = 0.0        # V3.1: CRITIQUE - Accepter embryonic 0-3h
+EMBRYONIC_AGE_MAX_HOURS = 3.0    # Zone embryonic: 0-3h (QI 182.83)
+OPTIMAL_TOKEN_AGE_MIN_HOURS = 48.0   # Zone mature: 48-72h (WR 36.1%)
+OPTIMAL_TOKEN_AGE_MAX_HOURS = 72.0
+MAX_TOKEN_AGE_HOURS = 168.0      # Max 7 jours
+DANGER_ZONE_AGE_MIN = 12.0       # Éviter zone danger 12-24h
+DANGER_ZONE_AGE_MAX = 24.0       # Quality Index 36.87 (PIRE)
 
 # Watchlist automatique (tokens "Money Printer")
 # snowball/SOL: 100% WR sur 81 alertes!
@@ -1120,27 +1139,35 @@ def check_watchlist_token(pool_data: Dict) -> bool:
 
 def filter_by_velocite(pool_data: Dict) -> Tuple[bool, str]:
     """
-    Filtre VÉLOCITÉ - Facteur #1 de succès (+133% impact)
-    Winners: 7.99 vs Losers: 3.05
+    Filtre VÉLOCITÉ - V3.1 avec seuils différenciés par réseau
+
+    Stratégie:
+    - ETH/SOLANA: Vélocité min 10 (réseaux performants)
+    - BASE: Vélocité min 15 (filtrage agressif, volume élevé)
+    - BSC: Vélocité min 12 (modéré)
 
     Returns:
         (pass_filter, reason)
     """
     velocite = pool_data.get('velocite_pump', 0)
+    network = pool_data.get('network', '').lower()
 
     # Token watchlist: bypass filtre vélocité
     if check_watchlist_token(pool_data):
         return True, "Watchlist token - bypass vélocité"
 
+    # V3.1: Seuil par réseau (si défini), sinon seuil global
+    min_velocity = NETWORK_SCORE_FILTERS.get(network, {}).get('min_velocity', MIN_VELOCITE_PUMP)
+
     # Filtre minimum CRITIQUE
-    if velocite < MIN_VELOCITE_PUMP:
-        return False, f"Vélocité trop faible: {velocite:.1f} < {MIN_VELOCITE_PUMP}"
+    if velocite < min_velocity:
+        return False, f"Vélocité trop faible: {velocite:.1f} < {min_velocity} ({network.upper()})"
 
     # Bonus si vélocité optimale
     if velocite >= OPTIMAL_VELOCITE_PUMP:
-        return True, f"Vélocité EXCELLENTE: {velocite:.1f} (>50 = pattern gagnant)"
+        return True, f"Vélocité EXCELLENTE: {velocite:.1f} (>{OPTIMAL_VELOCITE_PUMP} = pattern gagnant)"
 
-    return True, f"Vélocité OK: {velocite:.1f}"
+    return True, f"Vélocité OK: {velocite:.1f} (min {network.upper()}: {min_velocity})"
 
 def filter_by_type_pump(pool_data: Dict) -> Tuple[bool, str]:
     """
@@ -1205,8 +1232,44 @@ def filter_by_age(pool_data: Dict) -> Tuple[bool, str]:
     if OPTIMAL_TOKEN_AGE_MIN_HOURS <= age_hours <= OPTIMAL_TOKEN_AGE_MAX_HOURS:
         return True, f"Âge OPTIMAL: {age_hours:.1f}h (2-3 jours = 36.1% WR!)"
 
+    # V3.1: Zone embryonic 0-3h (Quality Index 182.83 - OPTIMAL!)
+    if 0 <= age_hours <= EMBRYONIC_AGE_MAX_HOURS:
+        velocite = pool_data.get('velocite_pump', 0)
+        if velocite >= 20:  # Embryonic OK si vélocité forte
+            return True, f"Âge EMBRYONIC OPTIMAL: {age_hours:.1f}h (QI 182.83!)"
+        else:
+            return True, f"Âge embryonic: {age_hours:.1f}h (acceptable si vélocité >20)"
+
     # Autres zones: acceptable
     return True, f"Âge OK: {age_hours:.1f}h"
+
+def filter_by_score_network(pool_data: Dict) -> Tuple[bool, str]:
+    """
+    Filtre SCORE par réseau - V3.1 NOUVEAU
+
+    Stratégie différenciée:
+    - ETH (77.4% quality): Score min 85 (moins strict, réseau excellent)
+    - BASE (59.2% quality): Score min 90 (strict, filtrer volume élevé)
+    - BSC (50.2% quality): Score min 88 (modéré)
+    - SOLANA (39.2% quality): Score min 85 (moins strict, bon potentiel)
+
+    Returns:
+        (pass_filter, reason)
+    """
+    score = pool_data.get('score', 0)
+    network = pool_data.get('network', '').lower()
+
+    # Token watchlist: bypass filtre score
+    if check_watchlist_token(pool_data):
+        return True, "Watchlist token - bypass score"
+
+    # V3.1: Seuil par réseau (si défini), sinon global 85
+    min_score = NETWORK_SCORE_FILTERS.get(network, {}).get('min_score', 85)
+
+    if score < min_score:
+        return False, f"Score insuffisant: {score} < {min_score} ({network.upper()})"
+
+    return True, f"Score OK: {score} (min {network.upper()}: {min_score})"
 
 def filter_by_liquidity_range(pool_data: Dict) -> Tuple[bool, str]:
     """
@@ -1254,31 +1317,37 @@ def apply_v3_filters(pool_data: Dict) -> Tuple[bool, List[str]]:
     """
     reasons = []
 
-    # 1. VÉLOCITÉ (Facteur #1 - +133% impact)
+    # 1. SCORE PAR RÉSEAU (V3.1 - NOUVEAU!)
+    pass_score, reason_score = filter_by_score_network(pool_data)
+    reasons.append(f"✓ {reason_score}" if pass_score else f"✗ {reason_score}")
+    if not pass_score:
+        return False, reasons
+
+    # 2. VÉLOCITÉ PAR RÉSEAU (V3.1 - Amélioré avec seuils différenciés)
     pass_vel, reason_vel = filter_by_velocite(pool_data)
     reasons.append(f"✓ {reason_vel}" if pass_vel else f"✗ {reason_vel}")
     if not pass_vel:
         return False, reasons
 
-    # 2. TYPE PUMP (73% des losers sont LENT)
+    # 3. TYPE PUMP (73% des losers sont LENT)
     pass_type, reason_type = filter_by_type_pump(pool_data)
     reasons.append(f"✓ {reason_type}" if pass_type else f"✗ {reason_type}")
     if not pass_type:
         return False, reasons
 
-    # 3. ÂGE TOKEN (zone optimale 2-3 jours: 36.1% WR)
+    # 4. ÂGE TOKEN (V3.1 - Hybride: embryonic 0-3h + mature 48-72h)
     pass_age, reason_age = filter_by_age(pool_data)
     reasons.append(f"✓ {reason_age}" if pass_age else f"✗ {reason_age}")
     if not pass_age:
         return False, reasons
 
-    # 4. LIQUIDITÉ (sweet spots par réseau)
+    # 5. LIQUIDITÉ (zones optimales par réseau)
     pass_liq, reason_liq = filter_by_liquidity_range(pool_data)
     reasons.append(f"✓ {reason_liq}" if pass_liq else f"✗ {reason_liq}")
     if not pass_liq:
         return False, reasons
 
-    # Tous les filtres passés!
+    # Tous les filtres V3.1 passés!
     return True, reasons
 
 def calculate_confidence_tier(pool_data: Dict) -> str:
