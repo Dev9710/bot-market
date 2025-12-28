@@ -15,9 +15,18 @@ def run_scanner():
     subprocess.run([sys.executable, "geckoterminal_scanner_v3.py"])
 
 def run_api():
-    """Lance l'API Dashboard Flask"""
-    print("📊 Démarrage de l'API Dashboard...")
-    subprocess.run([sys.executable, "railway_db_api.py"])
+    """Lance l'API Dashboard avec Gunicorn"""
+    import os
+    port = os.getenv('PORT', '5000')
+    print(f"📊 Démarrage de l'API Dashboard sur port {port}...")
+    subprocess.run([
+        "gunicorn",
+        "--bind", f"0.0.0.0:{port}",
+        "--workers", "2",
+        "--timeout", "120",
+        "--access-logfile", "-",
+        "wsgi:app"
+    ])
 
 def signal_handler(sig, frame):
     """Gestion de l'arrêt propre"""
