@@ -44,30 +44,31 @@ def get_db_connection():
 
 def parse_alert_row(row):
     """Convertit une ligne DB en dict pour le dashboard."""
-    import json
-
-    # Charger alert_data JSON s'il existe
-    alert_data = {}
-    if row['alert_data']:
-        try:
-            alert_data = json.loads(row['alert_data'])
-        except:
-            pass
+    # Calculer le tier basé sur le score
+    score = row['score']
+    if score >= 95:
+        tier = 'ULTRA_HIGH'
+    elif score >= 85:
+        tier = 'HIGH'
+    elif score >= 75:
+        tier = 'MEDIUM'
+    else:
+        tier = 'LOW'
 
     return {
         'id': row['id'],
-        'pool_address': row['pool_address'],
+        'pool_address': row.get('token_address', ''),  # Utilise token_address comme pool_address
         'network': row['network'],
         'token_name': row['token_name'],
-        'token_symbol': row['token_symbol'],
-        'score': row['score'],
-        'tier': row['tier'],
-        'price': row['price'],
-        'liquidity': row['liquidity'],
-        'volume_24h': row['volume_24h'],
-        'age_hours': row['age_hours'],
-        'velocite_pump': alert_data.get('velocite_pump', 0),
-        'type_pump': alert_data.get('type_pump', ''),
+        'token_symbol': row.get('token_name', '').split('/')[0] if '/' in row.get('token_name', '') else row.get('token_name', ''),  # Extrait le symbole du nom
+        'score': score,
+        'tier': tier,
+        'price': row.get('price_at_alert', 0),
+        'liquidity': row.get('liquidity', 0),
+        'volume_24h': row.get('volume_24h', 0),
+        'age_hours': row.get('age_hours', 0),
+        'velocite_pump': 0,  # Pas disponible dans alert_tracker
+        'type_pump': '',  # Pas disponible dans alert_tracker
         'created_at': row['created_at'],
         'timestamp': row['timestamp']
     }
@@ -132,8 +133,15 @@ def get_alerts():
             params.append(network)
 
         if tier:
-            query += " AND tier = ?"
-            params.append(tier)
+            # Convertir le tier en filtre de score
+            if tier == 'ULTRA_HIGH':
+                query += " AND score >= 95"
+            elif tier == 'HIGH':
+                query += " AND score >= 85 AND score < 95"
+            elif tier == 'MEDIUM':
+                query += " AND score >= 75 AND score < 85"
+            elif tier == 'LOW':
+                query += " AND score < 75"
 
         if min_score > 0:
             query += " AND score >= ?"
@@ -196,9 +204,16 @@ def get_stats():
         stats['avg_score'] = round(row['avg_score'], 1) if row['avg_score'] else 0
         stats['avg_liquidity'] = round(row['avg_liq'], 0) if row['avg_liq'] else 0
 
-        # Par tier
+        # Par tier (calculé à partir du score)
         cursor = conn.execute("""
-            SELECT tier, COUNT(*) as count
+            SELECT
+                CASE
+                    WHEN score >= 95 THEN 'ULTRA_HIGH'
+                    WHEN score >= 85 THEN 'HIGH'
+                    WHEN score >= 75 THEN 'MEDIUM'
+                    ELSE 'LOW'
+                END as tier,
+                COUNT(*) as count
             FROM alerts
             WHERE created_at >= ?
             GROUP BY tier
