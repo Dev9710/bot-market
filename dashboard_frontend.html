@@ -291,9 +291,21 @@
         },
         mounted() {
             console.log('App mounted, selectedAlert:', this.selectedAlert);
+
+            // FORCE: Fermer toute modale au démarrage
+            this.selectedAlert = null;
+
             this.loadData();
             // Auto-refresh toutes les 30 secondes pour avoir les alertes en live
             setInterval(() => this.loadData(), 30000);
+
+            // Fermer la modale avec ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.selectedAlert) {
+                    console.log('ESC pressed, closing modal');
+                    this.closeModal();
+                }
+            });
         },
         methods: {
             async loadData() {
