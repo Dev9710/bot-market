@@ -236,21 +236,23 @@
         <div v-if="selectedAlert" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" @click="selectedAlert = null">
             <div class="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto" @click.stop>
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold">{{ selectedAlert.token_symbol }} - Détails</h3>
-                    <button @click="selectedAlert = null" class="text-gray-400 hover:text-white">✕</button>
+                    <h3 class="text-xl font-bold">
+                        <span v-text="selectedAlert.token_symbol"></span> - Détails
+                    </h3>
+                    <button @click="selectedAlert = null" class="text-gray-400 hover:text-white text-2xl">✕</button>
                 </div>
                 <div class="space-y-3 text-sm">
-                    <div><span class="text-gray-400">Pool:</span> {{ selectedAlert.pool_address }}</div>
-                    <div><span class="text-gray-400">Réseau:</span> {{ selectedAlert.network.toUpperCase() }}</div>
-                    <div><span class="text-gray-400">Score:</span> <span :class="getScoreColor(selectedAlert.score)">{{ selectedAlert.score }}</span></div>
-                    <div><span class="text-gray-400">Tier:</span> {{ selectedAlert.tier }}</div>
-                    <div><span class="text-gray-400">Type Pump:</span> {{ selectedAlert.type_pump }}</div>
-                    <div><span class="text-gray-400">Vélocité:</span> {{ selectedAlert.velocite_pump.toFixed(2) }}</div>
-                    <div><span class="text-gray-400">Prix:</span> ${{ selectedAlert.price }}</div>
-                    <div><span class="text-gray-400">Liquidité:</span> ${{ formatNumber(selectedAlert.liquidity) }}</div>
-                    <div><span class="text-gray-400">Volume 24h:</span> ${{ formatNumber(selectedAlert.volume_24h) }}</div>
-                    <div><span class="text-gray-400">Âge:</span> {{ selectedAlert.age_hours.toFixed(1) }} heures</div>
-                    <div><span class="text-gray-400">Date alerte:</span> {{ formatDate(selectedAlert.created_at) }}</div>
+                    <div><span class="text-gray-400">Pool:</span> <span v-text="selectedAlert.pool_address"></span></div>
+                    <div><span class="text-gray-400">Réseau:</span> <span v-text="selectedAlert.network ? selectedAlert.network.toUpperCase() : 'N/A'"></span></div>
+                    <div><span class="text-gray-400">Score:</span> <span :class="getScoreColor(selectedAlert.score)" v-text="selectedAlert.score"></span></div>
+                    <div><span class="text-gray-400">Tier:</span> <span v-text="selectedAlert.tier"></span></div>
+                    <div><span class="text-gray-400">Type Pump:</span> <span v-text="selectedAlert.type_pump || 'N/A'"></span></div>
+                    <div><span class="text-gray-400">Vélocité:</span> <span v-text="selectedAlert.velocite_pump ? selectedAlert.velocite_pump.toFixed(2) : '0.0'"></span></div>
+                    <div><span class="text-gray-400">Prix:</span> $<span v-text="selectedAlert.price"></span></div>
+                    <div><span class="text-gray-400">Liquidité:</span> $<span v-text="formatNumber(selectedAlert.liquidity)"></span></div>
+                    <div><span class="text-gray-400">Volume 24h:</span> $<span v-text="formatNumber(selectedAlert.volume_24h)"></span></div>
+                    <div><span class="text-gray-400">Âge:</span> <span v-text="selectedAlert.age_hours ? selectedAlert.age_hours.toFixed(1) : '0.0'"></span> heures</div>
+                    <div><span class="text-gray-400">Date alerte:</span> <span v-text="formatDate(selectedAlert.created_at)"></span></div>
                 </div>
             </div>
         </div>
