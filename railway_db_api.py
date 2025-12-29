@@ -44,8 +44,11 @@ def get_db_connection():
 
 def parse_alert_row(row):
     """Convertit une ligne DB en dict pour le dashboard."""
+    # Convertir sqlite3.Row en dict pour utiliser .get()
+    row_dict = dict(row)
+
     # Calculer le tier basé sur le score
-    score = row['score']
+    score = row_dict.get('score', 0)
     if score >= 95:
         tier = 'ULTRA_HIGH'
     elif score >= 85:
@@ -56,25 +59,25 @@ def parse_alert_row(row):
         tier = 'LOW'
 
     # Extraire le symbole du nom du token (ex: "PEPE/WETH" -> "PEPE")
-    token_name = row.get('token_name', '')
+    token_name = row_dict.get('token_name', '')
     token_symbol = token_name.split('/')[0] if '/' in token_name else token_name
 
     return {
-        'id': row.get('id', 0),
-        'pool_address': row.get('token_address', ''),
-        'network': row.get('network', ''),
+        'id': row_dict.get('id', 0),
+        'pool_address': row_dict.get('token_address', ''),
+        'network': row_dict.get('network', ''),
         'token_name': token_name,
         'token_symbol': token_symbol,
         'score': score,
         'tier': tier,
-        'price': row.get('price_at_alert', 0),
-        'liquidity': row.get('liquidity', 0),
-        'volume_24h': row.get('volume_24h', 0),
-        'age_hours': row.get('age_hours', 0),
+        'price': row_dict.get('price_at_alert', 0),
+        'liquidity': row_dict.get('liquidity', 0),
+        'volume_24h': row_dict.get('volume_24h', 0),
+        'age_hours': row_dict.get('age_hours', 0),
         'velocite_pump': 0,
         'type_pump': '',
-        'created_at': row.get('created_at', ''),
-        'timestamp': row.get('timestamp', '')
+        'created_at': row_dict.get('created_at', ''),
+        'timestamp': row_dict.get('timestamp', '')
     }
 
 @app.route('/')
