@@ -55,22 +55,26 @@ def parse_alert_row(row):
     else:
         tier = 'LOW'
 
+    # Extraire le symbole du nom du token (ex: "PEPE/WETH" -> "PEPE")
+    token_name = row.get('token_name', '')
+    token_symbol = token_name.split('/')[0] if '/' in token_name else token_name
+
     return {
-        'id': row['id'],
-        'pool_address': row.get('token_address', ''),  # Utilise token_address comme pool_address
-        'network': row['network'],
-        'token_name': row['token_name'],
-        'token_symbol': row.get('token_name', '').split('/')[0] if '/' in row.get('token_name', '') else row.get('token_name', ''),  # Extrait le symbole du nom
+        'id': row.get('id', 0),
+        'pool_address': row.get('token_address', ''),
+        'network': row.get('network', ''),
+        'token_name': token_name,
+        'token_symbol': token_symbol,
         'score': score,
         'tier': tier,
         'price': row.get('price_at_alert', 0),
         'liquidity': row.get('liquidity', 0),
         'volume_24h': row.get('volume_24h', 0),
         'age_hours': row.get('age_hours', 0),
-        'velocite_pump': 0,  # Pas disponible dans alert_tracker
-        'type_pump': '',  # Pas disponible dans alert_tracker
-        'created_at': row['created_at'],
-        'timestamp': row['timestamp']
+        'velocite_pump': 0,
+        'type_pump': '',
+        'created_at': row.get('created_at', ''),
+        'timestamp': row.get('timestamp', '')
     }
 
 @app.route('/api/health', methods=['GET'])
