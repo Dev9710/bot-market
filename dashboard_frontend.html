@@ -290,6 +290,7 @@
             }
         },
         mounted() {
+            console.log('App mounted, selectedAlert:', this.selectedAlert);
             this.loadData();
             // Auto-refresh toutes les 30 secondes pour avoir les alertes en live
             setInterval(() => this.loadData(), 30000);
@@ -325,6 +326,7 @@
 
                     const res = await fetch(`${this.API_URL}/alerts?${params}`);
                     const data = await res.json();
+                    console.log('Alerts loaded:', data.alerts?.length || 0, 'alerts');
                     this.alerts = data.alerts || [];
                     this.totalAlerts = data.total || 0;
                 } catch (error) {
