@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner V3 - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold flex items-center gap-3">
+                    🚀 Scanner V3 - Dashboard
+                    <span class="text-sm text-gray-400">ULTRA_RENTABLE</span>
+                    <span class="flex items-center gap-2 text-sm">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span class="text-green-400 font-semibold">LIVE</span>
+                    </span>
+                </h1>
+                <div class="flex gap-4 items-center">
+                    <span class="text-sm text-gray-400" v-if="lastUpdate">
+                        Dernière mise à jour: {{ lastUpdate }}
+                    </span>
+                    <select v-model="filterDays" @change="loadData" class="bg-gray-700 px-3 py-2 rounded">
+                        <option value="1">Aujourd'hui</option>
+                        <option value="7">7 jours</option>
+                        <option value="30">30 jours</option>
+                        <option value="90">90 jours</option>
+                        <option value="365">Toutes les alertes</option>
+                    </select>
+                    <button @click="loadData" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                        🔄 Rafraîchir
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="container mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <!-- Total Alertes -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <div class="text-gray-400 text-sm mb-2">Total Alertes</div>
+                    <div class="text-3xl font-bold">{{ stats.total_alerts }}</div>
+                    <div class="text-sm text-gray-500 mt-2">
+                        {{ (stats.total_alerts / filterDays).toFixed(1) }} /jour
+                    </div>
+                </div>
+
+                <!-- Score Moyen -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <div class="text-gray-400 text-sm mb-2">Score Moyen</div>
+                    <div class="text-3xl font-bold" :class="getScoreColor(stats.avg_score)">
+                        {{ stats.avg_score }}
+                    </div>
+                    <div class="text-sm text-gray-500 mt-2">
+                        {{ getScoreLabel(stats.avg_score) }}
+                    </div>
+                </div>
+
+                <!-- Liquidité Moyenne -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <div class="text-gray-400 text-sm mb-2">Liquidité Moy</div>
+                    <div class="text-3xl font-bold text-green-400">
+                        ${{ formatNumber(stats.avg_liquidity) }}
+                    </div>
+                </div>
+
+                <!-- Tier Distribution -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <div class="text-gray-400 text-sm mb-2">Qualité</div>
+                    <div class="space-y-1">
+                        <div class="text-sm">
+                            <span class="text-purple-400">ULTRA HIGH:</span> {{ stats.by_tier.ULTRA_HIGH || 0 }}
+                        </div>
+                        <div class="text-sm">
+                            <span class="text-green-400">HIGH:</span> {{ stats.by_tier.HIGH || 0 }}
+                        </div>
+                        <div class="text-sm">
+                            <span class="text-yellow-400">MEDIUM:</span> {{ stats.by_tier.MEDIUM || 0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Score Distribution -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Distribution des Scores</h3>
+                    <canvas id="scoreChart"></canvas>
+                </div>
+
+                <!-- Network Distribution -->
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Alertes par Réseau</h3>
+                    <canvas id="networkChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Alerts Timeline -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+                <h3 class="text-lg font-semibold mb-4">Timeline (Alertes/Jour)</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <select v-model="filterNetwork" @change="loadAlerts" class="bg-gray-700 px-3 py-2 rounded">
+                        <option value="">Tous les réseaux</option>
+                        <option value="eth">ETH</option>
+                        <option value="base">BASE</option>
+                        <option value="bsc">BSC</option>
+                        <option value="solana">SOLANA</option>
+                    </select>
+
+                    <select v-model="filterTier" @change="loadAlerts" class="bg-gray-700 px-3 py-2 rounded">
+                        <option value="">Tous les tiers</option>
+                        <option value="ULTRA_HIGH">ULTRA HIGH</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="LOW">LOW</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        v-model="filterMinScore"
+                        @change="loadAlerts"
+                        placeholder="Score minimum"
+                        class="bg-gray-700 px-3 py-2 rounded"
+                    />
+
+                    <button @click="resetFilters" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">
+                        🔄 Reset Filtres
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerts Table -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700">
+                <div class="p-4 border-b border-gray-700">
+                    <h3 class="text-lg font-semibold">Alertes Récentes</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Date</th>
+                                <th class="px-4 py-3 text-left">Token</th>
+                                <th class="px-4 py-3 text-left">Réseau</th>
+                                <th class="px-4 py-3 text-left">Score</th>
+                                <th class="px-4 py-3 text-left">Tier</th>
+                                <th class="px-4 py-3 text-left">Vélocité</th>
+                                <th class="px-4 py-3 text-left">Liquidité</th>
+                                <th class="px-4 py-3 text-left">Âge</th>
+                                <th class="px-4 py-3 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="alert in alerts" :key="alert.id" class="border-b border-gray-700 hover:bg-gray-750">
+                                <td class="px-4 py-3 text-sm">{{ formatDate(alert.created_at) }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold">{{ alert.token_symbol }}</div>
+                                    <div class="text-xs text-gray-400">{{ alert.token_name }}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span :class="getNetworkBadge(alert.network)">
+                                        {{ alert.network.toUpperCase() }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="font-bold text-lg" :class="getScoreColor(alert.score)">
+                                        {{ alert.score }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span :class="getTierBadge(alert.tier)">
+                                        {{ alert.tier }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">{{ alert.velocite_pump.toFixed(1) }}</td>
+                                <td class="px-4 py-3 text-sm">${{ formatNumber(alert.liquidity) }}</td>
+                                <td class="px-4 py-3 text-sm">{{ alert.age_hours.toFixed(1) }}h</td>
+                                <td class="px-4 py-3">
+                                    <button @click="viewAlert(alert)" class="text-blue-400 hover:text-blue-300">
+                                        👁️ Détails
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="p-4 border-t border-gray-700 flex justify-between items-center">
+                    <div class="text-sm text-gray-400">
+                        Affichage {{ alerts.length }} / {{ totalAlerts }} alertes
+                    </div>
+                    <div class="flex gap-2">
+                        <button
+                            @click="prevPage"
+                            :disabled="currentPage === 0"
+                            class="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 px-4 py-2 rounded"
+                        >
+                            Précédent
+                        </button>
+                        <button
+                            @click="nextPage"
+                            :disabled="(currentPage + 1) * pageSize >= totalAlerts"
+                            class="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 px-4 py-2 rounded"
+                        >
+                            Suivant
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Detail Modal -->
+        <div v-if="selectedAlert" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" @click="selectedAlert = null">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto" @click.stop>
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold">{{ selectedAlert.token_symbol }} - Détails</h3>
+                    <button @click="selectedAlert = null" class="text-gray-400 hover:text-white">✕</button>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div><span class="text-gray-400">Pool:</span> {{ selectedAlert.pool_address }}</div>
+                    <div><span class="text-gray-400">Réseau:</span> {{ selectedAlert.network.toUpperCase() }}</div>
+                    <div><span class="text-gray-400">Score:</span> <span :class="getScoreColor(selectedAlert.score)">{{ selectedAlert.score }}</span></div>
+                    <div><span class="text-gray-400">Tier:</span> {{ selectedAlert.tier }}</div>
+                    <div><span class="text-gray-400">Type Pump:</span> {{ selectedAlert.type_pump }}</div>
+                    <div><span class="text-gray-400">Vélocité:</span> {{ selectedAlert.velocite_pump.toFixed(2) }}</div>
+                    <div><span class="text-gray-400">Prix:</span> ${{ selectedAlert.price }}</div>
+                    <div><span class="text-gray-400">Liquidité:</span> ${{ formatNumber(selectedAlert.liquidity) }}</div>
+                    <div><span class="text-gray-400">Volume 24h:</span> ${{ formatNumber(selectedAlert.volume_24h) }}</div>
+                    <div><span class="text-gray-400">Âge:</span> {{ selectedAlert.age_hours.toFixed(1) }} heures</div>
+                    <div><span class="text-gray-400">Date alerte:</span> {{ formatDate(selectedAlert.created_at) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                API_URL: 'https://bot-market-production.up.railway.app/api',
+                stats: {
+                    total_alerts: 0,
+                    avg_score: 0,
+                    avg_liquidity: 0,
+                    by_tier: {},
+                    by_network: {},
+                    score_distribution: {},
+                    alerts_per_day: []
+                },
+                alerts: [],
+                totalAlerts: 0,
+                selectedAlert: null,
+                filterDays: 365,
+                filterNetwork: '',
+                filterTier: '',
+                filterMinScore: '',
+                currentPage: 0,
+                pageSize: 20,
+                lastUpdate: null,
+                scoreChart: null,
+                networkChart: null,
+                timelineChart: null
+            }
+        },
+        mounted() {
+            this.loadData();
+            // Auto-refresh toutes les 30 secondes pour avoir les alertes en live
+            setInterval(() => this.loadData(), 30000);
+        },
+        methods: {
+            async loadData() {
+                await this.loadStats();
+                await this.loadAlerts();
+                this.updateCharts();
+                // Mettre à jour l'heure du dernier refresh
+                const now = new Date();
+                this.lastUpdate = now.toLocaleTimeString('fr-FR');
+            },
+            async loadStats() {
+                try {
+                    const res = await fetch(`${this.API_URL}/stats?days=${this.filterDays}`);
+                    this.stats = await res.json();
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                }
+            },
+            async loadAlerts() {
+                try {
+                    const params = new URLSearchParams({
+                        days: this.filterDays,
+                        limit: this.pageSize,
+                        offset: this.currentPage * this.pageSize
+                    });
+
+                    if (this.filterNetwork) params.append('network', this.filterNetwork);
+                    if (this.filterTier) params.append('tier', this.filterTier);
+                    if (this.filterMinScore) params.append('min_score', this.filterMinScore);
+
+                    const res = await fetch(`${this.API_URL}/alerts?${params}`);
+                    const data = await res.json();
+                    this.alerts = data.alerts;
+                    this.totalAlerts = data.total;
+                } catch (error) {
+                    console.error('Error loading alerts:', error);
+                }
+            },
+            updateCharts() {
+                this.updateScoreChart();
+                this.updateNetworkChart();
+                this.updateTimelineChart();
+            },
+            updateScoreChart() {
+                const ctx = document.getElementById('scoreChart');
+                if (this.scoreChart) this.scoreChart.destroy();
+
+                const dist = this.stats.score_distribution;
+                this.scoreChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['95-100', '90-94', '85-89', '80-84', '<80'],
+                        datasets: [{
+                            label: 'Nombre d\'alertes',
+                            data: [
+                                dist['95-100'] || 0,
+                                dist['90-94'] || 0,
+                                dist['85-89'] || 0,
+                                dist['80-84'] || 0,
+                                dist['<80'] || 0
+                            ],
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(234, 179, 8, 0.8)',
+                                'rgba(249, 115, 22, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            },
+            updateNetworkChart() {
+                const ctx = document.getElementById('networkChart');
+                if (this.networkChart) this.networkChart.destroy();
+
+                const networks = Object.keys(this.stats.by_network);
+                const counts = networks.map(n => this.stats.by_network[n].count);
+
+                this.networkChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: networks.map(n => n.toUpperCase()),
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: [
+                                'rgba(99, 102, 241, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(234, 179, 8, 0.8)',
+                                'rgba(249, 115, 22, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            },
+            updateTimelineChart() {
+                const ctx = document.getElementById('timelineChart');
+                if (this.timelineChart) this.timelineChart.destroy();
+
+                const timeline = this.stats.alerts_per_day.reverse();
+
+                this.timelineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: timeline.map(d => d.date),
+                        datasets: [{
+                            label: 'Alertes/jour',
+                            data: timeline.map(d => d.count),
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            },
+            viewAlert(alert) {
+                this.selectedAlert = alert;
+            },
+            nextPage() {
+                this.currentPage++;
+                this.loadAlerts();
+            },
+            prevPage() {
+                if (this.currentPage > 0) {
+                    this.currentPage--;
+                    this.loadAlerts();
+                }
+            },
+            resetFilters() {
+                this.filterNetwork = '';
+                this.filterTier = '';
+                this.filterMinScore = '';
+                this.currentPage = 0;
+                this.loadAlerts();
+            },
+            formatNumber(num) {
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+                return num.toFixed(0);
+            },
+            formatDate(dateStr) {
+                const date = new Date(dateStr);
+                return date.toLocaleString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            },
+            getScoreColor(score) {
+                if (score >= 95) return 'text-green-400';
+                if (score >= 90) return 'text-blue-400';
+                if (score >= 85) return 'text-yellow-400';
+                if (score >= 80) return 'text-orange-400';
+                return 'text-red-400';
+            },
+            getScoreLabel(score) {
+                if (score >= 95) return 'EXCELLENT';
+                if (score >= 90) return 'TRÈS BON';
+                if (score >= 85) return 'BON';
+                if (score >= 80) return 'MOYEN';
+                return 'FAIBLE';
+            },
+            getTierBadge(tier) {
+                const badges = {
+                    'ULTRA_HIGH': 'bg-purple-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'HIGH': 'bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'MEDIUM': 'bg-yellow-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'LOW': 'bg-orange-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'VERY_LOW': 'bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold'
+                };
+                return badges[tier] || 'bg-gray-600 text-white px-2 py-1 rounded text-xs';
+            },
+            getNetworkBadge(network) {
+                const badges = {
+                    'eth': 'bg-indigo-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'base': 'bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'bsc': 'bg-yellow-600 text-white px-2 py-1 rounded text-xs font-semibold',
+                    'solana': 'bg-purple-600 text-white px-2 py-1 rounded text-xs font-semibold'
+                };
+                return badges[network] || 'bg-gray-600 text-white px-2 py-1 rounded text-xs';
+            }
+        }
+    }).mount('#app');
+    </script>
+</body>
+</html>
