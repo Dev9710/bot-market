@@ -1,11 +1,24 @@
 #!/bin/bash
 
-# Démarrer le scanner V3 en arrière-plan
-echo "🔍 Démarrage du Scanner V3 en arrière-plan..."
-python geckoterminal_scanner_v3.py &
+# Script de surveillance qui redémarre le scanner s'il crash
+monitor_scanner() {
+    while true; do
+        echo "[MONITOR] Démarrage du Scanner V3..."
+        python geckoterminal_scanner_v3.py
 
-# Attendre 3 secondes pour que le scanner démarre
-sleep 3
+        EXIT_CODE=$?
+        echo "[MONITOR] Scanner arrêté avec code: $EXIT_CODE"
+        echo "[MONITOR] Redémarrage dans 10 secondes..."
+        sleep 10
+    done
+}
+
+# Démarrer le scanner avec surveillance en arrière-plan
+echo "🔍 Démarrage du Scanner V3 avec surveillance auto-restart..."
+monitor_scanner &
+
+# Attendre 5 secondes pour que le scanner démarre
+sleep 5
 
 # Démarrer Gunicorn en premier plan (bloque le script)
 echo "📊 Démarrage de l'API Dashboard avec Gunicorn..."
