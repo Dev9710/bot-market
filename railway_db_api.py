@@ -10,7 +10,7 @@ Architecture:
 - Frontend dashboard consomme cette API
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 import sqlite3
 import os
@@ -76,6 +76,14 @@ def parse_alert_row(row):
         'created_at': row.get('created_at', ''),
         'timestamp': row.get('timestamp', '')
     }
+
+@app.route('/')
+def dashboard():
+    """Serve the dashboard HTML."""
+    try:
+        return send_file('dashboard_frontend.html')
+    except Exception as e:
+        return f"Dashboard file not found: {str(e)}", 404
 
 @app.route('/api/health', methods=['GET'])
 def health():
