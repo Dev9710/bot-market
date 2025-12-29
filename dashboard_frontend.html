@@ -233,13 +233,13 @@
         </div>
 
         <!-- Alert Detail Modal -->
-        <div v-if="selectedAlert" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" @click="selectedAlert = null">
+        <div v-if="selectedAlert" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50" @click="closeModal">
             <div class="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto" @click.stop>
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold">
-                        <span v-text="selectedAlert.token_symbol"></span> - Détails
+                        <span v-text="selectedAlert.token_symbol || 'N/A'"></span> - Détails
                     </h3>
-                    <button @click="selectedAlert = null" class="text-gray-400 hover:text-white text-2xl">✕</button>
+                    <button @click="closeModal" class="text-gray-400 hover:text-white text-2xl leading-none px-2">✕</button>
                 </div>
                 <div class="space-y-3 text-sm">
                     <div><span class="text-gray-400">Pool:</span> <span v-text="selectedAlert.pool_address"></span></div>
@@ -432,7 +432,12 @@
                 });
             },
             viewAlert(alert) {
+                console.log('Alert clicked:', alert);
                 this.selectedAlert = alert;
+            },
+            closeModal() {
+                console.log('Closing modal');
+                this.selectedAlert = null;
             },
             nextPage() {
                 this.currentPage++;
