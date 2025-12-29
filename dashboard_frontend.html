@@ -367,13 +367,22 @@
                 }
             },
             updateCharts() {
-                this.updateScoreChart();
-                this.updateNetworkChart();
-                this.updateTimelineChart();
+                try {
+                    this.updateScoreChart();
+                    this.updateNetworkChart();
+                    this.updateTimelineChart();
+                } catch (error) {
+                    console.error('Error updating charts:', error);
+                }
             },
             updateScoreChart() {
-                const ctx = document.getElementById('scoreChart');
-                if (this.scoreChart) this.scoreChart.destroy();
+                try {
+                    const ctx = document.getElementById('scoreChart');
+                    if (!ctx) {
+                        console.warn('scoreChart canvas not found');
+                        return;
+                    }
+                    if (this.scoreChart) this.scoreChart.destroy();
 
                 const dist = this.stats.score_distribution;
                 this.scoreChart = new Chart(ctx, {
@@ -407,15 +416,23 @@
                         }
                     }
                 });
+                } catch (error) {
+                    console.error('Error updating score chart:', error);
+                }
             },
             updateNetworkChart() {
-                const ctx = document.getElementById('networkChart');
-                if (this.networkChart) this.networkChart.destroy();
+                try {
+                    const ctx = document.getElementById('networkChart');
+                    if (!ctx) {
+                        console.warn('networkChart canvas not found');
+                        return;
+                    }
+                    if (this.networkChart) this.networkChart.destroy();
 
-                const networks = Object.keys(this.stats.by_network);
-                const counts = networks.map(n => this.stats.by_network[n].count);
+                    const networks = Object.keys(this.stats.by_network);
+                    const counts = networks.map(n => this.stats.by_network[n].count);
 
-                this.networkChart = new Chart(ctx, {
+                    this.networkChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: networks.map(n => n.toUpperCase()),
@@ -436,14 +453,22 @@
                         }
                     }
                 });
+                } catch (error) {
+                    console.error('Error updating network chart:', error);
+                }
             },
             updateTimelineChart() {
-                const ctx = document.getElementById('timelineChart');
-                if (this.timelineChart) this.timelineChart.destroy();
+                try {
+                    const ctx = document.getElementById('timelineChart');
+                    if (!ctx) {
+                        console.warn('timelineChart canvas not found');
+                        return;
+                    }
+                    if (this.timelineChart) this.timelineChart.destroy();
 
-                const timeline = this.stats.alerts_per_day.reverse();
+                    const timeline = this.stats.alerts_per_day.reverse();
 
-                this.timelineChart = new Chart(ctx, {
+                    this.timelineChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: timeline.map(d => d.date),
@@ -463,6 +488,9 @@
                         }
                     }
                 });
+                } catch (error) {
+                    console.error('Error updating timeline chart:', error);
+                }
             },
             viewAlert(alert) {
                 console.log('Alert clicked:', alert);
