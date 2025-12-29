@@ -193,9 +193,9 @@
                                         {{ alert.tier }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm">{{ alert.velocite_pump.toFixed(1) }}</td>
-                                <td class="px-4 py-3 text-sm">${{ formatNumber(alert.liquidity) }}</td>
-                                <td class="px-4 py-3 text-sm">{{ alert.age_hours.toFixed(1) }}h</td>
+                                <td class="px-4 py-3 text-sm">{{ alert.velocite_pump ? alert.velocite_pump.toFixed(1) : '0.0' }}</td>
+                                <td class="px-4 py-3 text-sm">${{ formatNumber(alert.liquidity || 0) }}</td>
+                                <td class="px-4 py-3 text-sm">{{ alert.age_hours ? alert.age_hours.toFixed(1) : '0.0' }}h</td>
                                 <td class="px-4 py-3">
                                     <button @click="viewAlert(alert)" class="text-blue-400 hover:text-blue-300">
                                         👁️ Détails
