@@ -10,10 +10,12 @@ Architecture:
 - Frontend dashboard consomme cette API
 """
 
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, Response
 from flask_cors import CORS
 import sqlite3
 import os
+import time
+import json
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -380,7 +382,6 @@ def get_alert_detail(alert_id):
 
         # Ajouter données complètes
         if row['alert_data']:
-            import json
             alert['full_data'] = json.loads(row['alert_data'])
 
         conn.close()
@@ -390,29 +391,81 @@ def get_alert_detail(alert_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/stream')
+def stream():
+    """Server-Sent Events stream for live updates."""
+    def event_stream():
+        last_id = 0
+
+        # Send initial connection confirmation
+        yield f"data: {json.dumps({'type': 'connected', 'message': 'Live stream connected'})}\n\n"
+
+        while True:
+            try:
+                conn = get_db_connection()
+
+                # Check for new alerts since last_id
+                cursor = conn.execute("""
+                    SELECT * FROM alerts
+                    WHERE id > ?
+                    ORDER BY id ASC
+                    LIMIT 10
+                """, [last_id])
+
+                new_alerts = cursor.fetchall()
+
+                if new_alerts:
+                    for row in new_alerts:
+                        alert = parse_alert_row(row)
+                        last_id = row['id']
+
+                        # Send new alert event
+                        yield f"data: {json.dumps({'type': 'new_alert', 'alert': alert})}\n\n"
+
+                # Also send periodic stats update every 30 seconds
+                cursor = conn.execute("SELECT COUNT(*) as total FROM alerts")
+                total = cursor.fetchone()['total']
+
+                yield f"data: {json.dumps({'type': 'heartbeat', 'total_alerts': total, 'timestamp': datetime.now().isoformat()})}\n\n"
+
+                conn.close()
+
+                # Wait 5 seconds before next check
+                time.sleep(5)
+
+            except Exception as e:
+                yield f"data: {json.dumps({'type': 'error', 'error': str(e)})}\n\n"
+                time.sleep(5)
+
+    return Response(event_stream(), mimetype='text/event-stream', headers={
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no'
+    })
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 
     # Vérifier DB
     if not os.path.exists(DB_PATH):
-        print(f"⚠️ AVERTISSEMENT: Base de données non trouvée: {DB_PATH}")
-        print(f"   L'API démarrera mais retournera des erreurs jusqu'à ce que le scanner crée la DB")
+        print(f"[WARNING] Base de donnees non trouvee: {DB_PATH}")
+        print(f"   L'API demarrera mais retournera des erreurs jusqu'a ce que le scanner cree la DB")
     else:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.execute("SELECT COUNT(*) FROM alerts")
         total = cursor.fetchone()[0]
         conn.close()
-        print(f"✅ Base de données connectée: {DB_PATH}")
+        print(f"[OK] Base de donnees connectee: {DB_PATH}")
         print(f"   {total} alertes disponibles")
 
-    print(f"\n🚀 Railway DB API démarrée sur port {port}")
-    print(f"📊 Endpoints disponibles:")
+    print(f"\n[START] Railway DB API demarree sur port {port}")
+    print(f"[INFO] Endpoints disponibles:")
     print(f"   GET /api/health")
     print(f"   GET /api/alerts")
     print(f"   GET /api/stats")
     print(f"   GET /api/networks")
     print(f"   GET /api/recent")
     print(f"   GET /api/alerts/:id")
+    print(f"   GET /api/stream (Server-Sent Events)")
     print()
 
     app.run(host='0.0.0.0', port=port, debug=False)
