@@ -69,8 +69,13 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # Afficher configuration au démarrage
-if TELEGRAM_CHAT_ID:
-    print(f"📱 V3 Telegram: Chat ID = {TELEGRAM_CHAT_ID}")
+if TELEGRAM_CHAT_ID and TELEGRAM_BOT_TOKEN:
+    print(f"✅ V3 Telegram configuré: Chat ID = {TELEGRAM_CHAT_ID}")
+    print(f"   Bot Token: {TELEGRAM_BOT_TOKEN[:20]}...")
+else:
+    print(f"⚠️ WARNING: Telegram NON configuré!")
+    print(f"   TELEGRAM_BOT_TOKEN: {'✅ OK' if TELEGRAM_BOT_TOKEN else '❌ MANQUANT'}")
+    print(f"   TELEGRAM_CHAT_ID: {'✅ OK' if TELEGRAM_CHAT_ID else '❌ MANQUANT'}")
 
 # Réseaux à surveiller - V3.1: ARBITRUM DÉSACTIVÉ (4.4% quality rate)
 # Analyse 4252 alertes: Arbitrum = 26.5% volume mais seulement 4.4% qualité
@@ -144,20 +149,20 @@ print("V3.1 ULTRA_RENTABLE - Configuration active")
 print("Objectif: 2.7 alertes/jour | Score 95.9 | WR 55-70% | ROI +10-15%/mois")
 print("=" * 80)
 
-# Configuration ULTRA_RENTABLE
+# Configuration ULTRA_RENTABLE - MODIFIÉE pour plus d'alertes
 ULTRA_RENTABLE_CONFIG = {
-    'MIN_VELOCITE_PUMP': 10.0,
+    'MIN_VELOCITE_PUMP': 5.0,  # Réduit de 10 à 5 pour plus d'alertes
     'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 85, 'min_velocity': 10},
-        'base': {'min_score': 90, 'min_velocity': 15},
-        'bsc': {'min_score': 88, 'min_velocity': 12},
-        'solana': {'min_score': 85, 'min_velocity': 10},
+        'eth': {'min_score': 80, 'min_velocity': 5},  # Réduit pour plus d'alertes
+        'base': {'min_score': 85, 'min_velocity': 8},  # Réduit pour plus d'alertes
+        'bsc': {'min_score': 83, 'min_velocity': 6},  # Réduit pour plus d'alertes
+        'solana': {'min_score': 80, 'min_velocity': 5},  # Réduit pour plus d'alertes
     },
     'LIQUIDITY': {
-        'eth': (100000, 500000),
-        'base': (300000, 2000000),
-        'bsc': (500000, 5000000),
-        'solana': (100000, 250000),
+        'eth': (50000, 1000000),  # Élargi pour plus d'alertes
+        'base': (150000, 3000000),  # Élargi pour plus d'alertes
+        'bsc': (250000, 10000000),  # Élargi pour plus d'alertes
+        'solana': (50000, 500000),  # Élargi pour plus d'alertes
     }
 }
 
