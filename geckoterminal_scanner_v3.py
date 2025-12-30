@@ -758,7 +758,12 @@ def calculate_base_score(pool_data: Dict) -> int:
 
     # === BONUS RÉSEAU V3 (max 35 points - nouveau!) ===
     network = pool_data.get("network", "")
-    liq = pool_data["liquidity"]
+    liq = pool_data.get("liquidity", 0)
+
+    # DEBUG: Log si liquidité manquante
+    if liq == 0:
+        log(f"   [DEBUG] Pool {pool_data.get('name', 'UNK')}: liq=0, vol={pool_data.get('volume_24h', 0)}, age={pool_data.get('age_hours', 0)}")
+        return 0  # Score 0 si pas de liquidité
 
     # ETH et Solana = champions (38.9% WR)
     if network == "eth":
