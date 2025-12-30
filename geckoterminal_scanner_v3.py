@@ -1420,14 +1420,18 @@ def apply_v3_filters(pool_data: Dict) -> Tuple[bool, List[str]]:
     """
     Applique TOUS les filtres V3 dans l'ordre d'importance
     Retourne (pass_all_filters, reasons_list)
+
+    NOTE IMPORTANTE: Le filtre de score est désactivé car le score est calculé
+    APRÈS apply_v3_filters(). Le score sera vérifié plus tard dans is_valid_opportunity().
     """
     reasons = []
 
-    # 1. SCORE PAR RÉSEAU (V3.1 - NOUVEAU!)
-    pass_score, reason_score = filter_by_score_network(pool_data)
-    reasons.append(f"✓ {reason_score}" if pass_score else f"✗ {reason_score}")
-    if not pass_score:
-        return False, reasons
+    # 1. SCORE PAR RÉSEAU - DÉSACTIVÉ (score pas encore calculé à ce stade!)
+    # Le score sera vérifié après calculate_final_score() dans la fonction appelante
+    # pass_score, reason_score = filter_by_score_network(pool_data)
+    # reasons.append(f"✓ {reason_score}" if pass_score else f"✗ {reason_score}")
+    # if not pass_score:
+    #     return False, reasons
 
     # 2. VÉLOCITÉ PAR RÉSEAU (V3.1 - Amélioré avec seuils différenciés)
     pass_vel, reason_vel = filter_by_velocite(pool_data)
@@ -2895,37 +2899,25 @@ def scan_geckoterminal():
     for network in NETWORKS:
         log(f"\n🔍 Scan réseau: {network.upper()}")
 
-        # Trending pools - récupérer 3 pages (60 pools au lieu de 20)
-        trending_count = 0
-        for page in range(1, 4):  # Pages 1, 2, 3
-            trending = get_trending_pools(network, page=page)
-            if trending:
-                trending_count += len(trending)
-                for pool in trending:
-                    pool_data = parse_pool_data(pool, network)
-                    if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                        all_pools.append(pool_data)
-            time.sleep(1)  # Petite pause entre les pages
-
-        if trending_count > 0:
-            log(f"   📊 {trending_count} pools trending trouvés (3 pages)")
+        # Trending pools - 1 page seulement (20 pools)
+        trending = get_trending_pools(network)
+        if trending:
+            for pool in trending:
+                pool_data = parse_pool_data(pool, network)
+                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
+                    all_pools.append(pool_data)
+            log(f"   📊 {len(trending)} pools trending trouvés")
 
         time.sleep(2)
 
-        # New pools - récupérer 3 pages (60 pools au lieu de 20)
-        new_count = 0
-        for page in range(1, 4):  # Pages 1, 2, 3
-            new_pools = get_new_pools(network, page=page)
-            if new_pools:
-                new_count += len(new_pools)
-                for pool in new_pools:
-                    pool_data = parse_pool_data(pool, network)
-                    if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                        all_pools.append(pool_data)
-            time.sleep(1)  # Petite pause entre les pages
-
-        if new_count > 0:
-            log(f"   🆕 {new_count} nouveaux pools trouvés (3 pages)")
+        # New pools - 1 page seulement (20 pools)
+        new_pools = get_new_pools(network)
+        if new_pools:
+            for pool in new_pools:
+                pool_data = parse_pool_data(pool, network)
+                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
+                    all_pools.append(pool_data)
+            log(f"   🆕 {len(new_pools)} nouveaux pools trouvés")
 
         time.sleep(2)
 
@@ -2977,6 +2969,16 @@ def scan_geckoterminal():
             # NOUVEAU: Rejeter immédiatement si WHALE DUMP détecté
             if whale_analysis['pattern'] == 'WHALE_SELLING':
                 log(f"   🚨 {pool_data['name']}: WHALE DUMP détecté - REJETÉ")
+                tokens_rejected += 1
+                continue
+
+            # FILTRE SCORE PAR RÉSEAU (maintenant que le score est calculé!)
+            network = pool_data.get('network', '').lower()
+            min_score_required = NETWORK_SCORE_FILTERS.get(network, {}).get('min_score', 85)
+
+            # Token watchlist: bypass filtre score
+            if not check_watchlist_token(pool_data) and score < min_score_required:
+                log(f"   ⏭️  {pool_data['name']}: [V3 REJECT] Score insuffisant: {score} < {min_score_required} ({network.upper()})")
                 tokens_rejected += 1
                 continue
 
@@ -3259,14 +3261,21 @@ def main():
     """Boucle principale."""
     global security_checker, alert_tracker
 
-    log("🚀 Démarrage GeckoTerminal Scanner V3...")
+    log("=" * 80)
+    log("🚀 GeckoTerminal Scanner V3.2.3 - FIX CRITIQUE")
+    log("=" * 80)
+    log("🐛 CORRECTION: Filtre de score déplacé APRÈS calcul du score")
+    log("   Problème: Le score était vérifié avant d'être calculé (toujours 0!)")
+    log("   Solution: Score maintenant calculé puis filtré dans le bon ordre")
+    log("=" * 80)
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
-    log(f"📋 Seuils par réseau (liq/vol/txns):")
-    log(f"   • Solana/BSC/ETH/Base: $100K / $50K / 100 txns")
-    log(f"   • Arbitrum: $2K / $400 / 10 txns")
+    log(f"📋 Scores min par réseau:")
+    log(f"   • ETH: 78+ | BASE: 82+ | BSC: 80+ | SOLANA: 72+")
+    log(f"   • POLYGON: 75+ | AVALANCHE: 80+")
     log(f"⏰ Age max: {MAX_TOKEN_AGE_HOURS}h")
-    log(f"🔄 Scan toutes les 5 minutes")
+    log(f"🔄 Scan toutes les 5 minutes (1 page/réseau)")
     log(f"🎯 Max {MAX_ALERTS_PER_SCAN} alertes par scan")
+    log("=" * 80)
 
     # Initialiser le système de sécurité et tracking
     log("\n🔒 Initialisation du système de sécurité...")
