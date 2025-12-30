@@ -148,9 +148,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.2 DASHBOARD - POLYGON + AVALANCHE - 2025-12-30 23:00")
+print("V3.2.1 DASHBOARD - BUGFIX LIQUIDITE - 2025-12-30 23:30")
 print("Objectif: 8-10 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("NEW: +Polygon +Avalanche | Fallback FDV/MarketCap liquidity")
+print("FIX: Fallback cascade reserve→FDV→MarketCap→Volume (bug ligne 522 corrigé!)")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -513,24 +513,24 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         volume_6h = float(volume_usd_data.get("h6") or 0)
         volume_1h = float(volume_usd_data.get("h1") or 0)
 
-        # Liquidity - avec fallback sur FDV et Market Cap
+        # Liquidity - avec fallback sur FDV, Market Cap et Volume
         reserve_value = attrs.get("reserve_in_usd")
         liquidity = 0
         liquidity_source = "none"
 
-        # Essayer reserve_in_usd d'abord
-        if reserve_value and reserve_value not in [None, "", "0.0", "0"]:
+        # Essayer reserve_in_usd d'abord - ACCEPTER "0.0" pour tester après conversion
+        if reserve_value not in [None, "", "null"]:
             try:
                 liquidity = float(reserve_value)
                 if liquidity > 0:
                     liquidity_source = "reserve_in_usd"
             except (ValueError, TypeError):
-                liquidity = 0
+                pass  # Continue vers fallbacks
 
         # FALLBACK 1: Si reserve_in_usd est 0, essayer fdv_usd (10% du FDV)
         if liquidity == 0:
             fdv_value = attrs.get("fdv_usd")
-            if fdv_value and fdv_value not in [None, "", "0.0", "0", "null"]:
+            if fdv_value not in [None, "", "null"]:
                 try:
                     fdv = float(fdv_value)
                     if fdv > 0:
@@ -543,7 +543,7 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         # FALLBACK 2: Si toujours 0, essayer market_cap_usd (15% du market cap)
         if liquidity == 0:
             mcap_value = attrs.get("market_cap_usd")
-            if mcap_value and mcap_value not in [None, "", "0.0", "0", "null"]:
+            if mcap_value not in [None, "", "null"]:
                 try:
                     mcap = float(mcap_value)
                     if mcap > 0:
@@ -553,9 +553,15 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
                 except (ValueError, TypeError):
                     pass
 
+        # FALLBACK 3: Si TOUJOURS 0, estimer depuis volume_24h (ratio 5:1)
+        if liquidity == 0 and volume_24h > 0:
+            # Ratio conservateur: liquidité = 5x le volume 24h
+            liquidity = volume_24h * 5
+            liquidity_source = "volume_24h(x5)"
+
         # Log pour debug
         if liquidity == 0:
-            log(f"   [LIQUIDITY] {name}: FAILED - reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}")
+            log(f"   [LIQUIDITY] {name}: FAILED - reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
         elif liquidity_source != "reserve_in_usd":
             log(f"   [LIQUIDITY] {name}: ${liquidity:,.0f} from {liquidity_source}")
 
