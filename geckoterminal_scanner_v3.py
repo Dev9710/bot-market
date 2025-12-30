@@ -145,31 +145,31 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 ULTRA_RENTABLE - Configuration active")
-print("Objectif: 2.7 alertes/jour | Score 95.9 | WR 55-70% | ROI +10-15%/mois")
+print("V3.1 DASHBOARD - Configuration active")
+print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
 print("=" * 80)
 
-# Configuration ULTRA_RENTABLE - MODIFIÉE pour plus d'alertes
-ULTRA_RENTABLE_CONFIG = {
-    'MIN_VELOCITE_PUMP': 5.0,  # Réduit de 10 à 5 pour plus d'alertes
+# Configuration DASHBOARD (5 alertes/jour)
+DASHBOARD_CONFIG = {
+    'MIN_VELOCITE_PUMP': 5.0,
     'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 80, 'min_velocity': 5},  # Réduit pour plus d'alertes
-        'base': {'min_score': 85, 'min_velocity': 8},  # Réduit pour plus d'alertes
-        'bsc': {'min_score': 83, 'min_velocity': 6},  # Réduit pour plus d'alertes
-        'solana': {'min_score': 80, 'min_velocity': 5},  # Réduit pour plus d'alertes
+        'eth': {'min_score': 78, 'min_velocity': 5},
+        'base': {'min_score': 82, 'min_velocity': 8},
+        'bsc': {'min_score': 80, 'min_velocity': 6},
+        'solana': {'min_score': 72, 'min_velocity': 5},
     },
     'LIQUIDITY': {
-        'eth': (50000, 1000000),  # Élargi pour plus d'alertes
-        'base': (150000, 3000000),  # Élargi pour plus d'alertes
-        'bsc': (250000, 10000000),  # Élargi pour plus d'alertes
-        'solana': (50000, 500000),  # Élargi pour plus d'alertes
+        'eth': (80000, 600000),
+        'base': (250000, 2500000),
+        'bsc': (400000, 6000000),
+        'solana': (80000, 300000),
     }
 }
 
 # Appliquer la configuration
-MIN_VELOCITE_PUMP = ULTRA_RENTABLE_CONFIG['MIN_VELOCITE_PUMP']
-NETWORK_SCORE_FILTERS = ULTRA_RENTABLE_CONFIG['NETWORK_SCORE_FILTERS']
-NETWORK_THRESHOLDS = build_network_thresholds(ULTRA_RENTABLE_CONFIG)
+MIN_VELOCITE_PUMP = DASHBOARD_CONFIG['MIN_VELOCITE_PUMP']
+NETWORK_SCORE_FILTERS = DASHBOARD_CONFIG['NETWORK_SCORE_FILTERS']
+NETWORK_THRESHOLDS = build_network_thresholds(DASHBOARD_CONFIG)
 
 # ============================================
 # V3: NOUVEAUX FILTRES (Backtest Phase 2)
