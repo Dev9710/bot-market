@@ -145,9 +145,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 DASHBOARD - EXTENDED SCAN v3 - 2025-12-30 16:30")
+print("V3.1 DASHBOARD - DEBUG API v4 - 2025-12-30 16:45")
 print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("FIX: Scan 120 pools/réseau (3 pages) pour trouver liquidité réelle")
+print("DEBUG: Log structure JSON brute de l'API pour diagnostiquer liq=0")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -404,7 +404,16 @@ def get_trending_pools(network: str, page: int = 1) -> Optional[List[Dict]]:
             return None
 
         data = response.json()
-        return data.get("data", [])
+        pools = data.get("data", [])
+
+        # DEBUG: Log premier pool brut pour diagnostic
+        if pools and page == 1 and not hasattr(get_trending_pools, '_logged_raw'):
+            import json as json_lib
+            log(f"   [DEBUG-RAW-POOL] Premier trending pool {network}:")
+            log(f"      {json_lib.dumps(pools[0], indent=2)[:800]}")  # 800 premiers caractères
+            get_trending_pools._logged_raw = True
+
+        return pools
     except Exception as e:
         log(f"❌ Erreur get_trending_pools {network}: {e}")
         return None
@@ -473,6 +482,17 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
     """Parse données pool GeckoTerminal avec enrichissements."""
     try:
         attrs = pool.get("attributes", {})
+
+        # DEBUG: Log structure du premier pool pour diagnostiquer
+        if not hasattr(parse_pool_data, '_logged_structure'):
+            log(f"   [DEBUG-STRUCTURE] Premier pool reçu:")
+            log(f"      Pool keys: {list(pool.keys())}")
+            log(f"      Attributes keys: {list(attrs.keys())[:10]}")  # Premiers 10 keys
+            if 'reserve_in_usd' in attrs:
+                log(f"      reserve_in_usd found: {attrs['reserve_in_usd']}")
+            else:
+                log(f"      reserve_in_usd NOT FOUND in attributes!")
+            parse_pool_data._logged_structure = True
 
         # Infos de base
         name = attrs.get("name", "Unknown")
