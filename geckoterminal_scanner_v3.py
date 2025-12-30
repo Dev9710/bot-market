@@ -78,9 +78,10 @@ else:
     print(f"   TELEGRAM_CHAT_ID: {'✅ OK' if TELEGRAM_CHAT_ID else '❌ MANQUANT'}")
 
 # Réseaux à surveiller - V3.1: ARBITRUM DÉSACTIVÉ (4.4% quality rate)
-# Analyse 4252 alertes: Arbitrum = 26.5% volume mais seulement 4.4% qualité
-# Réallocation sur ETH/BASE/BSC/SOLANA améliore ROI de +13.5%
-NETWORKS = ["eth", "bsc", "base", "solana"]  # V3.1: Arbitrum retiré
+# V3.2: Ajout Polygon et Avalanche pour augmenter volume d'opportunités
+# Polygon: Très actif memecoins, frais bas
+# Avalanche: Écosystème DeFi mature, bonne qualité
+NETWORKS = ["eth", "bsc", "base", "solana", "polygon_pos", "avax"]  # V3.2: +Polygon +Avalanche
 
 # ============================================
 # SEUILS PAR RÉSEAU - Configuration centralisée
@@ -122,14 +123,16 @@ def build_network_thresholds(mode_config):
             "min_txns": 100
         },
         "avax": {
-            "min_liquidity": 100000,
+            "min_liquidity": liq.get('avax', (100000, 800000))[0],
+            "max_liquidity": liq.get('avax', (100000, 800000))[1],
             "min_volume": 50000,
             "min_txns": 100
         },
         "polygon_pos": {
-            "min_liquidity": 100000,
-            "min_volume": 50000,
-            "min_txns": 100
+            "min_liquidity": liq.get('polygon_pos', (50000, 500000))[0],
+            "max_liquidity": liq.get('polygon_pos', (50000, 500000))[1],
+            "min_volume": 30000,  # Plus bas car frais très bas sur Polygon
+            "min_txns": 80
         },
         "default": {
             "min_liquidity": 100000,
@@ -145,9 +148,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 DASHBOARD - LIQUIDITY FALLBACK v5 - 2025-12-30 22:00")
-print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("FIX: Fallback FDV/MarketCap quand reserve_in_usd=0")
+print("V3.2 DASHBOARD - POLYGON + AVALANCHE - 2025-12-30 23:00")
+print("Objectif: 8-10 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
+print("NEW: +Polygon +Avalanche | Fallback FDV/MarketCap liquidity")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -158,12 +161,16 @@ DASHBOARD_CONFIG = {
         'base': {'min_score': 82, 'min_velocity': 8},
         'bsc': {'min_score': 80, 'min_velocity': 6},
         'solana': {'min_score': 72, 'min_velocity': 5},
+        'polygon_pos': {'min_score': 75, 'min_velocity': 5},  # V3.2: Moins strict car frais bas
+        'avax': {'min_score': 80, 'min_velocity': 6},  # V3.2: Similar à BSC
     },
     'LIQUIDITY': {
         'eth': (80000, 600000),
         'base': (250000, 2500000),
         'bsc': (400000, 6000000),
         'solana': (80000, 300000),
+        'polygon_pos': (50000, 500000),  # V3.2: Plus bas car frais très bas
+        'avax': (100000, 800000),  # V3.2: Similar à ETH
     }
 }
 
@@ -849,6 +856,16 @@ def calculate_base_score(pool_data: Dict) -> int:
             score += 10
     elif network == "base":
         score += 15  # 12.8% WR (faible)
+    elif network == "polygon_pos":
+        score += 20  # V3.2: Nouveau réseau, score modéré (à ajuster)
+        # Zone optimale Polygon: frais bas = plus d'activité
+        if 50000 <= liq <= 300000:
+            score += 10
+    elif network == "avax":
+        score += 28  # V3.2: Écosystème mature, similar à BSC
+        # Zone optimale Avalanche
+        if 100000 <= liq <= 500000:
+            score += 12
     elif network == "arbitrum":
         score += 5   # 4.9% WR (catastrophique)
     else:
