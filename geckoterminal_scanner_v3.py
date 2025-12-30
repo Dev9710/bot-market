@@ -148,9 +148,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.2.1 DASHBOARD - BUGFIX LIQUIDITE - 2025-12-30 23:30")
+print("V3.2.2 DASHBOARD - DEBUG VALEURS API - 2025-12-30 23:45")
 print("Objectif: 8-10 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("FIX: Fallback cascade reserve→FDV→MarketCap→Volume (bug ligne 522 corrigé!)")
+print("DEBUG: Log valeurs brutes API pour vérifier si reserve_in_usd vraiment 0")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -517,6 +517,13 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         reserve_value = attrs.get("reserve_in_usd")
         liquidity = 0
         liquidity_source = "none"
+
+        # DEBUG SYSTEMATIQUE: Logger TOUTES les valeurs brutes (premiers pools seulement)
+        if not hasattr(parse_pool_data, '_debug_count'):
+            parse_pool_data._debug_count = 0
+        if parse_pool_data._debug_count < 5:  # Log 5 premiers pools
+            log(f"   [DEBUG-VALUES] {name[:30]}: reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol={volume_24h}")
+            parse_pool_data._debug_count += 1
 
         # Essayer reserve_in_usd d'abord - ACCEPTER "0.0" pour tester après conversion
         if reserve_value not in [None, "", "null"]:
