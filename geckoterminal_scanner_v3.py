@@ -145,9 +145,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 DASHBOARD - FIX LIQUIDITE v2 - 2025-12-30 16:15")
+print("V3.1 DASHBOARD - EXTENDED SCAN v3 - 2025-12-30 16:30")
 print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("FIX: Gestion null/None dans reserve_in_usd de l'API GeckoTerminal")
+print("FIX: Scan 120 pools/réseau (3 pages) pour trouver liquidité réelle")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -2813,25 +2813,37 @@ def scan_geckoterminal():
     for network in NETWORKS:
         log(f"\n🔍 Scan réseau: {network.upper()}")
 
-        # Trending pools
-        trending = get_trending_pools(network)
-        if trending:
-            log(f"   📊 {len(trending)} pools trending trouvés")
-            for pool in trending:
-                pool_data = parse_pool_data(pool, network)  # Passer le network en paramètre
-                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                    all_pools.append(pool_data)
+        # Trending pools - récupérer 3 pages (60 pools au lieu de 20)
+        trending_count = 0
+        for page in range(1, 4):  # Pages 1, 2, 3
+            trending = get_trending_pools(network, page=page)
+            if trending:
+                trending_count += len(trending)
+                for pool in trending:
+                    pool_data = parse_pool_data(pool, network)
+                    if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
+                        all_pools.append(pool_data)
+            time.sleep(1)  # Petite pause entre les pages
+
+        if trending_count > 0:
+            log(f"   📊 {trending_count} pools trending trouvés (3 pages)")
 
         time.sleep(2)
 
-        # New pools
-        new_pools = get_new_pools(network)
-        if new_pools:
-            log(f"   🆕 {len(new_pools)} nouveaux pools trouvés")
-            for pool in new_pools:
-                pool_data = parse_pool_data(pool, network)  # Passer le network en paramètre
-                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                    all_pools.append(pool_data)
+        # New pools - récupérer 3 pages (60 pools au lieu de 20)
+        new_count = 0
+        for page in range(1, 4):  # Pages 1, 2, 3
+            new_pools = get_new_pools(network, page=page)
+            if new_pools:
+                new_count += len(new_pools)
+                for pool in new_pools:
+                    pool_data = parse_pool_data(pool, network)
+                    if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
+                        all_pools.append(pool_data)
+            time.sleep(1)  # Petite pause entre les pages
+
+        if new_count > 0:
+            log(f"   🆕 {new_count} nouveaux pools trouvés (3 pages)")
 
         time.sleep(2)
 
