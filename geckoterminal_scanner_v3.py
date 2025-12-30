@@ -145,8 +145,9 @@ def build_network_thresholds(mode_config):
 # Basé sur analyse de 4252 alertes Railway
 
 print("=" * 80)
-print("V3.1 DASHBOARD - Configuration active")
+print("V3.1 DASHBOARD - FIX LIQUIDITE v2 - 2025-12-30 16:15")
 print("Objectif: 5 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
+print("FIX: Gestion null/None dans reserve_in_usd de l'API GeckoTerminal")
 print("=" * 80)
 
 # Configuration DASHBOARD (5 alertes/jour)
@@ -489,10 +490,14 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         reserve_value = attrs.get("reserve_in_usd")
         if reserve_value is None or reserve_value == "":
             liquidity = 0
+            log(f"   [DEBUG-API] reserve_in_usd = {reserve_value} (None/empty) -> liq=0")
         else:
             try:
                 liquidity = float(reserve_value)
-            except (ValueError, TypeError):
+                if liquidity == 0:
+                    log(f"   [DEBUG-API] reserve_in_usd = '{reserve_value}' -> liq=0 after conversion")
+            except (ValueError, TypeError) as e:
+                log(f"   [DEBUG-API] reserve_in_usd = '{reserve_value}' -> ERROR: {e}")
                 liquidity = 0
 
         # Transactions (protéger contre None)
