@@ -484,7 +484,16 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
         volume_24h = float(volume_usd_data.get("h24") or 0)
         volume_6h = float(volume_usd_data.get("h6") or 0)
         volume_1h = float(volume_usd_data.get("h1") or 0)
-        liquidity = float(attrs.get("reserve_in_usd") or 0)
+
+        # Liquidity - gérer None/null de l'API
+        reserve_value = attrs.get("reserve_in_usd")
+        if reserve_value is None or reserve_value == "":
+            liquidity = 0
+        else:
+            try:
+                liquidity = float(reserve_value)
+            except (ValueError, TypeError):
+                liquidity = 0
 
         # Transactions (protéger contre None)
         transactions_data = attrs.get("transactions", {}) or {}
