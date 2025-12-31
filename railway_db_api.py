@@ -416,6 +416,43 @@ def get_alert_detail(alert_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/alerts/token/<pool_address>', methods=['GET'])
+def get_token_alerts_history(pool_address):
+    """Récupère toutes les alertes pour un même token (historique complet)."""
+    try:
+        conn = get_db_connection()
+
+        cursor = conn.execute("""
+            SELECT * FROM alerts
+            WHERE token_address = ?
+            ORDER BY created_at DESC
+        """, [pool_address])
+
+        alerts = []
+        for row in cursor.fetchall():
+            alert = parse_alert_row(row)
+
+            # Ajouter données complètes pour chaque alerte
+            row_dict = dict(row)
+            if row_dict.get('alert_data'):
+                try:
+                    alert['full_data'] = json.loads(row_dict['alert_data'])
+                except (json.JSONDecodeError, TypeError):
+                    alert['full_data'] = {}
+
+            alerts.append(alert)
+
+        conn.close()
+
+        return jsonify({
+            'alerts': alerts,
+            'count': len(alerts),
+            'pool_address': pool_address
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/stream')
 def stream():
     """Server-Sent Events stream for live updates."""

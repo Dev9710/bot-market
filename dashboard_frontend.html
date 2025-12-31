@@ -621,6 +621,9 @@
                 });
             }
 
+            // Deduplicate alerts by pool_address (group same tokens)
+            filtered = deduplicateAlerts(filtered);
+
             state.totalAlerts = filtered.length;
             document.getElementById('filteredCount').textContent = filtered.length;
 
@@ -630,6 +633,36 @@
 
             renderAlerts();
             updatePagination();
+        }
+
+        // Deduplicate alerts by pool_address (keep latest, add count badge)
+        function deduplicateAlerts(alerts) {
+            const grouped = {};
+
+            alerts.forEach(alert => {
+                const key = alert.pool_address || alert.token_address;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        latest: alert,
+                        count: 1,
+                        all_alerts: [alert]
+                    };
+                } else {
+                    grouped[key].count++;
+                    grouped[key].all_alerts.push(alert);
+                    // Keep the most recent alert
+                    if (new Date(alert.created_at) > new Date(grouped[key].latest.created_at)) {
+                        grouped[key].latest = alert;
+                    }
+                }
+            });
+
+            // Return deduplicated alerts with count and all_alerts properties
+            return Object.values(grouped).map(g => ({
+                ...g.latest,
+                alert_count: g.count,
+                all_alerts: g.all_alerts
+            }));
         }
 
         // Toggle filter
@@ -824,6 +857,9 @@
 
             tbody.innerHTML = state.alerts.map(alert => {
                 const isChecked = state.compareTokens.some(t => t.id === alert.id);
+                const alertCount = alert.alert_count || 1;
+                const hasDuplicates = alertCount > 1;
+
                 return `
                 <tr class="border-b border-white/5 hover:bg-white/5 transition">
                     <td class="py-4">
@@ -833,8 +869,13 @@
                                class="rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500 compare-checkbox">
                     </td>
                     <td class="py-4">
-                        <div class="font-semibold">${alert.token_symbol}</div>
-                        <div class="text-xs text-gray-500">${alert.token_name}</div>
+                        <div class="flex items-center gap-2">
+                            <div>
+                                <div class="font-semibold">${alert.token_symbol}</div>
+                                <div class="text-xs text-gray-500">${alert.token_name}</div>
+                            </div>
+                            ${hasDuplicates ? `<span class="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded text-xs font-bold border border-orange-500/30">×${alertCount}</span>` : ''}
+                        </div>
                     </td>
                     <td class="py-4">
                         <span class="${getNetworkBadgeClass(alert.network)}">
