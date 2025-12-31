@@ -90,6 +90,26 @@ def dashboard():
     except Exception as e:
         return f"Dashboard file not found: {str(e)}", 404
 
+@app.route('/bot-market/<path:filename>')
+def serve_bot_market_files(filename):
+    """Serve static files from bot-market directory."""
+    try:
+        file_path = os.path.join('bot-market', filename)
+        if os.path.exists(file_path):
+            return send_file(file_path)
+        else:
+            return f"File not found: {filename}", 404
+    except Exception as e:
+        return f"Error serving file: {str(e)}", 500
+
+@app.route('/compare.html')
+def serve_compare():
+    """Serve the token comparison page."""
+    try:
+        return send_file('compare.html')
+    except Exception as e:
+        return f"Compare page not found: {str(e)}", 404
+
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check."""
