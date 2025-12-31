@@ -140,6 +140,18 @@
                 <div class="flex gap-4 items-center">
                     <span id="lastUpdate" class="text-sm text-gray-400"></span>
 
+                    <!-- Search Box -->
+                    <div class="relative">
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="🔍 Rechercher (Ctrl+K)..."
+                            class="glass px-4 py-2 pr-20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-64"
+                            style="background: rgba(255,255,255,0.05);"
+                        />
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">Ctrl+K</span>
+                    </div>
+
                     <select id="filterDays" class="glass px-4 py-2 rounded-lg text-white cursor-pointer hover:bg-white/10 transition">
                         <option value="1">Aujourd'hui</option>
                         <option value="7" selected>7 jours</option>
@@ -375,7 +387,8 @@
                 networks: [],
                 score90: false,
                 fresh: false
-            }
+            },
+            searchQuery: ''
         };
 
         // API Base URL
@@ -397,6 +410,19 @@
             console.log('✅ Dashboard initialized');
         }
 
+        // Debounce helper
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         // Setup event listeners
         function setupEventListeners() {
             document.getElementById('refreshBtn').addEventListener('click', loadData);
@@ -405,6 +431,25 @@
                 state.currentPage = 1;
                 loadData();
             });
+
+            // Search input with debounce
+            const searchInput = document.getElementById('searchInput');
+            const debouncedSearch = debounce((e) => {
+                state.searchQuery = e.target.value.toLowerCase().trim();
+                state.currentPage = 1;
+                applyFilters();
+            }, 300);
+            searchInput.addEventListener('input', debouncedSearch);
+
+            // Keyboard shortcut: Ctrl+K or Cmd+K to focus search
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            });
+
             document.getElementById('prevBtn').addEventListener('click', () => {
                 if (state.currentPage > 1) {
                     state.currentPage--;
@@ -472,6 +517,19 @@
         // Apply filters
         function applyFilters() {
             let filtered = [...state.allAlerts];
+
+            // Search filter (symbol, name, address)
+            if (state.searchQuery) {
+                filtered = filtered.filter(alert => {
+                    const symbol = (alert.token_symbol || '').toLowerCase();
+                    const name = (alert.token_name || '').toLowerCase();
+                    const address = (alert.pool_address || '').toLowerCase();
+
+                    return symbol.includes(state.searchQuery) ||
+                           name.includes(state.searchQuery) ||
+                           address.includes(state.searchQuery);
+                });
+            }
 
             // Tier filter
             if (state.filters.tiers.length > 0) {
