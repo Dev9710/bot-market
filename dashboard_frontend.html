@@ -140,6 +140,16 @@
                 <div class="flex gap-4 items-center">
                     <span id="lastUpdate" class="text-sm text-gray-400"></span>
 
+                    <!-- Sniper Mode Toggle -->
+                    <button
+                        id="sniperModeBtn"
+                        onclick="toggleSniperMode()"
+                        class="px-4 py-2 rounded-lg font-bold text-sm transition-all border-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20"
+                        style="background: rgba(168, 85, 247, 0.05);"
+                    >
+                        🎯 MODE SNIPER
+                    </button>
+
                     <!-- Search Box -->
                     <div class="relative">
                         <input
@@ -388,7 +398,8 @@
                 score90: false,
                 fresh: false
             },
-            searchQuery: ''
+            searchQuery: '',
+            sniperMode: false
         };
 
         // API Base URL
@@ -514,9 +525,37 @@
             }
         }
 
+        // Toggle Sniper Mode
+        function toggleSniperMode() {
+            state.sniperMode = !state.sniperMode;
+            const btn = document.getElementById('sniperModeBtn');
+
+            if (state.sniperMode) {
+                btn.classList.add('active');
+                btn.style.background = 'rgba(168, 85, 247, 0.3)';
+                btn.style.borderColor = 'rgba(168, 85, 247, 0.8)';
+                btn.style.boxShadow = '0 0 20px rgba(168, 85, 247, 0.6)';
+                btn.textContent = '🎯 MODE SNIPER ✓';
+            } else {
+                btn.classList.remove('active');
+                btn.style.background = 'rgba(168, 85, 247, 0.05)';
+                btn.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+                btn.style.boxShadow = 'none';
+                btn.textContent = '🎯 MODE SNIPER';
+            }
+
+            state.currentPage = 1;
+            applyFilters();
+        }
+
         // Apply filters
         function applyFilters() {
             let filtered = [...state.allAlerts];
+
+            // SNIPER MODE: Only ULTRA_HIGH tier
+            if (state.sniperMode) {
+                filtered = filtered.filter(alert => alert.tier === 'ULTRA_HIGH');
+            }
 
             // Search filter (symbol, name, address)
             if (state.searchQuery) {
@@ -531,8 +570,8 @@
                 });
             }
 
-            // Tier filter
-            if (state.filters.tiers.length > 0) {
+            // Tier filter (only if NOT in sniper mode)
+            if (!state.sniperMode && state.filters.tiers.length > 0) {
                 filtered = filtered.filter(alert => state.filters.tiers.includes(alert.tier));
             }
 
