@@ -498,7 +498,7 @@ def get_pool_by_address(network: str, pool_address: str) -> Optional[Dict]:
 # ============================================
 # PARSING & ENRICHISSEMENT
 # ============================================
-def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
+def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict = None) -> Optional[Dict]:
     """Parse données pool GeckoTerminal avec enrichissements."""
     try:
         attrs = pool.get("attributes", {})
@@ -584,20 +584,16 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
             liquidity = volume_24h * 5
             liquidity_source = "volume_24h(x5)"
 
-        # Log pour debug - AMÉLIORATION: Logger TOUTES les sources + valeur exacte
+        # Log PERMANENT de la source de liquidité (CRITIQUE pour vérifier qualité données)
         if liquidity == 0:
-            log(f"   [LIQUIDITY-FAIL] {name}: reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
+            log(f"   ⚠️ [LIQ=0] {name}: reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
         elif liquidity_source != "reserve_in_usd":
-            # Log avec valeur EXACTE pour détecter arrondissage
-            log(f"   [LIQUIDITY-FALLBACK] {name}: ${liquidity:,.2f} (raw: {liquidity}) from {liquidity_source}")
-        # NOUVEAU: Logger aussi quand on utilise reserve_in_usd (pour vérifier)
-        else:
-            # Ne logger que les 3 premiers pour éviter spam
-            if not hasattr(parse_pool_data, '_reserve_log_count'):
-                parse_pool_data._reserve_log_count = 0
-            if parse_pool_data._reserve_log_count < 3:
-                log(f"   [LIQUIDITY-OK] {name}: ${liquidity:,.0f} from reserve_in_usd")
-                parse_pool_data._reserve_log_count += 1
+            # ALERTE: Utilisation d'estimation au lieu de donnée réelle!
+            log(f"   ⚠️ [LIQ-ESTIMATE] {name}: ${liquidity:,.0f} from {liquidity_source} (NOT REAL RESERVE!)")
+
+        # Mettre à jour les statistiques de sources de liquidité
+        if liquidity_stats is not None:
+            liquidity_stats[liquidity_source] = liquidity_stats.get(liquidity_source, 0) + 1
 
         # Transactions (protéger contre None)
         transactions_data = attrs.get("transactions", {}) or {}
@@ -2917,10 +2913,19 @@ def scan_geckoterminal():
     """Scan GeckoTerminal avec analyse avancée."""
 
     log("=" * 80)
-    log("🦎 GECKOTERMINAL SCANNER V3.1 - ULTRA_RENTABLE")
+    log("🦎 GECKOTERMINAL SCANNER V3.2.5 - DASHBOARD + Liquidity Quality Check")
     log("=" * 80)
 
     all_pools = []
+
+    # Statistiques sources de liquidité
+    liquidity_stats = {
+        'reserve_in_usd': 0,
+        'fdv_usd(10%)': 0,
+        'market_cap(15%)': 0,
+        'volume_24h(x5)': 0,
+        'none': 0
+    }
 
     # Collecter tous les pools
     for network in NETWORKS:
@@ -2930,7 +2935,7 @@ def scan_geckoterminal():
         trending = get_trending_pools(network)
         if trending:
             for pool in trending:
-                pool_data = parse_pool_data(pool, network)
+                pool_data = parse_pool_data(pool, network, liquidity_stats)
                 if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
                     all_pools.append(pool_data)
             log(f"   📊 {len(trending)} pools trending trouvés")
@@ -2941,7 +2946,7 @@ def scan_geckoterminal():
         new_pools = get_new_pools(network)
         if new_pools:
             for pool in new_pools:
-                pool_data = parse_pool_data(pool, network)
+                pool_data = parse_pool_data(pool, network, liquidity_stats)
                 if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
                     all_pools.append(pool_data)
             log(f"   🆕 {len(new_pools)} nouveaux pools trouvés")
@@ -3278,6 +3283,50 @@ def scan_geckoterminal():
 
         log(f"   📊 Tracking terminé: {updates_sent} mises à jour envoyées")
 
+    # ==========================================
+    # STATISTIQUES SOURCES DE LIQUIDITÉ
+    # ==========================================
+    log(f"\n📊 STATISTIQUES SOURCES DE LIQUIDITÉ:")
+    log(f"   Total pools analysés: {sum(liquidity_stats.values())}")
+
+    total_pools = sum(liquidity_stats.values())
+    if total_pools > 0:
+        real_reserve = liquidity_stats.get('reserve_in_usd', 0)
+        fdv_estimate = liquidity_stats.get('fdv_usd(10%)', 0)
+        mcap_estimate = liquidity_stats.get('market_cap(15%)', 0)
+        vol_estimate = liquidity_stats.get('volume_24h(x5)', 0)
+        none_liq = liquidity_stats.get('none', 0)
+
+        # Calculer pourcentages
+        real_pct = (real_reserve / total_pools) * 100
+        fdv_pct = (fdv_estimate / total_pools) * 100
+        mcap_pct = (mcap_estimate / total_pools) * 100
+        vol_pct = (vol_estimate / total_pools) * 100
+        none_pct = (none_liq / total_pools) * 100
+
+        log(f"   ✅ reserve_in_usd (REAL):      {real_reserve:4d} pools ({real_pct:5.1f}%)")
+
+        if fdv_estimate + mcap_estimate + vol_estimate + none_liq > 0:
+            log(f"   ⚠️  ESTIMATIONS (FALLBACK):")
+            if fdv_estimate > 0:
+                log(f"      • fdv_usd (10%):           {fdv_estimate:4d} pools ({fdv_pct:5.1f}%)")
+            if mcap_estimate > 0:
+                log(f"      • market_cap (15%):        {mcap_estimate:4d} pools ({mcap_pct:5.1f}%)")
+            if vol_estimate > 0:
+                log(f"      • volume_24h (x5):         {vol_estimate:4d} pools ({vol_pct:5.1f}%)")
+            if none_liq > 0:
+                log(f"      • none (LIQ=0):            {none_liq:4d} pools ({none_pct:5.1f}%)")
+
+        # Résumé qualité des données
+        if real_pct >= 90:
+            log(f"   🎯 EXCELLENT: {real_pct:.1f}% de données réelles")
+        elif real_pct >= 70:
+            log(f"   ✅ BON: {real_pct:.1f}% de données réelles")
+        elif real_pct >= 50:
+            log(f"   ⚠️  MOYEN: Seulement {real_pct:.1f}% de données réelles")
+        else:
+            log(f"   🚨 CRITIQUE: Seulement {real_pct:.1f}% de données réelles!")
+
     log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées, {tokens_rejected} tokens rejetés (sécurité)")
     log("=" * 80)
 
@@ -3289,11 +3338,12 @@ def main():
     global security_checker, alert_tracker
 
     log("=" * 80)
-    log("🚀 GeckoTerminal Scanner V3.2.3 - FIX CRITIQUE")
+    log("🚀 GeckoTerminal Scanner V3.2.5 - Liquidity Quality Check")
     log("=" * 80)
-    log("🐛 CORRECTION: Filtre de score déplacé APRÈS calcul du score")
-    log("   Problème: Le score était vérifié avant d'être calculé (toujours 0!)")
-    log("   Solution: Score maintenant calculé puis filtré dans le bon ordre")
+    log("✅ CONFIGURATION DASHBOARD ACTIVE")
+    log("   Objectif: 5 alertes/jour | Score 91.4 | WR 45-58%")
+    log("🔍 NOUVEAU: Tracking permanent des sources de liquidité")
+    log("   Vérifie si reserve_in_usd (REAL) vs fallback estimations")
     log("=" * 80)
     log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
     log(f"📋 Scores min par réseau:")
