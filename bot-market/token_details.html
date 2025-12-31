@@ -386,11 +386,11 @@
                             </div>
                             <div>
                                 <div class="text-gray-500 text-xs">Liquidité</div>
-                                <div class="font-semibold text-green-400">${fullData.liquidity ? '$' + formatNumber(fullData.liquidity) : 'N/A'}</div>
+                                <div class="font-semibold text-green-400">${(alert.liquidity || fullData.liquidity) ? '$' + formatNumber(alert.liquidity || fullData.liquidity) : 'N/A'}</div>
                             </div>
                             <div>
                                 <div class="text-gray-500 text-xs">Volume 24h</div>
-                                <div class="font-semibold">${fullData.volume_24h ? '$' + formatNumber(fullData.volume_24h) : 'N/A'}</div>
+                                <div class="font-semibold">${(alert.volume_24h || fullData.volume_24h) ? '$' + formatNumber(alert.volume_24h || fullData.volume_24h) : 'N/A'}</div>
                             </div>
                             <div>
                                 <div class="text-gray-500 text-xs">TP1</div>
@@ -420,8 +420,8 @@
             });
 
             const scores = sortedAlerts.map(a => a.score);
-            const liquidities = sortedAlerts.map(a => (a.full_data?.liquidity || a.liquidity || 0));
-            const volumes = sortedAlerts.map(a => (a.full_data?.volume_24h || a.volume_24h || 0));
+            const liquidities = sortedAlerts.map(a => (a.liquidity || a.full_data?.liquidity || 0));
+            const volumes = sortedAlerts.map(a => (a.volume_24h || a.full_data?.volume_24h || 0));
 
             // Score Evolution Chart
             const scoreCtx = document.getElementById('scoreEvolutionChart');
@@ -696,7 +696,7 @@
             // Risques
             const ageHours = fullData.age_hours || alert.age_hours || 0;
             document.getElementById('age').innerHTML = getFreshnessDisplay(ageHours);
-            document.getElementById('liquidity').textContent = fullData.liquidity ? `$${formatNumber(fullData.liquidity)}` : 'N/A';
+            document.getElementById('liquidity').textContent = (alert.liquidity || fullData.liquidity) ? `$${formatNumber(alert.liquidity || fullData.liquidity)}` : 'N/A';
             document.getElementById('network').textContent = (fullData.network || alert.network || '').toUpperCase();
 
             // Pump Analysis
