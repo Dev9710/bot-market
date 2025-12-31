@@ -442,6 +442,215 @@ def stream():
         'X-Accel-Buffering': 'no'
     })
 
+# ============================================================================
+# PORTFOLIO ENDPOINTS
+# ============================================================================
+
+@app.route('/api/portfolio', methods=['GET'])
+def get_portfolio():
+    """Get all portfolio positions."""
+    try:
+        status_filter = request.args.get('status', 'ACTIVE')  # ACTIVE, ALL, CLOSED
+
+        conn = get_db_connection()
+
+        if status_filter == 'ALL':
+            cursor = conn.execute("""
+                SELECT * FROM portfolio
+                ORDER BY created_at DESC
+            """)
+        else:
+            cursor = conn.execute("""
+                SELECT * FROM portfolio
+                WHERE status = ?
+                ORDER BY created_at DESC
+            """, [status_filter])
+
+        positions = []
+        for row in cursor.fetchall():
+            positions.append(dict(row))
+
+        conn.close()
+
+        return jsonify({
+            'positions': positions,
+            'count': len(positions)
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/portfolio', methods=['POST'])
+def add_to_portfolio():
+    """Add a new position to portfolio."""
+    try:
+        data = request.json
+
+        required_fields = ['alert_id', 'pool_address', 'network', 'token_symbol', 'entry_price']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+
+        conn = get_db_connection()
+
+        cursor = conn.execute("""
+            INSERT INTO portfolio (
+                alert_id, pool_address, network, token_symbol, token_name,
+                entry_price, position_size, tp1_price, tp2_price, tp3_price,
+                stop_loss_price, notes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, [
+            data['alert_id'],
+            data['pool_address'],
+            data['network'],
+            data['token_symbol'],
+            data.get('token_name', ''),
+            data['entry_price'],
+            data.get('position_size'),
+            data.get('tp1_price'),
+            data.get('tp2_price'),
+            data.get('tp3_price'),
+            data.get('stop_loss_price'),
+            data.get('notes', '')
+        ])
+
+        conn.commit()
+        position_id = cursor.lastrowid
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'position_id': position_id,
+            'message': 'Position added to portfolio'
+        }), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/portfolio/<int:position_id>', methods=['PUT'])
+def update_portfolio_position(position_id):
+    """Update a portfolio position."""
+    try:
+        data = request.json
+
+        conn = get_db_connection()
+
+        # Build UPDATE query dynamically based on provided fields
+        updates = []
+        values = []
+
+        allowed_fields = [
+            'current_price', 'status', 'tp1_hit', 'tp2_hit', 'tp3_hit',
+            'stop_loss_hit', 'current_pnl_percent', 'highest_price',
+            'max_gain_percent', 'notes'
+        ]
+
+        for field in allowed_fields:
+            if field in data:
+                updates.append(f"{field} = ?")
+                values.append(data[field])
+
+        if not updates:
+            return jsonify({'error': 'No valid fields to update'}), 400
+
+        # Always update last_updated
+        updates.append("last_updated = CURRENT_TIMESTAMP")
+
+        values.append(position_id)
+        query = f"UPDATE portfolio SET {', '.join(updates)} WHERE id = ?"
+
+        conn.execute(query, values)
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Position updated'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/portfolio/<int:position_id>', methods=['DELETE'])
+def delete_portfolio_position(position_id):
+    """Delete a portfolio position."""
+    try:
+        conn = get_db_connection()
+        conn.execute("DELETE FROM portfolio WHERE id = ?", [position_id])
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Position deleted'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/portfolio/stats', methods=['GET'])
+def get_portfolio_stats():
+    """Get portfolio performance statistics."""
+    try:
+        conn = get_db_connection()
+
+        # Active positions count
+        cursor = conn.execute("SELECT COUNT(*) as count FROM portfolio WHERE status = 'ACTIVE'")
+        active_count = cursor.fetchone()['count']
+
+        # Total positions
+        cursor = conn.execute("SELECT COUNT(*) as count FROM portfolio")
+        total_count = cursor.fetchone()['count']
+
+        # Win rate (TP1+ hit)
+        cursor = conn.execute("""
+            SELECT COUNT(*) as wins FROM portfolio
+            WHERE tp1_hit = 1 OR tp2_hit = 1 OR tp3_hit = 1
+        """)
+        wins = cursor.fetchone()['wins']
+
+        # Stop losses hit
+        cursor = conn.execute("SELECT COUNT(*) as losses FROM portfolio WHERE stop_loss_hit = 1")
+        losses = cursor.fetchone()['losses']
+
+        # Average PnL for closed positions
+        cursor = conn.execute("""
+            SELECT AVG(current_pnl_percent) as avg_pnl
+            FROM portfolio
+            WHERE status != 'ACTIVE' AND current_pnl_percent IS NOT NULL
+        """)
+        avg_pnl = cursor.fetchone()['avg_pnl'] or 0
+
+        # Best performing position
+        cursor = conn.execute("""
+            SELECT token_symbol, max_gain_percent
+            FROM portfolio
+            WHERE max_gain_percent IS NOT NULL
+            ORDER BY max_gain_percent DESC
+            LIMIT 1
+        """)
+        best = cursor.fetchone()
+
+        conn.close()
+
+        win_rate = (wins / total_count * 100) if total_count > 0 else 0
+
+        return jsonify({
+            'active_positions': active_count,
+            'total_positions': total_count,
+            'wins': wins,
+            'losses': losses,
+            'win_rate': round(win_rate, 1),
+            'avg_pnl': round(avg_pnl, 2),
+            'best_trade': {
+                'symbol': best['token_symbol'] if best else 'N/A',
+                'gain': round(best['max_gain_percent'], 2) if best and best['max_gain_percent'] else 0
+            }
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 
@@ -459,13 +668,18 @@ if __name__ == '__main__':
 
     print(f"\n[START] Railway DB API demarree sur port {port}")
     print(f"[INFO] Endpoints disponibles:")
-    print(f"   GET /api/health")
-    print(f"   GET /api/alerts")
-    print(f"   GET /api/stats")
-    print(f"   GET /api/networks")
-    print(f"   GET /api/recent")
-    print(f"   GET /api/alerts/:id")
-    print(f"   GET /api/stream (Server-Sent Events)")
+    print(f"   GET  /api/health")
+    print(f"   GET  /api/alerts")
+    print(f"   GET  /api/stats")
+    print(f"   GET  /api/networks")
+    print(f"   GET  /api/recent")
+    print(f"   GET  /api/alerts/:id")
+    print(f"   GET  /api/stream (Server-Sent Events)")
+    print(f"   GET  /api/portfolio")
+    print(f"   POST /api/portfolio")
+    print(f"   PUT  /api/portfolio/:id")
+    print(f"   DEL  /api/portfolio/:id")
+    print(f"   GET  /api/portfolio/stats")
     print()
 
     app.run(host='0.0.0.0', port=port, debug=False)
