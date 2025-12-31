@@ -688,6 +688,9 @@ if __name__ == '__main__':
 
     print(f"\n[START] Railway DB API demarree sur port {port}")
     print(f"[INFO] Endpoints disponibles:")
+    print(f"   GET  / (Dashboard)")
+    print(f"   GET  /compare.html (Token Comparator)")
+    print(f"   GET  /bot-market/:filename (Static files)")
     print(f"   GET  /api/health")
     print(f"   GET  /api/alerts")
     print(f"   GET  /api/stats")
