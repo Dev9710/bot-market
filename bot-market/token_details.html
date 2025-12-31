@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Details - Scanner V3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .section {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .data-value {
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .freshness-fresh { color: #ef4444; font-weight: 600; }
+        .freshness-recent { color: #f59e0b; }
+        .freshness-active { color: #22c55e; }
+        .freshness-old { color: #6b7280; }
+
+        iframe {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen p-4 md:p-8">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <a href="javascript:history.back()" class="text-gray-400 hover:text-white transition text-sm inline-block mb-4">
+            ← Retour
+        </a>
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold" id="tokenSymbol">-</h1>
+                <p class="text-gray-400 mt-1" id="tokenName">-</p>
+            </div>
+            <div class="text-right">
+                <div class="text-4xl font-bold" id="score">-</div>
+                <div class="text-sm text-gray-400" id="tier">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="max-w-7xl mx-auto text-center py-12">
+        <div class="text-gray-400">Chargement...</div>
+    </div>
+
+    <!-- Content -->
+    <div id="content" class="max-w-7xl mx-auto" style="display: none;">
+        <!-- Chart -->
+        <div class="section mb-6">
+            <h2 class="text-xl font-bold mb-4">📈 Graphique Prix (Temps Réel)</h2>
+            <div id="chartContainer" style="height: 500px;">
+                <!-- GeckoTerminal iframe will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Prix & Targets -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-green-400">💰 Prix & Targets</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Prix Entry</span>
+                        <span class="data-value text-blue-400" id="entry_price">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Stop Loss (-10%)</span>
+                        <span class="data-value text-red-400" id="stop_loss">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">TP1 (+5%)</span>
+                        <span class="data-value text-green-400" id="tp1">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">TP2 (+10%)</span>
+                        <span class="data-value text-green-400" id="tp2">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">TP3 (+15%)</span>
+                        <span class="data-value text-green-400" id="tp3">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volume -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-blue-400">📊 Volume</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Volume 24h</span>
+                        <span class="data-value" id="volume_24h">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Volume 6h</span>
+                        <span class="data-value" id="volume_6h">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Volume 1h</span>
+                        <span class="data-value" id="volume_1h">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Accél. 1h vs 6h</span>
+                        <span class="data-value" id="accel_1h">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Accél. 6h vs 24h</span>
+                        <span class="data-value" id="accel_6h">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-purple-400">🔄 Transactions</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Buys 24h</span>
+                        <span class="data-value text-green-400" id="buys">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Sells 24h</span>
+                        <span class="data-value text-red-400" id="sells">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Buy Ratio</span>
+                        <span class="data-value" id="buy_ratio">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Total Txns</span>
+                        <span class="data-value" id="total_txns">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Scoring -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-yellow-400">⭐ Scoring</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Score Total</span>
+                        <span class="data-value" id="score_total">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Score Base</span>
+                        <span class="data-value" id="base_score">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Bonus Momentum</span>
+                        <span class="data-value text-green-400" id="momentum_bonus">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Score Sécurité</span>
+                        <span class="data-value" id="security_score">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risques -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-orange-400">⚠️ Risques</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Âge du Token</span>
+                        <span class="data-value" id="age">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Liquidité</span>
+                        <span class="data-value text-green-400" id="liquidity">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Réseau</span>
+                        <span class="data-value" id="network">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pump Analysis -->
+            <div class="section">
+                <h3 class="text-lg font-bold mb-4 text-red-400">🚀 Analyse Pump</h3>
+                <div class="space-y-3">
+                    <div class="data-row">
+                        <span class="data-label">Vélocité Pump</span>
+                        <span class="data-value" id="velocite_pump">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Type Pump</span>
+                        <span class="data-value" id="type_pump">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">TP Tracking</span>
+                        <span class="data-value text-xs" id="tp_tracking">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Message (Raw Telegram) -->
+        <div class="section mb-6">
+            <h3 class="text-lg font-bold mb-4">📱 Message Telegram (Brut)</h3>
+            <pre class="text-sm text-gray-300 whitespace-pre-wrap font-mono bg-black/50 p-4 rounded" id="alert_message">-</pre>
+        </div>
+
+        <!-- Links -->
+        <div class="section">
+            <h3 class="text-lg font-bold mb-4">🔗 Liens</h3>
+            <div class="flex flex-wrap gap-4">
+                <a id="geckoLink" href="#" target="_blank" class="px-4 py-2 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition border border-green-500/30">
+                    Voir sur GeckoTerminal →
+                </a>
+                <button onclick="history.back()" class="px-4 py-2 bg-gray-500/20 text-gray-400 rounded hover:bg-gray-500/30 transition border border-gray-500/30">
+                    ← Retour
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin + '/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const alertId = urlParams.get('id');
+
+        async function loadToken() {
+            if (!alertId) {
+                document.getElementById('loading').innerHTML = '<div class="text-red-400">ID manquant</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/alerts/${alertId}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                renderToken(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').innerHTML = `<div class="text-red-400">Erreur: ${error.message}</div>`;
+            }
+        }
+
+        function renderToken(alert) {
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            // Header
+            document.getElementById('tokenSymbol').textContent = alert.token_symbol;
+            document.getElementById('tokenName').textContent = alert.token_name;
+            document.getElementById('score').textContent = alert.score;
+            document.getElementById('score').className = `text-4xl font-bold ${getScoreColor(alert.score)}`;
+            document.getElementById('tier').textContent = alert.tier;
+
+            // Get full data from alert_data JSON
+            const fullData = alert.full_data || {};
+
+            // Prix & Targets
+            document.getElementById('entry_price').textContent = fullData.entry_price ? `$${fullData.entry_price.toFixed(8)}` : 'N/A';
+            document.getElementById('stop_loss').textContent = fullData.stop_loss_price ? `$${fullData.stop_loss_price.toFixed(8)}` : 'N/A';
+            document.getElementById('tp1').textContent = fullData.tp1_price ? `$${fullData.tp1_price.toFixed(8)}` : 'N/A';
+            document.getElementById('tp2').textContent = fullData.tp2_price ? `$${fullData.tp2_price.toFixed(8)}` : 'N/A';
+            document.getElementById('tp3').textContent = fullData.tp3_price ? `$${fullData.tp3_price.toFixed(8)}` : 'N/A';
+
+            // Volume
+            document.getElementById('volume_24h').textContent = fullData.volume_24h ? `$${formatNumber(fullData.volume_24h)}` : 'N/A';
+            document.getElementById('volume_6h').textContent = fullData.volume_6h ? `$${formatNumber(fullData.volume_6h)}` : 'N/A';
+            document.getElementById('volume_1h').textContent = fullData.volume_1h ? `$${formatNumber(fullData.volume_1h)}` : 'N/A';
+            document.getElementById('accel_1h').textContent = fullData.volume_acceleration_1h_vs_6h ? `${fullData.volume_acceleration_1h_vs_6h.toFixed(2)}x` : 'N/A';
+            document.getElementById('accel_6h').textContent = fullData.volume_acceleration_6h_vs_24h ? `${fullData.volume_acceleration_6h_vs_24h.toFixed(2)}x` : 'N/A';
+
+            // Transactions
+            document.getElementById('buys').textContent = fullData.buys_24h || 'N/A';
+            document.getElementById('sells').textContent = fullData.sells_24h || 'N/A';
+            document.getElementById('buy_ratio').textContent = fullData.buy_ratio ? `${(fullData.buy_ratio * 100).toFixed(1)}%` : 'N/A';
+            document.getElementById('total_txns').textContent = fullData.total_txns || 'N/A';
+
+            // Scoring
+            document.getElementById('score_total').textContent = fullData.score || alert.score || 'N/A';
+            document.getElementById('base_score').textContent = fullData.base_score || 'N/A';
+            document.getElementById('momentum_bonus').textContent = fullData.momentum_bonus ? `+${fullData.momentum_bonus}` : 'N/A';
+            document.getElementById('security_score').textContent = fullData.confidence_score ? `${fullData.confidence_score}/100` : 'N/A';
+
+            // Risques
+            const ageHours = fullData.age_hours || alert.age_hours || 0;
+            document.getElementById('age').innerHTML = getFreshnessDisplay(ageHours);
+            document.getElementById('liquidity').textContent = fullData.liquidity ? `$${formatNumber(fullData.liquidity)}` : 'N/A';
+            document.getElementById('network').textContent = (fullData.network || alert.network || '').toUpperCase();
+
+            // Pump Analysis
+            document.getElementById('velocite_pump').textContent = fullData.velocite_pump || 'N/A';
+            document.getElementById('type_pump').textContent = fullData.type_pump || 'N/A';
+            document.getElementById('tp_tracking').textContent = fullData.decision_tp_tracking || 'N/A';
+
+            // Alert Message
+            document.getElementById('alert_message').textContent = fullData.alert_message || 'Message non disponible';
+
+            // GeckoTerminal Chart
+            const network = (fullData.network || alert.network || '').toLowerCase();
+            const poolAddress = fullData.token_address || alert.pool_address;
+
+            if (network && poolAddress) {
+                const chartUrl = `https://www.geckoterminal.com/${network}/pools/${poolAddress}?embed=1&info=0&swaps=0`;
+                document.getElementById('chartContainer').innerHTML = `
+                    <iframe
+                        src="${chartUrl}"
+                        width="100%"
+                        height="500"
+                        frameborder="0"
+                        allow="clipboard-write"
+                        allowfullscreen
+                        style="border-radius: 12px;"
+                    ></iframe>
+                `;
+
+                // Link
+                document.getElementById('geckoLink').href = `https://www.geckoterminal.com/${network}/pools/${poolAddress}`;
+            } else {
+                document.getElementById('chartContainer').innerHTML = `
+                    <div class="text-center text-gray-400 py-12">Graphique non disponible (adresse manquante)</div>
+                `;
+            }
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            return num.toFixed(0);
+        }
+
+        function getFreshnessDisplay(ageHours) {
+            const ageMinutes = ageHours * 60;
+            let emoji, cssClass, text;
+
+            if (ageMinutes < 5) {
+                emoji = '🔴';
+                cssClass = 'freshness-fresh';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageMinutes < 30) {
+                emoji = '🟡';
+                cssClass = 'freshness-recent';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageHours < 6) {
+                emoji = '🟢';
+                cssClass = 'freshness-active';
+                text = ageHours.toFixed(1) + 'h';
+            } else {
+                emoji = '⚪';
+                cssClass = 'freshness-old';
+                text = ageHours.toFixed(1) + 'h';
+            }
+
+            return `<span class="${cssClass}">${emoji} ${text}</span>`;
+        }
+
+        function getScoreColor(score) {
+            if (score >= 95) return 'text-purple-400';
+            if (score >= 85) return 'text-blue-400';
+            if (score >= 75) return 'text-green-400';
+            if (score >= 60) return 'text-yellow-400';
+            return 'text-red-400';
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', loadToken);
+    </script>
+</body>
+</html>

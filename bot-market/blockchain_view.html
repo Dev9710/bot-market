@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain View - Scanner V3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .freshness-fresh { color: #ef4444; font-weight: 600; }
+        .freshness-recent { color: #f59e0b; }
+        .freshness-active { color: #22c55e; }
+        .freshness-old { color: #6b7280; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen p-6">
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <a href="dashboard_frontend.html" class="text-gray-400 hover:text-white transition text-sm mb-2 inline-block">
+                    ← Retour au dashboard
+                </a>
+                <h1 class="text-4xl font-bold" id="networkTitle">ETH</h1>
+                <p class="text-gray-400 mt-2">Tokens filtrés par le scanner</p>
+            </div>
+
+            <div class="text-right">
+                <div class="text-3xl font-bold" id="tokenCount">0</div>
+                <div class="text-sm text-gray-400">tokens détectés</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Row -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="statsContainer">
+        <!-- Stats cards -->
+    </div>
+
+    <!-- Tokens Grid -->
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="tokensGrid">
+            <!-- Loading state -->
+            <div class="col-span-full text-center py-12 text-gray-400">
+                Chargement...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get network from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const network = urlParams.get('network') || 'eth';
+        const API_URL = window.location.origin + '/api';
+
+        // Network colors
+        const networkColors = {
+            eth: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400' },
+            bsc: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-400' },
+            base: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-400' },
+            solana: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400' },
+            polygon_pos: { bg: 'bg-violet-500/10', border: 'border-violet-500/30', text: 'text-violet-400' },
+            avax: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400' }
+        };
+
+        // Initialize
+        async function init() {
+            document.getElementById('networkTitle').textContent = network.toUpperCase();
+            await loadTokens();
+        }
+
+        // Load tokens
+        async function loadTokens() {
+            try {
+                const response = await fetch(`${API_URL}/alerts?network=${network}&days=7&limit=500`);
+                const data = await response.json();
+                const tokens = data.alerts || [];
+
+                document.getElementById('tokenCount').textContent = tokens.length;
+
+                renderStats(tokens);
+                renderTokens(tokens);
+            } catch (error) {
+                console.error('Error loading tokens:', error);
+                document.getElementById('tokensGrid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-400">
+                        Erreur de chargement
+                    </div>
+                `;
+            }
+        }
+
+        // Render stats
+        function renderStats(tokens) {
+            const avgScore = tokens.length > 0
+                ? tokens.reduce((sum, t) => sum + t.score, 0) / tokens.length
+                : 0;
+
+            const ultraHigh = tokens.filter(t => t.tier === 'ULTRA_HIGH').length;
+            const high = tokens.filter(t => t.tier === 'HIGH').length;
+
+            const avgLiquidity = tokens.length > 0
+                ? tokens.reduce((sum, t) => sum + (t.liquidity || 0), 0) / tokens.length
+                : 0;
+
+            const colors = networkColors[network] || networkColors.eth;
+
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="card p-6 rounded-lg fade-in">
+                    <div class="text-sm text-gray-400 mb-2">Score Moyen</div>
+                    <div class="text-3xl font-bold ${getScoreColor(avgScore)}">${avgScore.toFixed(1)}</div>
+                </div>
+
+                <div class="card p-6 rounded-lg fade-in">
+                    <div class="text-sm text-gray-400 mb-2">ULTRA HIGH</div>
+                    <div class="text-3xl font-bold text-purple-400">${ultraHigh}</div>
+                </div>
+
+                <div class="card p-6 rounded-lg fade-in">
+                    <div class="text-sm text-gray-400 mb-2">HIGH</div>
+                    <div class="text-3xl font-bold text-blue-400">${high}</div>
+                </div>
+
+                <div class="card p-6 rounded-lg fade-in">
+                    <div class="text-sm text-gray-400 mb-2">Liquidité Moy.</div>
+                    <div class="text-3xl font-bold text-green-400">$${formatNumber(avgLiquidity)}</div>
+                </div>
+            `;
+        }
+
+        // Render tokens
+        function renderTokens(tokens) {
+            if (tokens.length === 0) {
+                document.getElementById('tokensGrid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400">
+                        Aucun token pour ce réseau
+                    </div>
+                `;
+                return;
+            }
+
+            const colors = networkColors[network] || networkColors.eth;
+
+            document.getElementById('tokensGrid').innerHTML = tokens.map(token => `
+                <div class="card p-6 rounded-lg cursor-pointer fade-in" onclick="viewToken(${token.id})">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold">${token.token_symbol}</h3>
+                            <p class="text-sm text-gray-400">${token.token_name}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold ${getScoreColor(token.score)}">${token.score}</div>
+                            <div class="text-xs ${colors.text}">${token.tier}</div>
+                        </div>
+                    </div>
+
+                    <!-- Info Grid -->
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Liquidité</span>
+                            <span class="font-semibold text-green-400">$${formatNumber(token.liquidity)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Volume 24h</span>
+                            <span class="font-semibold">$${formatNumber(token.volume_24h || 0)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Âge</span>
+                            <span class="font-semibold">${getFreshnessDisplay(token.age_hours)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Date</span>
+                            <span class="text-gray-500">${formatDate(token.created_at)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Action -->
+                    <div class="mt-4 pt-4 border-t border-gray-800">
+                        <span class="text-blue-400 text-sm font-semibold">Voir détails →</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // View token details
+        function viewToken(id) {
+            window.location.href = `token_details.html?id=${id}`;
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            return num.toFixed(0);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getFreshnessDisplay(ageHours) {
+            const ageMinutes = ageHours * 60;
+            let emoji, cssClass, text;
+
+            if (ageMinutes < 5) {
+                emoji = '🔴';
+                cssClass = 'freshness-fresh';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageMinutes < 30) {
+                emoji = '🟡';
+                cssClass = 'freshness-recent';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageHours < 6) {
+                emoji = '🟢';
+                cssClass = 'freshness-active';
+                text = ageHours.toFixed(1) + 'h';
+            } else {
+                emoji = '⚪';
+                cssClass = 'freshness-old';
+                text = ageHours.toFixed(1) + 'h';
+            }
+
+            return `<span class="${cssClass}">${emoji} ${text}</span>`;
+        }
+
+        function getScoreColor(score) {
+            if (score >= 95) return 'text-purple-400';
+            if (score >= 85) return 'text-blue-400';
+            if (score >= 75) return 'text-green-400';
+            if (score >= 60) return 'text-yellow-400';
+            return 'text-red-400';
+        }
+
+        // Init on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -104,6 +104,19 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+
+        /* Filter buttons active state */
+        .filter-btn.active {
+            background-color: rgba(59, 130, 246, 0.3) !important;
+            border-color: rgba(59, 130, 246, 0.8) !important;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Freshness indicators */
+        .freshness-fresh { color: #ef4444; font-weight: 600; }
+        .freshness-recent { color: #f59e0b; }
+        .freshness-active { color: #22c55e; }
+        .freshness-old { color: #6b7280; }
     </style>
 </head>
 <body class="text-white min-h-screen">
@@ -150,6 +163,40 @@
             <!-- Stats will be injected here -->
         </div>
 
+        <!-- Network Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <a href="blockchain_view.html?network=eth" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🔷</div>
+                <div class="font-bold text-blue-400 group-hover:text-blue-300">ETH</div>
+                <div class="text-xs text-gray-400 mt-1" id="eth-count">-</div>
+            </a>
+            <a href="blockchain_view.html?network=bsc" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🟡</div>
+                <div class="font-bold text-yellow-400 group-hover:text-yellow-300">BSC</div>
+                <div class="text-xs text-gray-400 mt-1" id="bsc-count">-</div>
+            </a>
+            <a href="blockchain_view.html?network=base" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🔵</div>
+                <div class="font-bold text-indigo-400 group-hover:text-indigo-300">BASE</div>
+                <div class="text-xs text-gray-400 mt-1" id="base-count">-</div>
+            </a>
+            <a href="blockchain_view.html?network=solana" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🟣</div>
+                <div class="font-bold text-purple-400 group-hover:text-purple-300">SOLANA</div>
+                <div class="text-xs text-gray-400 mt-1" id="solana-count">-</div>
+            </a>
+            <a href="blockchain_view.html?network=polygon_pos" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🟪</div>
+                <div class="font-bold text-violet-400 group-hover:text-violet-300">POLYGON</div>
+                <div class="text-xs text-gray-400 mt-1" id="polygon_pos-count">-</div>
+            </a>
+            <a href="blockchain_view.html?network=avax" class="glass-card p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer group">
+                <div class="text-2xl mb-2">🔴</div>
+                <div class="font-bold text-red-400 group-hover:text-red-300">AVAX</div>
+                <div class="text-xs text-gray-400 mt-1" id="avax-count">-</div>
+            </a>
+        </div>
+
         <!-- Charts Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- Score Distribution Chart -->
@@ -180,6 +227,64 @@
             </h3>
             <div class="chart-container" style="height: 250px;">
                 <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Smart Filters -->
+        <div class="glass-card p-6 rounded-xl fade-in mb-6">
+            <div class="flex flex-wrap gap-3 items-center">
+                <span class="text-sm font-semibold text-gray-300">Filtres Rapides:</span>
+
+                <!-- Tier Filters -->
+                <div class="flex gap-2">
+                    <button onclick="toggleFilter('tier', 'ULTRA_HIGH')" class="filter-btn tier-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/20" data-filter="ULTRA_HIGH">
+                        ULTRA HIGH
+                    </button>
+                    <button onclick="toggleFilter('tier', 'HIGH')" class="filter-btn tier-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/20" data-filter="HIGH">
+                        HIGH
+                    </button>
+                    <button onclick="toggleFilter('tier', 'MEDIUM')" class="filter-btn tier-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-green-500/30 text-green-400 hover:bg-green-500/20" data-filter="MEDIUM">
+                        MEDIUM
+                    </button>
+                </div>
+
+                <div class="h-6 w-px bg-white/10"></div>
+
+                <!-- Network Filters -->
+                <div class="flex gap-2">
+                    <button onclick="toggleFilter('network', 'eth')" class="filter-btn network-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/20" data-filter="eth">
+                        ETH
+                    </button>
+                    <button onclick="toggleFilter('network', 'bsc')" class="filter-btn network-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20" data-filter="bsc">
+                        BSC
+                    </button>
+                    <button onclick="toggleFilter('network', 'base')" class="filter-btn network-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20" data-filter="base">
+                        BASE
+                    </button>
+                    <button onclick="toggleFilter('network', 'solana')" class="filter-btn network-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/20" data-filter="solana">
+                        SOLANA
+                    </button>
+                </div>
+
+                <div class="h-6 w-px bg-white/10"></div>
+
+                <!-- Quick Filters -->
+                <div class="flex gap-2">
+                    <button onclick="toggleQuickFilter('score90')" class="filter-btn quick-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20" data-filter="score90">
+                        Score >90
+                    </button>
+                    <button onclick="toggleQuickFilter('fresh')" class="filter-btn quick-filter px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20" data-filter="fresh">
+                        <5min
+                    </button>
+                </div>
+
+                <button onclick="clearAllFilters()" class="ml-auto px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-red-500/30 text-red-400 hover:bg-red-500/20">
+                    Réinitialiser
+                </button>
+
+                <div class="text-xs text-gray-400">
+                    <span id="filteredCount">0</span> résultats
+                </div>
             </div>
         </div>
 
@@ -253,6 +358,7 @@
         // Global state
         const state = {
             alerts: [],
+            allAlerts: [], // Store unfiltered alerts
             stats: {},
             filterDays: 7,
             currentPage: 1,
@@ -263,7 +369,13 @@
                 network: null,
                 timeline: null
             },
-            eventSource: null
+            eventSource: null,
+            filters: {
+                tiers: [],
+                networks: [],
+                score90: false,
+                fresh: false
+            }
         };
 
         // API Base URL
@@ -344,24 +456,122 @@
         async function loadAlerts() {
             try {
                 const offset = (state.currentPage - 1) * state.itemsPerPage;
-                const response = await fetch(`${API_URL}/alerts?days=${state.filterDays}&limit=${state.itemsPerPage}&offset=${offset}`);
+                const response = await fetch(`${API_URL}/alerts?days=${state.filterDays}&limit=1000`); // Load more for client-side filtering
                 const data = await response.json();
 
-                state.alerts = data.alerts || [];
-                state.totalAlerts = data.total || 0;
-
-                renderAlerts();
-                updatePagination();
+                state.allAlerts = data.alerts || [];
+                applyFilters();
             } catch (error) {
                 console.error('Error loading alerts:', error);
+                state.allAlerts = [];
                 state.alerts = [];
                 state.totalAlerts = 0;
             }
         }
 
+        // Apply filters
+        function applyFilters() {
+            let filtered = [...state.allAlerts];
+
+            // Tier filter
+            if (state.filters.tiers.length > 0) {
+                filtered = filtered.filter(alert => state.filters.tiers.includes(alert.tier));
+            }
+
+            // Network filter
+            if (state.filters.networks.length > 0) {
+                filtered = filtered.filter(alert => state.filters.networks.includes(alert.network));
+            }
+
+            // Score >90 filter
+            if (state.filters.score90) {
+                filtered = filtered.filter(alert => alert.score >= 90);
+            }
+
+            // Fresh (<5min) filter
+            if (state.filters.fresh) {
+                filtered = filtered.filter(alert => {
+                    const ageMinutes = alert.age_hours * 60;
+                    return ageMinutes < 5;
+                });
+            }
+
+            state.totalAlerts = filtered.length;
+            document.getElementById('filteredCount').textContent = filtered.length;
+
+            // Pagination
+            const offset = (state.currentPage - 1) * state.itemsPerPage;
+            state.alerts = filtered.slice(offset, offset + state.itemsPerPage);
+
+            renderAlerts();
+            updatePagination();
+        }
+
+        // Toggle filter
+        function toggleFilter(type, value) {
+            const btn = event.target;
+            const filterKey = type === 'tier' ? 'tiers' : 'networks';
+
+            if (state.filters[filterKey].includes(value)) {
+                // Remove filter
+                state.filters[filterKey] = state.filters[filterKey].filter(v => v !== value);
+                btn.classList.remove('active');
+            } else {
+                // Add filter
+                state.filters[filterKey].push(value);
+                btn.classList.add('active');
+            }
+
+            applyFilters();
+        }
+
+        // Toggle quick filter
+        function toggleQuickFilter(type) {
+            const btn = event.target;
+            state.filters[type] = !state.filters[type];
+
+            if (state.filters[type]) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+
+            applyFilters();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            state.filters = {
+                tiers: [],
+                networks: [],
+                score90: false,
+                fresh: false
+            };
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            state.currentPage = 1;
+            applyFilters();
+        }
+
+        // Update network counts
+        function updateNetworkCounts() {
+            const networks = state.stats.by_network || {};
+            Object.keys(networks).forEach(network => {
+                const countEl = document.getElementById(`${network}-count`);
+                if (countEl) {
+                    countEl.textContent = `${networks[network].count} tokens`;
+                }
+            });
+        }
+
         // Render stats cards
         function renderStats() {
             const container = document.getElementById('statsContainer');
+            updateNetworkCounts();
 
             const avgPerDay = state.filterDays > 0 ? (state.stats.total_alerts / state.filterDays).toFixed(1) : '0.0';
 
@@ -432,7 +642,7 @@
                         </span>
                     </td>
                     <td class="py-4 text-sm">$${formatNumber(alert.liquidity || 0)}</td>
-                    <td class="py-4 text-sm">${(alert.age_hours || 0).toFixed(1)}h</td>
+                    <td class="py-4 text-sm">${getFreshnessDisplay(alert.age_hours)}</td>
                     <td class="py-4 text-sm text-gray-400">${formatDate(alert.created_at)}</td>
                     <td class="py-4">
                         <button onclick="viewAlert(${alert.id})" class="text-blue-400 hover:text-blue-300 transition">
@@ -760,6 +970,31 @@
             if (!dateStr) return 'N/A';
             const date = new Date(dateStr);
             return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getFreshnessDisplay(ageHours) {
+            const ageMinutes = ageHours * 60;
+            let emoji, cssClass, text;
+
+            if (ageMinutes < 5) {
+                emoji = '🔴';
+                cssClass = 'freshness-fresh';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageMinutes < 30) {
+                emoji = '🟡';
+                cssClass = 'freshness-recent';
+                text = Math.floor(ageMinutes) + 'min';
+            } else if (ageHours < 6) {
+                emoji = '🟢';
+                cssClass = 'freshness-active';
+                text = ageHours.toFixed(1) + 'h';
+            } else {
+                emoji = '⚪';
+                cssClass = 'freshness-old';
+                text = ageHours.toFixed(1) + 'h';
+            }
+
+            return `<span class="${cssClass}">${emoji} ${text}</span>`;
         }
 
         function getScoreColorClass(score) {
