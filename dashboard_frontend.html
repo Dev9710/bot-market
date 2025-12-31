@@ -335,6 +335,9 @@
                 <table class="w-full">
                     <thead class="border-b border-white/10">
                         <tr class="text-left text-sm text-gray-400">
+                            <th class="pb-3 w-8">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500">
+                            </th>
                             <th class="pb-3">Token</th>
                             <th class="pb-3">Réseau</th>
                             <th class="pb-3">Score</th>
@@ -386,6 +389,20 @@
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
 
+    <!-- Floating Comparison Panel -->
+    <div id="comparePanel" class="fixed bottom-6 right-6 glass-card p-4 rounded-xl shadow-2xl" style="display: none; max-width: 400px; z-index: 100;">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-purple-400">🔍 Comparaison</h3>
+            <button onclick="closeCompare()" class="text-gray-400 hover:text-white text-2xl leading-none">×</button>
+        </div>
+        <div id="compareList" class="space-y-2 mb-3 max-h-40 overflow-y-auto">
+            <!-- Selected tokens will appear here -->
+        </div>
+        <button onclick="openCompareView()" id="compareBtn" class="w-full bg-purple-500/20 text-purple-400 px-4 py-2 rounded hover:bg-purple-500/30 transition border border-purple-500/30 font-semibold">
+            Comparer (<span id="compareCount">0</span>)
+        </button>
+    </div>
+
     <script>
         // Global state
         const state = {
@@ -409,7 +426,8 @@
                 fresh: false
             },
             searchQuery: '',
-            sniperMode: false
+            sniperMode: false,
+            compareTokens: [] // Tokens selected for comparison
         };
 
         // API Base URL
@@ -800,12 +818,20 @@
             document.getElementById('totalAlerts').textContent = state.totalAlerts;
 
             if (state.alerts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">Aucune alerte pour cette période</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400">Aucune alerte pour cette période</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = state.alerts.map(alert => `
+            tbody.innerHTML = state.alerts.map(alert => {
+                const isChecked = state.compareTokens.some(t => t.id === alert.id);
+                return `
                 <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                    <td class="py-4">
+                        <input type="checkbox"
+                               ${isChecked ? 'checked' : ''}
+                               onchange="toggleCompare(${alert.id})"
+                               class="rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500 compare-checkbox">
+                    </td>
                     <td class="py-4">
                         <div class="font-semibold">${alert.token_symbol}</div>
                         <div class="text-xs text-gray-500">${alert.token_name}</div>
@@ -834,7 +860,7 @@
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         // View alert detail
@@ -1214,6 +1240,96 @@
                 'solana': 'bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs font-semibold'
             };
             return badges[network] || 'bg-gray-500/20 text-gray-400 px-2 py-1 rounded text-xs';
+        }
+
+        // ============================================================================
+        // COMPARISON FUNCTIONS
+        // ============================================================================
+
+        // Toggle token in comparison list
+        function toggleCompare(alertId) {
+            const alert = state.allAlerts.find(a => a.id === alertId);
+            if (!alert) return;
+
+            const index = state.compareTokens.findIndex(t => t.id === alertId);
+
+            if (index > -1) {
+                // Remove from comparison
+                state.compareTokens.splice(index, 1);
+            } else {
+                // Add to comparison (max 4 tokens)
+                if (state.compareTokens.length >= 4) {
+                    showNotification('Maximum 4 tokens pour la comparaison', 'warning');
+                    // Uncheck the checkbox
+                    event.target.checked = false;
+                    return;
+                }
+                state.compareTokens.push(alert);
+            }
+
+            updateComparePanel();
+            renderAlerts(); // Re-render to update checkboxes
+        }
+
+        // Toggle select all
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.compare-checkbox');
+
+            if (selectAll.checked) {
+                // Select visible alerts (max 4)
+                state.compareTokens = state.alerts.slice(0, 4);
+            } else {
+                state.compareTokens = [];
+            }
+
+            updateComparePanel();
+            renderAlerts();
+        }
+
+        // Update comparison panel
+        function updateComparePanel() {
+            const panel = document.getElementById('comparePanel');
+            const list = document.getElementById('compareList');
+            const count = document.getElementById('compareCount');
+
+            count.textContent = state.compareTokens.length;
+
+            if (state.compareTokens.length === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+
+            list.innerHTML = state.compareTokens.map(token => `
+                <div class="flex items-center justify-between bg-white/5 p-2 rounded">
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm">${token.token_symbol}</div>
+                        <div class="text-xs text-gray-400">Score: ${token.score}</div>
+                    </div>
+                    <button onclick="toggleCompare(${token.id})" class="text-red-400 hover:text-red-300 text-lg leading-none">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Close comparison panel
+        function closeCompare() {
+            state.compareTokens = [];
+            updateComparePanel();
+            renderAlerts();
+        }
+
+        // Open comparison view
+        function openCompareView() {
+            if (state.compareTokens.length < 2) {
+                showNotification('Sélectionnez au moins 2 tokens', 'warning');
+                return;
+            }
+
+            // Store in localStorage and open new page
+            localStorage.setItem('compareTokens', JSON.stringify(state.compareTokens));
+            window.open('compare.html', '_blank');
         }
 
         // Initialize on page load

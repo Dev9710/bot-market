@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparaison - Scanner V3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+        }
+
+        .metric-row {
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #9ca3af;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .winner {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen p-6">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <a href="javascript:window.close()" class="text-gray-400 hover:text-white transition text-sm inline-block mb-4">
+            ← Fermer
+        </a>
+        <h1 class="text-3xl font-bold mb-2">🔍 Comparaison de Tokens</h1>
+        <p class="text-gray-400">Analyse côte à côte</p>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="max-w-7xl mx-auto text-center py-12 text-gray-400">
+        Chargement...
+    </div>
+
+    <!-- Comparison Grid -->
+    <div id="content" class="max-w-7xl mx-auto" style="display: none;">
+        <div id="compareGrid" class="grid gap-4">
+            <!-- Tokens will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        // Load tokens from localStorage
+        const compareTokens = JSON.parse(localStorage.getItem('compareTokens') || '[]');
+
+        if (compareTokens.length === 0) {
+            document.getElementById('loading').innerHTML = '<div class="text-red-400">Aucun token à comparer</div>';
+        } else {
+            renderComparison();
+        }
+
+        function renderComparison() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            const grid = document.getElementById('compareGrid');
+
+            // Determine grid columns based on number of tokens
+            const cols = compareTokens.length === 2 ? 'md:grid-cols-2' :
+                         compareTokens.length === 3 ? 'md:grid-cols-3' :
+                         'md:grid-cols-2 lg:grid-cols-4';
+
+            grid.className = `grid gap-4 grid-cols-1 ${cols}`;
+
+            // Find winners for each metric
+            const maxScore = Math.max(...compareTokens.map(t => t.score));
+            const maxLiquidity = Math.max(...compareTokens.map(t => t.liquidity || 0));
+            const maxVolume = Math.max(...compareTokens.map(t => t.volume_24h || 0));
+            const minAge = Math.min(...compareTokens.map(t => t.age_hours || Infinity));
+
+            grid.innerHTML = compareTokens.map(token => {
+                const isScoreWinner = token.score === maxScore;
+                const isLiquidityWinner = token.liquidity === maxLiquidity;
+                const isVolumeWinner = token.volume_24h === maxVolume;
+                const isAgeWinner = token.age_hours === minAge;
+
+                return `
+                <div class="card p-6">
+                    <!-- Header -->
+                    <div class="mb-6 text-center">
+                        <h2 class="text-2xl font-bold mb-1">${token.token_symbol}</h2>
+                        <p class="text-sm text-gray-400 mb-3">${token.token_name}</p>
+                        <span class="${getNetworkBadge(token.network)}">${token.network.toUpperCase()}</span>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="space-y-0">
+                        <div class="metric-row ${isScoreWinner ? 'winner' : ''}">
+                            <div class="metric-label">Score</div>
+                            <div class="metric-value ${getScoreColor(token.score)}">
+                                ${token.score}
+                                ${isScoreWinner ? '<span class="text-sm ml-2">🏆</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-label">Tier</div>
+                            <div class="metric-value">
+                                <span class="${getTierBadge(token.tier)}">${token.tier}</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-row ${isLiquidityWinner ? 'winner' : ''}">
+                            <div class="metric-label">Liquidité</div>
+                            <div class="metric-value text-green-400">
+                                $${formatNumber(token.liquidity || 0)}
+                                ${isLiquidityWinner ? '<span class="text-sm ml-2">🏆</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="metric-row ${isVolumeWinner ? 'winner' : ''}">
+                            <div class="metric-label">Volume 24h</div>
+                            <div class="metric-value text-blue-400">
+                                $${formatNumber(token.volume_24h || 0)}
+                                ${isVolumeWinner ? '<span class="text-sm ml-2">🏆</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="metric-row ${isAgeWinner ? 'winner' : ''}">
+                            <div class="metric-label">Âge</div>
+                            <div class="metric-value">
+                                ${(token.age_hours || 0).toFixed(1)}h
+                                ${isAgeWinner ? '<span class="text-sm ml-2">🏆</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-label">Prix</div>
+                            <div class="metric-value text-gray-300">
+                                $${token.price || 'N/A'}
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-label">Date</div>
+                            <div class="metric-value text-xs text-gray-400">
+                                ${formatDate(token.created_at)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action -->
+                    <div class="mt-6">
+                        <a href="bot-market/token_details.html?id=${token.id}" target="_blank" class="block w-full bg-blue-500/20 text-blue-400 px-4 py-2 rounded hover:bg-blue-500/30 transition border border-blue-500/30 text-center font-semibold">
+                            Voir Détails →
+                        </a>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            return num.toFixed(0);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getScoreColor(score) {
+            if (score >= 95) return 'text-purple-400';
+            if (score >= 85) return 'text-blue-400';
+            if (score >= 75) return 'text-green-400';
+            if (score >= 60) return 'text-yellow-400';
+            return 'text-red-400';
+        }
+
+        function getTierBadge(tier) {
+            const badges = {
+                'ULTRA_HIGH': 'bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs font-semibold border border-purple-500/30',
+                'HIGH': 'bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs font-semibold border border-blue-500/30',
+                'MEDIUM': 'bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30',
+                'LOW': 'bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-semibold border border-yellow-500/30'
+            };
+            return badges[tier] || 'bg-gray-500/20 text-gray-400 px-2 py-1 rounded text-xs';
+        }
+
+        function getNetworkBadge(network) {
+            const badges = {
+                'eth': 'bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-semibold',
+                'bsc': 'bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-semibold',
+                'base': 'bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full text-xs font-semibold',
+                'solana': 'bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-xs font-semibold'
+            };
+            return badges[network] || 'bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-xs';
+        }
+    </script>
+</body>
+</html>
