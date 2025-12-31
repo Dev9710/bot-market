@@ -401,8 +401,13 @@ def get_alert_detail(alert_id):
         alert = parse_alert_row(row)
 
         # Ajouter données complètes
-        if row['alert_data']:
-            alert['full_data'] = json.loads(row['alert_data'])
+        row_dict = dict(row)
+        if row_dict.get('alert_data'):
+            try:
+                alert['full_data'] = json.loads(row_dict['alert_data'])
+            except (json.JSONDecodeError, TypeError) as e:
+                print(f"Error parsing alert_data for alert {alert_id}: {e}")
+                alert['full_data'] = {}
 
         conn.close()
 

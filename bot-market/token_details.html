@@ -286,14 +286,14 @@
             document.getElementById('content').style.display = 'block';
 
             // Header
-            document.getElementById('tokenSymbol').textContent = alert.token_symbol;
-            document.getElementById('tokenName').textContent = alert.token_name;
-            document.getElementById('score').textContent = alert.score;
-            document.getElementById('score').className = `text-4xl font-bold ${getScoreColor(alert.score)}`;
-            document.getElementById('tier').textContent = alert.tier;
+            document.getElementById('tokenSymbol').textContent = alert.token_symbol || 'N/A';
+            document.getElementById('tokenName').textContent = alert.token_name || 'N/A';
+            document.getElementById('score').textContent = alert.score || 0;
+            document.getElementById('score').className = `text-4xl font-bold ${getScoreColor(alert.score || 0)}`;
+            document.getElementById('tier').textContent = alert.tier || 'N/A';
 
             // Get full data from alert_data JSON
-            const fullData = alert.full_data || {};
+            const fullData = alert.full_data || alert || {};
 
             // Prix & Targets
             document.getElementById('entry_price').textContent = fullData.entry_price ? `$${fullData.entry_price.toFixed(8)}` : 'N/A';

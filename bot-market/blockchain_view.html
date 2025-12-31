@@ -36,6 +36,12 @@
         .fade-in {
             animation: fadeIn 0.3s ease-out;
         }
+
+        .active-filter {
+            background-color: rgba(59, 130, 246, 0.3) !important;
+            border-color: rgba(59, 130, 246, 0.8) !important;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
     </style>
 </head>
 <body class="text-white min-h-screen p-6">
@@ -43,7 +49,7 @@
     <header class="max-w-7xl mx-auto mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <a href="dashboard_frontend.html" class="text-gray-400 hover:text-white transition text-sm mb-2 inline-block">
+                <a href="/" class="text-gray-400 hover:text-white transition text-sm mb-2 inline-block">
                     ← Retour au dashboard
                 </a>
                 <h1 class="text-4xl font-bold" id="networkTitle">ETH</h1>
@@ -53,6 +59,26 @@
             <div class="text-right">
                 <div class="text-3xl font-bold" id="tokenCount">0</div>
                 <div class="text-sm text-gray-400">tokens détectés</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mt-6 flex gap-3 items-center">
+            <span class="text-sm font-semibold text-gray-300">Filtres:</span>
+            <button onclick="filterByDays(1)" id="filter-today" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20">
+                Aujourd'hui
+            </button>
+            <button onclick="filterByDays(7)" id="filter-7days" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-blue-500/30 text-blue-400 bg-blue-500/20 active-filter">
+                7 jours
+            </button>
+            <button onclick="filterByDays(30)" id="filter-30days" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20">
+                30 jours
+            </button>
+            <button onclick="clearFilters()" class="ml-auto px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-red-500/30 text-red-400 hover:bg-red-500/20">
+                Réinitialiser
+            </button>
+            <div class="text-xs text-gray-400">
+                <span id="filteredCount">0</span> résultats
             </div>
         </div>
     </header>
@@ -78,6 +104,10 @@
         const network = urlParams.get('network') || 'eth';
         const API_URL = window.location.origin + '/api';
 
+        // State
+        let allTokens = [];
+        let currentDays = 7;
+
         // Network colors
         const networkColors = {
             eth: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400' },
@@ -97,14 +127,15 @@
         // Load tokens
         async function loadTokens() {
             try {
-                const response = await fetch(`${API_URL}/alerts?network=${network}&days=7&limit=500`);
+                const response = await fetch(`${API_URL}/alerts?network=${network}&days=${currentDays}&limit=500`);
                 const data = await response.json();
-                const tokens = data.alerts || [];
+                allTokens = data.alerts || [];
 
-                document.getElementById('tokenCount').textContent = tokens.length;
+                document.getElementById('tokenCount').textContent = allTokens.length;
+                document.getElementById('filteredCount').textContent = allTokens.length;
 
-                renderStats(tokens);
-                renderTokens(tokens);
+                renderStats(allTokens);
+                renderTokens(allTokens);
             } catch (error) {
                 console.error('Error loading tokens:', error);
                 document.getElementById('tokensGrid').innerHTML = `
@@ -113,6 +144,30 @@
                     </div>
                 `;
             }
+        }
+
+        // Filter by days
+        function filterByDays(days) {
+            currentDays = days;
+
+            // Update active button
+            document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+                btn.classList.remove('active-filter', 'bg-blue-500/20', 'text-blue-400', 'border-blue-500/30');
+                btn.classList.add('border-white/30', 'text-gray-300');
+            });
+
+            const activeBtn = document.getElementById(`filter-${days === 1 ? 'today' : days + 'days'}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-filter', 'bg-blue-500/20', 'text-blue-400', 'border-blue-500/30');
+                activeBtn.classList.remove('border-white/30', 'text-gray-300');
+            }
+
+            loadTokens();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            filterByDays(7);
         }
 
         // Render stats
@@ -210,7 +265,7 @@
 
         // View token details
         function viewToken(id) {
-            window.location.href = `token_details.html?id=${id}`;
+            window.location.href = `/bot-market/token_details.html?id=${id}`;
         }
 
         // Utility functions
