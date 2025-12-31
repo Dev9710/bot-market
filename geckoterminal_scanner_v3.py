@@ -441,7 +441,20 @@ def get_new_pools(network: str, page: int = 1) -> Optional[List[Dict]]:
             return None
 
         data = response.json()
-        return data.get("data", [])
+        pools = data.get("data", [])
+
+        # DEBUG: Logger structure du premier NEW pool (une seule fois)
+        if pools and not hasattr(get_new_pools, '_logged_structure'):
+            log(f"   [DEBUG-NEW-POOL] Premier NEW pool {network}:")
+            first_pool = pools[0]
+            attrs = first_pool.get("attributes", {})
+            log(f"      Name: {attrs.get('name', 'N/A')}")
+            log(f"      reserve_in_usd: {attrs.get('reserve_in_usd', 'MISSING')}")
+            log(f"      fdv_usd: {attrs.get('fdv_usd', 'MISSING')}")
+            log(f"      market_cap_usd: {attrs.get('market_cap_usd', 'MISSING')}")
+            get_new_pools._logged_structure = True
+
+        return pools
     except Exception as e:
         log(f"❌ Erreur get_new_pools {network}: {e}")
         return None
@@ -544,8 +557,13 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
                         # Estimer liquidité à 10% du FDV (conservateur)
                         liquidity = fdv * 0.10
                         liquidity_source = "fdv_usd(10%)"
-                except (ValueError, TypeError):
-                    pass
+                    else:
+                        # DEBUG: FDV est 0
+                        if parse_pool_data._debug_count < 10:
+                            log(f"   [DEBUG-FDV] {name[:30]}: fdv_value={fdv_value}, fdv_float={fdv}, result=0")
+                except (ValueError, TypeError) as e:
+                    if parse_pool_data._debug_count < 10:
+                        log(f"   [DEBUG-FDV-ERROR] {name[:30]}: fdv_value={fdv_value}, error={e}")
 
         # FALLBACK 2: Si toujours 0, essayer market_cap_usd (15% du market cap)
         if liquidity == 0:
@@ -566,11 +584,20 @@ def parse_pool_data(pool: Dict, network: str = "unknown") -> Optional[Dict]:
             liquidity = volume_24h * 5
             liquidity_source = "volume_24h(x5)"
 
-        # Log pour debug
+        # Log pour debug - AMÉLIORATION: Logger TOUTES les sources + valeur exacte
         if liquidity == 0:
-            log(f"   [LIQUIDITY] {name}: FAILED - reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
+            log(f"   [LIQUIDITY-FAIL] {name}: reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
         elif liquidity_source != "reserve_in_usd":
-            log(f"   [LIQUIDITY] {name}: ${liquidity:,.0f} from {liquidity_source}")
+            # Log avec valeur EXACTE pour détecter arrondissage
+            log(f"   [LIQUIDITY-FALLBACK] {name}: ${liquidity:,.2f} (raw: {liquidity}) from {liquidity_source}")
+        # NOUVEAU: Logger aussi quand on utilise reserve_in_usd (pour vérifier)
+        else:
+            # Ne logger que les 3 premiers pour éviter spam
+            if not hasattr(parse_pool_data, '_reserve_log_count'):
+                parse_pool_data._reserve_log_count = 0
+            if parse_pool_data._reserve_log_count < 3:
+                log(f"   [LIQUIDITY-OK] {name}: ${liquidity:,.0f} from reserve_in_usd")
+                parse_pool_data._reserve_log_count += 1
 
         # Transactions (protéger contre None)
         transactions_data = attrs.get("transactions", {}) or {}
