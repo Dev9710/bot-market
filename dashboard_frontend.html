@@ -219,6 +219,16 @@
             </a>
         </div>
 
+        <!-- Performance Indicators -->
+        <div class="glass-card p-6 rounded-xl mb-8 fade-in">
+            <h3 class="text-xl font-semibold mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                📊 Indicateurs de Performance
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="performanceIndicators">
+                <!-- Performance metrics will be injected here -->
+            </div>
+        </div>
+
         <!-- Charts Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- Score Distribution Chart -->
@@ -703,6 +713,83 @@
                         <div><span class="text-green-400">HIGH:</span> ${state.stats.by_tier?.HIGH || 0}</div>
                         <div><span class="text-yellow-400">MEDIUM:</span> ${state.stats.by_tier?.MEDIUM || 0}</div>
                     </div>
+                </div>
+            `;
+
+            // Render performance indicators
+            renderPerformanceIndicators();
+        }
+
+        // Render performance indicators
+        function renderPerformanceIndicators() {
+            const container = document.getElementById('performanceIndicators');
+
+            // Calculate metrics from stats
+            const totalAlerts = state.stats.total_alerts || 0;
+            const ultraHigh = state.stats.by_tier?.ULTRA_HIGH || 0;
+            const high = state.stats.by_tier?.HIGH || 0;
+            const medium = state.stats.by_tier?.MEDIUM || 0;
+            const low = state.stats.by_tier?.LOW || 0;
+
+            // Quality Rate: ULTRA_HIGH + HIGH as percentage
+            const qualityRate = totalAlerts > 0
+                ? (((ultraHigh + high) / totalAlerts) * 100).toFixed(1)
+                : 0;
+
+            // Precision Rate: ULTRA_HIGH only
+            const precisionRate = totalAlerts > 0
+                ? ((ultraHigh / totalAlerts) * 100).toFixed(1)
+                : 0;
+
+            // Find best network by average score
+            const networks = state.stats.by_network || {};
+            let bestNetwork = { name: 'N/A', score: 0, count: 0 };
+            Object.keys(networks).forEach(net => {
+                if (networks[net].avg_score > bestNetwork.score) {
+                    bestNetwork = {
+                        name: net.toUpperCase(),
+                        score: networks[net].avg_score.toFixed(1),
+                        count: networks[net].count
+                    };
+                }
+            });
+
+            // Consistency: % of days with avg score >85
+            const timeline = state.stats.alerts_per_day || [];
+            const goodDays = timeline.filter(day => day.avg_score >= 85).length;
+            const consistency = timeline.length > 0
+                ? ((goodDays / timeline.length) * 100).toFixed(0)
+                : 0;
+
+            container.innerHTML = `
+                <div class="glass p-4 rounded-lg hover:bg-white/5 transition">
+                    <div class="text-sm text-gray-400 mb-2">Taux de Qualité</div>
+                    <div class="text-3xl font-bold ${qualityRate >= 80 ? 'text-green-400' : qualityRate >= 60 ? 'text-yellow-400' : 'text-red-400'}">
+                        ${qualityRate}%
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">HIGH + ULTRA</div>
+                </div>
+
+                <div class="glass p-4 rounded-lg hover:bg-white/5 transition">
+                    <div class="text-sm text-gray-400 mb-2">Taux de Précision</div>
+                    <div class="text-3xl font-bold ${precisionRate >= 50 ? 'text-purple-400' : precisionRate >= 30 ? 'text-blue-400' : 'text-gray-400'}">
+                        ${precisionRate}%
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">ULTRA_HIGH uniquement</div>
+                </div>
+
+                <div class="glass p-4 rounded-lg hover:bg-white/5 transition">
+                    <div class="text-sm text-gray-400 mb-2">Meilleur Réseau</div>
+                    <div class="text-2xl font-bold text-cyan-400">${bestNetwork.name}</div>
+                    <div class="text-xs text-gray-500 mt-1">Score ${bestNetwork.score} (${bestNetwork.count} tokens)</div>
+                </div>
+
+                <div class="glass p-4 rounded-lg hover:bg-white/5 transition">
+                    <div class="text-sm text-gray-400 mb-2">Régularité</div>
+                    <div class="text-3xl font-bold ${consistency >= 70 ? 'text-green-400' : consistency >= 50 ? 'text-yellow-400' : 'text-red-400'}">
+                        ${consistency}%
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Jours score >85</div>
                 </div>
             `;
         }
