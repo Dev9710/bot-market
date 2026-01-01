@@ -1,0 +1,287 @@
+📊 ANALYSE DES ZONES DE PROFIT SYSTÉMATIQUES
+
+Database: alerts_history.db
+
+1️⃣  Analyse de l'évolution des prix...
+
+====================================================================================================
+💰 ANALYSE 1: ÉVOLUTION DES PRIX ENTRE ALERTES
+====================================================================================================
+
+
+🌐 RÉSEAU: ARBITRUM
+   Tokens analysés: 6
+
+   📈 TOP 10 GAINS ENTRE ALERTES:
+       1. TMX                  | +  22.9% en   0.1h | Vol: $     6K | Liq: $     4K
+       2. MIND                 | +  22.2% en   0.1h | Vol: $   140K | Liq: $    76K
+       3. MIND                 | +  20.5% en   0.1h | Vol: $   147K | Liq: $    90K
+       4. MIND                 | +  19.3% en   0.1h | Vol: $   139K | Liq: $    74K
+       5. TMX                  | +  17.9% en   3.5h | Vol: $     3K | Liq: $     2K
+       6. OLEA                 | +  16.1% en  11.9h | Vol: $   175K | Liq: $    85K
+       7. MIND                 | +  15.8% en   0.1h | Vol: $   143K | Liq: $    82K
+       8. MIND                 | +  15.3% en   0.1h | Vol: $   146K | Liq: $   125K
+       9. TMX                  | +  10.2% en   0.1h | Vol: $    14K | Liq: $     4K
+      10. OLEA                 | +   9.9% en   0.1h | Vol: $   144K | Liq: $   283K
+
+   📊 STATS GAINS:
+      • Gain moyen: +13.2%
+      • Temps moyen entre alertes: 0.9h
+      • Total occurrences: 18
+
+🌐 RÉSEAU: BASE
+   Tokens analysés: 5
+
+   📈 TOP 10 GAINS ENTRE ALERTES:
+       1. SLING                | + 254.0% en   2.3h | Vol: $   864K | Liq: $   232K
+       2. SLING                | +  60.2% en   0.1h | Vol: $  1192K | Liq: $   439K
+       3. BECOMEUNGOVERNABLE   | +  32.3% en   0.8h | Vol: $   817K | Liq: $   131K
+       4. BECOMEUNGOVERNABLE   | +  27.1% en   0.1h | Vol: $   864K | Liq: $   132K
+       5. SLING                | +  26.0% en   0.1h | Vol: $  1569K | Liq: $   479K
+       6. SLING                | +  24.5% en   0.1h | Vol: $   998K | Liq: $   318K
+       7. SLING                | +  22.6% en   0.1h | Vol: $  3072K | Liq: $   206K
+       8. BECOMEUNGOVERNABLE   | +  20.4% en   0.1h | Vol: $  1323K | Liq: $   129K
+       9. SLING                | +  19.3% en   0.1h | Vol: $  3457K | Liq: $   167K
+      10. SLING                | +  19.1% en   0.1h | Vol: $  2641K | Liq: $   286K
+
+   📊 STATS GAINS:
+      • Gain moyen: +16.5%
+      • Temps moyen entre alertes: 0.2h
+      • Total occurrences: 66
+
+🌐 RÉSEAU: BSC
+   Tokens analysés: 17
+
+   📈 TOP 10 GAINS ENTRE ALERTES:
+       1. ABUNDANCE            | +  70.0% en   0.1h | Vol: $   177K | Liq: $   144K
+       2. Lippo                | +  50.3% en   0.1h | Vol: $   183K | Liq: $   132K
+       3. DOGWIFE              | +  39.4% en   0.1h | Vol: $   147K | Liq: $   123K
+       4. ONECLICK             | +  39.3% en   0.1h | Vol: $   248K | Liq: $   114K
+       5. AT                   | +  35.1% en   0.1h | Vol: $   180K | Liq: $   128K
+       6. 圣诞cz                 | +  34.2% en   0.1h | Vol: $   225K | Liq: $   134K
+       7. RISEX                | +  32.1% en   0.1h | Vol: $   205K | Liq: $   129K
+       8. BIFI                 | +  30.6% en   0.1h | Vol: $   197K | Liq: $   135K
+       9. AT                   | +  23.8% en   0.1h | Vol: $   191K | Liq: $   118K
+      10. 白描文学                 | +  21.2% en   0.1h | Vol: $   185K | Liq: $   121K
+
+   📊 STATS GAINS:
+      • Gain moyen: +27.0%
+      • Temps moyen entre alertes: 0.1h
+      • Total occurrences: 18
+
+🌐 RÉSEAU: ETH
+   Tokens analysés: 11
+
+   📈 TOP 10 GAINS ENTRE ALERTES:
+       1. ATLAS                | +1233.5% en   0.1h | Vol: $  1058K | Liq: $   157K
+       2. ATLAS                | +1022.6% en   0.3h | Vol: $  2755K | Liq: $   190K
+       3. OZ                   | +  49.4% en   0.3h | Vol: $   525K | Liq: $   102K
+       4. OZ                   | +  29.4% en   0.1h | Vol: $   645K | Liq: $   122K
+       5. SNOWBALL             | +  28.8% en   0.2h | Vol: $   219K | Liq: $   111K
+       6. ATLAS                | +  25.0% en   0.1h | Vol: $  2881K | Liq: $   163K
+       7. ATLAS                | +  24.2% en   0.2h | Vol: $  2937K | Liq: $   191K
+       8. testicle             | +  22.6% en   0.1h | Vol: $  6268K | Liq: $   277K
+       9. Vision               | +  21.8% en   0.1h | Vol: $   318K | Liq: $   118K
+      10. testicle             | +  20.6% en   0.1h | Vol: $  6045K | Liq: $   261K
+
+   📊 STATS GAINS:
+      • Gain moyen: +59.1%
+      • Temps moyen entre alertes: 0.2h
+      • Total occurrences: 50
+
+🌐 RÉSEAU: SOLANA
+   Tokens analysés: 9
+
+   📈 TOP 10 GAINS ENTRE ALERTES:
+       1. BEPE                 | +  59.1% en  10.6h | Vol: $  2472K | Liq: $   129K
+       2. snowball             | +  54.4% en   0.1h | Vol: $  2816K | Liq: $   175K
+       3. snowball             | +  38.4% en   0.1h | Vol: $  3077K | Liq: $   219K
+       4. testicle             | +  36.9% en   0.5h | Vol: $  1476K | Liq: $   125K
+       5. snowball             | +  36.4% en   0.1h | Vol: $  3487K | Liq: $   241K
+       6. BLIND                | +  34.1% en  13.7h | Vol: $  4039K | Liq: $   122K
+       7. FIREBALL             | +  27.7% en   0.2h | Vol: $  1908K | Liq: $   149K
+       8. testicle             | +  26.3% en   0.4h | Vol: $  2622K | Liq: $   118K
+       9. testicle             | +  25.4% en   0.2h | Vol: $  2316K | Liq: $   127K
+      10. liquid               | +  24.7% en   0.1h | Vol: $  1796K | Liq: $   143K
+
+   📊 STATS GAINS:
+      • Gain moyen: +13.3%
+      • Temps moyen entre alertes: 0.3h
+      • Total occurrences: 141
+
+2️⃣  Analyse des zones de volume...
+
+
+====================================================================================================
+📊 ANALYSE 2: ZONES DE VOLUME QUI PERFORMENT
+====================================================================================================
+
+
+🌐 ARBITRUM
+
+   Volume       Liquidité    Âge           Count  Avg Alerts  Avg Score    Accel
+   -------------------------------------------------------------------------------------
+   <100K        <100K        1-6h              3        61.0       64.3     2.8x
+
+🌐 BASE
+
+   Volume       Liquidité    Âge           Count  Avg Alerts  Avg Score    Accel
+   -------------------------------------------------------------------------------------
+   100K-500K    100K-500K    5-30min           3       139.3       96.7     6.0x
+
+🌐 BSC
+
+   Volume       Liquidité    Âge           Count  Avg Alerts  Avg Score    Accel
+   -------------------------------------------------------------------------------------
+   <100K        100K-500K    5-30min           8         2.1       88.8     6.0x
+   100K-500K    100K-500K    5-30min          11         2.1       90.9     6.0x
+   <100K        100K-500K    <5min             3         2.0       96.7     6.0x
+
+🌐 ETH
+
+   Volume       Liquidité    Âge           Count  Avg Alerts  Avg Score    Accel
+   -------------------------------------------------------------------------------------
+   100K-500K    100K-500K    1-6h              7         4.7       94.3     4.0x
+
+🌐 SOLANA
+
+   Volume       Liquidité    Âge           Count  Avg Alerts  Avg Score    Accel
+   -------------------------------------------------------------------------------------
+   1M-5M        100K-500K    >24h              3       179.0       68.3     0.6x
+   1M-5M        100K-500K    6-24h             4        94.8       77.5     1.0x
+   >5M          100K-500K    6-24h             4        50.0       64.2     1.1x
+
+3️⃣  Analyse des timeframes...
+
+
+====================================================================================================
+⏱️  ANALYSE 3: TIMEFRAMES DE PERFORMANCE (Temps avant nouvelle alerte = performance)
+====================================================================================================
+
+
+🌐 ARBITRUM
+
+   Timeframe        Occurrences  Avg Score   Avg Liquidity      Avg Volume
+   ---------------------------------------------------------------------------
+   <15min                  1091       61.0 $           64K $        42360K
+   15min-1h                   2       57.5 $           43K $          602K
+
+🌐 BASE
+
+   Timeframe        Occurrences  Avg Score   Avg Liquidity      Avg Volume
+   ---------------------------------------------------------------------------
+   <15min                  1307       81.6 $         1019K $         2004K
+
+🌐 BSC
+
+   Timeframe        Occurrences  Avg Score   Avg Liquidity      Avg Volume
+   ---------------------------------------------------------------------------
+   <15min                   100       81.4 $         1195K $        93265K
+
+🌐 ETH
+
+   Timeframe        Occurrences  Avg Score   Avg Liquidity      Avg Volume
+   ---------------------------------------------------------------------------
+   <15min                   364       90.2 $          175K $         3021K
+
+🌐 SOLANA
+
+   Timeframe        Occurrences  Avg Score   Avg Liquidity      Avg Volume
+   ---------------------------------------------------------------------------
+   <15min                  1089       70.5 $          145K $         4207K
+   15min-1h                   4       75.0 $          102K $         2880K
+   >3 jours                   1       70.0 $          105K $         2132K
+
+4️⃣  Analyse de la progression du score...
+
+
+====================================================================================================
+📈 ANALYSE 4: PROGRESSION DU SCORE = INDICATEUR DE PERFORMANCE
+====================================================================================================
+
+
+🌐 ARBITRUM
+
+   Trend Score             Count   Tokens   % Continue  Avg Score      Avg Liq
+   -------------------------------------------------------------------------------------
+   Score stable              771       17        98.6%       60.7 $        62K
+   Score en baisse           177       13        97.2%       59.0 $        63K
+   Score en hausse           162       13        99.4%       64.0 $        74K
+   Première alerte            17       17       100.0%       59.5 $        26K
+
+🌐 BASE
+
+   Trend Score             Count   Tokens   % Continue  Avg Score      Avg Liq
+   -------------------------------------------------------------------------------------
+   Score stable              778        6        99.7%       85.7 $      1221K
+   Score en baisse           279        5        98.9%       71.4 $       713K
+   Score en hausse           256        5        99.6%       80.1 $       726K
+   Première alerte            14       14        42.9%       90.1 $       234K
+
+🌐 BSC
+
+   Trend Score             Count   Tokens   % Continue  Avg Score      Avg Liq
+   -------------------------------------------------------------------------------------
+   Première alerte           124      124        20.2%       88.4 $       140K
+   Score stable               61       16        77.0%       83.0 $      1003K
+   Score en baisse            33       11        69.7%       79.9 $       913K
+   Score en hausse            31        5        96.8%       85.5 $      1118K
+
+🌐 ETH
+
+   Trend Score             Count   Tokens   % Continue  Avg Score      Avg Liq
+   -------------------------------------------------------------------------------------
+   Score stable              260       15        95.0%       93.3 $       181K
+   Score en baisse            62        7        98.4%       79.0 $       163K
+   Score en hausse            57        8        98.2%       87.9 $       173K
+   Première alerte            19       19        78.9%       92.1 $       187K
+
+🌐 SOLANA
+
+   Trend Score             Count   Tokens   % Continue  Avg Score      Avg Liq
+   -------------------------------------------------------------------------------------
+   Score stable              674       11        99.3%       71.5 $       140K
+   Score en baisse           218       10        98.6%       65.2 $       154K
+   Score en hausse           213       11        98.6%       72.9 $       151K
+   Première alerte            46       46        23.9%       90.0 $       155K
+
+5️⃣  Génération des insights...
+
+
+====================================================================================================
+🎯 INSIGHTS ACTIONNABLES POUR LE TRADING
+====================================================================================================
+
+💡 MEILLEURS PROFILS D'ENTRY (Volume + Liquidité):
+
+   Réseau     Volume       Liquidité      Tokens   Perf Moy    Score
+   ---------------------------------------------------------------------------
+   solana     1M-5M        <200K               7     130.9x     73.6
+   arbitrum   <200K        <200K               7      83.4x     64.9
+   arbitrum   200K-1M      <200K               4      58.8x     52.0
+   arbitrum   1M-5M        <200K               4      57.8x     50.0
+   solana     >5M          <200K               4      50.0x     64.2
+   eth        200K-1M      <200K               3       9.0x     86.7
+   eth        <200K        <200K               7       5.1x     93.6
+
+
+🎲 RÈGLES DE TRADING RECOMMANDÉES:
+
+   ✅ ZONE OPTIMALE IDENTIFIÉE:
+      • Réseau: SOLANA
+      • Volume: 1M-5M
+      • Liquidité: <200K
+      • Performance moyenne: 130.9 alertes/token
+      • Score entry moyen: 73.6
+
+   📊 SIGNAUX DE CONTINUATION:
+
+      ✓ BASE: Score en stable → 100% chance de nouvelle alerte
+      ✓ BASE: Score en hausse → 100% chance de nouvelle alerte
+      ✓ ARBITRUM: Score en hausse → 99% chance de nouvelle alerte
+      ✓ SOLANA: Score en stable → 99% chance de nouvelle alerte
+      ✓ BASE: Score en baisse → 99% chance de nouvelle alerte
+
+
+✅ Analyse terminée!
+
