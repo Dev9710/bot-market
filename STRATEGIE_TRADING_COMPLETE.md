@@ -186,14 +186,49 @@ Score hausse:   7% du capital
 ×2+ alertes:   10% du capital (MAX)
 ```
 
-#### Stops et Targets
+#### Stops et Targets (DYNAMIQUES)
+
+**⚠️ IMPORTANT:** Les targets sont recalculés à CHAQUE nouvelle alerte!
+
+**Système dynamique basé sur:**
+- Réseau (gains moyens: ETH +59%, BSC +27%, BASE +17%, SOL +13%)
+- Évolution prix/liquidité/volume entre alertes
+- Nombre d'alertes (×2+ = targets augmentés)
+- Conditions actuelles (score, momentum, freshness)
+
+**Exemples:**
+
+*Première alerte (SOLANA zone optimale):*
 ```
-Stop Loss:  -10% (strict, non négociable)
-TP1 (+5%):  Sortir 50% position
-TP2 (+15%): Sortir 30% position
-TP3 (+30%): Sortir 20% position
-Trail Stop: -5% après TP1
+Entry:  Prix d'alerte
+SL:     -10% (strict)
+TP1:    +15.7% → Exit 50%
+TP2:    +33.6% → Exit 30%
+TP3:    +67.3% → Exit 20%
+Trail:  -5% après TP1
 ```
+
+*×5 alertes + prix hausse + liq hausse (TRÈS BULLISH):*
+```
+Entry:  Prix actuel
+SL:     -10% (strict)
+TP1:    +35.2% → Exit 30% (hold plus longtemps)
+TP2:    +75.4% → Exit 40%
+TP3:    +150%  → Exit 30%
+Trail:  -7% après TP2 (laisser respirer le pump)
+```
+
+*Conditions dégradées (liq baisse, prix baisse):*
+```
+Entry:  Prix actuel
+SL:     -7% (plus serré)
+TP1:    +8.1%  → Exit 70% (sortir vite!)
+TP2:    +20.2% → Exit 20%
+TP3:    +40.5% → Exit 10%
+Trail:  -3% après TP1 (très serré)
+```
+
+**📊 Utiliser:** `python dynamic_targets_calculator.py` pour calculs automatiques
 
 #### Timing
 ```
