@@ -585,6 +585,7 @@
         const alertId = urlParams.get('id');
 
         let alertHistory = [];
+        let alert = null; // Store current alert globally
         let scoreChart = null;
         let liquidityChart = null;
 
@@ -943,9 +944,10 @@
             });
         }
 
-        function renderToken(alert) {
-            // Store alert data for portfolio button
-            currentAlertData = alert;
+        function renderToken(data) {
+            // Store alert data globally
+            alert = data;
+            currentAlertData = data;
 
             // Hide loading, show content
             document.getElementById('loading').style.display = 'none';

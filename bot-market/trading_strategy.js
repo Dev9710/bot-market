@@ -315,12 +315,14 @@ function checkOptimalZone(alert) {
 
 function calculateDynamicTargets(alert, previousAlerts = []) {
     const network = (alert.network || '').toLowerCase();
-    const price = alert.price_at_alert || 0;
-    const liq = alert.liquidity || 0;
-    const vol = alert.volume_24h || 0;
-    const score = alert.score || 0;
-    const ageMinutes = (alert.age_hours || 0) * 60;
-    const accel = alert.volume_acceleration_1h_vs_6h || 0;
+    // Try multiple price fields with fallbacks
+    const fullData = alert.full_data || {};
+    const price = alert.price_at_alert || fullData.entry_price || fullData.price_at_alert || alert.price || 0;
+    const liq = alert.liquidity || fullData.liquidity || 0;
+    const vol = alert.volume_24h || fullData.volume_24h || 0;
+    const score = alert.score || fullData.score || 0;
+    const ageMinutes = ((alert.age_hours || fullData.age_hours || 0) * 60);
+    const accel = alert.volume_acceleration_1h_vs_6h || fullData.volume_acceleration_1h_vs_6h || 0;
     const alertCount = previousAlerts.length + 1;
 
     // Base targets par réseau (gains moyens identifiés)
