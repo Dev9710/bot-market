@@ -1149,7 +1149,14 @@
         function populateStrategyAnalysis(alert, previousAlerts = []) {
             // Calculate auto score
             const { score, breakdown } = calculateAutoScore(alert);
-            const recommendation = getRecommendation(score);
+
+            // Check optimal zone and checklist FIRST
+            const zoneCheck = checkOptimalZone(alert);
+            const checklist = generateChecklist(alert, zoneCheck);
+
+            // Get recommendation based on BOTH score AND checklist
+            const checklistRatio = checklist.passed / checklist.total;
+            const recommendation = getFinalRecommendation(score, checklistRatio, checklist.passed, checklist.total);
 
             // Update Score & Recommendation
             const scoreEl = document.getElementById('autoScore');
@@ -1177,8 +1184,7 @@
                 </div>
             `).join('');
 
-            // Optimal Zone Detection
-            const zoneCheck = checkOptimalZone(alert);
+            // Optimal Zone Detection (already calculated above)
             const optimalZoneEl = document.getElementById('optimalZone');
 
             if (zoneCheck && zoneCheck.isOptimal) {
@@ -1267,8 +1273,7 @@
             riskEl.textContent = targets.riskLevel;
             riskEl.className = `text-sm font-bold ${targets.riskLevel === 'LOW' ? 'text-green-400' : targets.riskLevel === 'HIGH' ? 'text-red-400' : 'text-yellow-400'}`;
 
-            // Checklist
-            const checklist = generateChecklist(alert, zoneCheck);
+            // Checklist (already calculated above)
             const checklistEl = document.getElementById('checklistCriteria');
 
             checklistEl.innerHTML = checklist.items.map(item => `
@@ -1353,6 +1358,76 @@
             const total = items.length;
 
             return { items, passed, total };
+        }
+
+        function getFinalRecommendation(score, checklistRatio, checklistPassed, checklistTotal) {
+            // La checklist a la priorité finale
+            // Si checklist < 60% (moins de 3/5) → SKIP peu importe le score
+            // Si checklist 60-80% (3-4/5) → PRUDENT (sauf si score très élevé)
+            // Si checklist 100% (5/5) → Suivre le score
+
+            if (checklistRatio < 0.6) {
+                // Moins de 60% des critères → SKIP
+                return {
+                    action: '🔴 SKIP',
+                    position: '0% capital',
+                    confidence: 'Critères insuffisants'
+                };
+            } else if (checklistRatio < 1.0) {
+                // 60-99% des critères → PRUDENT ou BUY selon score
+                if (score >= 85) {
+                    return {
+                        action: '🟡 BUY (Prudent)',
+                        position: '3-5% capital',
+                        confidence: `${Math.round(checklistRatio * 100)}% critères (${checklistPassed}/${checklistTotal})`
+                    };
+                } else if (score >= 70) {
+                    return {
+                        action: '⚠️ PRUDENT',
+                        position: '3% capital max',
+                        confidence: `${Math.round(checklistRatio * 100)}% critères (${checklistPassed}/${checklistTotal})`
+                    };
+                } else {
+                    return {
+                        action: '🔴 SKIP',
+                        position: '0% capital',
+                        confidence: 'Score + critères insuffisants'
+                    };
+                }
+            } else {
+                // 100% des critères → Suivre le score
+                if (score >= 95) {
+                    return {
+                        action: '🟢 STRONG BUY',
+                        position: '10% capital',
+                        confidence: '95%+'
+                    };
+                } else if (score >= 85) {
+                    return {
+                        action: '🟢 BUY',
+                        position: '7% capital',
+                        confidence: '85%+'
+                    };
+                } else if (score >= 70) {
+                    return {
+                        action: '🟡 BUY (Modéré)',
+                        position: '5% capital',
+                        confidence: '70%+'
+                    };
+                } else if (score >= 55) {
+                    return {
+                        action: '⚠️ HOLD',
+                        position: '3% capital',
+                        confidence: '55%+'
+                    };
+                } else {
+                    return {
+                        action: '🔴 SKIP',
+                        position: '0% capital',
+                        confidence: 'Score trop faible'
+                    };
+                }
+            }
         }
 
         function toggleBreakdown() {
