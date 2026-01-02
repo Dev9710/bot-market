@@ -174,8 +174,8 @@
                     </div>
 
                     <select id="filterDays" class="glass px-4 py-2 rounded-lg text-white cursor-pointer hover:bg-white/10 transition">
-                        <option value="1">Aujourd'hui</option>
-                        <option value="7" selected>7 jours</option>
+                        <option value="1" selected>Aujourd'hui</option>
+                        <option value="7">7 jours</option>
                         <option value="30">30 jours</option>
                         <option value="90">90 jours</option>
                         <option value="365">Toutes</option>
@@ -420,7 +420,7 @@
             alerts: [],
             allAlerts: [], // Store unfiltered alerts
             stats: {},
-            filterDays: 7,
+            filterDays: 1,
             currentPage: 1,
             itemsPerPage: 20,
             totalAlerts: 0,
@@ -729,10 +729,15 @@
         // Update network counts
         function updateNetworkCounts() {
             const networks = state.stats.by_network || {};
-            Object.keys(networks).forEach(network => {
+
+            // List of all network IDs to update
+            const allNetworks = ['eth', 'bsc', 'base', 'solana', 'polygon_pos', 'avax', 'arbitrum'];
+
+            allNetworks.forEach(network => {
                 const countEl = document.getElementById(`${network}-count`);
                 if (countEl) {
-                    countEl.textContent = `${networks[network].count} tokens`;
+                    const count = networks[network]?.count || 0;
+                    countEl.textContent = `${count} token${count !== 1 ? 's' : ''}`;
                 }
             });
         }

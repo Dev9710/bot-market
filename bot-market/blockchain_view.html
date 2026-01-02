@@ -65,10 +65,10 @@
         <!-- Filters -->
         <div class="mt-6 flex gap-3 items-center">
             <span class="text-sm font-semibold text-gray-300">Filtres:</span>
-            <button onclick="filterByDays(1)" id="filter-today" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20">
+            <button onclick="filterByDays(1)" id="filter-today" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-blue-500/30 text-blue-400 bg-blue-500/20 active-filter">
                 Aujourd'hui
             </button>
-            <button onclick="filterByDays(7)" id="filter-7days" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-blue-500/30 text-blue-400 bg-blue-500/20 active-filter">
+            <button onclick="filterByDays(7)" id="filter-7days" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20">
                 7 jours
             </button>
             <button onclick="filterByDays(30)" id="filter-30days" class="px-3 py-1.5 rounded text-xs font-semibold transition border-2 border-white/30 text-gray-300 hover:bg-white/20">
@@ -106,7 +106,7 @@
 
         // State
         let allTokens = [];
-        let currentDays = 7;
+        let currentDays = 1;
 
         // Network colors
         const networkColors = {
@@ -200,7 +200,7 @@
 
         // Clear filters
         function clearFilters() {
-            filterByDays(7);
+            filterByDays(1);
         }
 
         // Render stats
@@ -305,7 +305,7 @@
 
         // View token details
         function viewToken(id) {
-            window.location.href = `/bot-market/token_details.html?id=${id}`;
+            window.location.href = `token_details.html?id=${id}`;
         }
 
         // Utility functions
