@@ -22,7 +22,27 @@ Stratégie complète de trading basée sur les données réelles:
 - ✅ Gestion de capital et position sizing
 - ✅ Red flags et signaux d'exit
 
-#### 2. [profit_zones_analysis.txt](profit_zones_analysis.txt) ⭐⭐
+#### 2. [SYSTEME_TARGETS_DYNAMIQUES.md](SYSTEME_TARGETS_DYNAMIQUES.md) ⭐⭐⭐
+**Système de Targets Dynamiques (TP/SL/TS)**
+
+Documentation complète du système de recalcul automatique:
+- 🎯 Targets recalculés à CHAQUE alerte
+- 📊 Facteurs d'ajustement (réseau, score, liquidité, momentum)
+- 📈 Évolution prix/volume/liquidité entre alertes
+- 💰 Position sizing dynamique (3-10% capital)
+- 🔧 3 exemples détaillés de calcul
+- 🛡️ Protection SL/TS adaptative
+
+#### 3. [SOLANA_ATH_BREAKOUT_ANALYSIS.md](SOLANA_ATH_BREAKOUT_ANALYSIS.md) ⭐⭐
+**Analyse Stratégie ATH Breakout SOLANA**
+
+Vérification de la stratégie "ATH breakout" sur données réelles:
+- ❌ ATH Breakout seul: **46.4% win rate** (NON FIABLE)
+- ✅ Pattern Retracement: **+12.8% gain moyen** (VALIDÉ)
+- 🎯 Zone $200K market cap confirmée
+- 💡 Recommandation: Combiner avec zone optimale SOLANA
+
+#### 4. [profit_zones_analysis.txt](profit_zones_analysis.txt) ⭐⭐
 **Analyse détaillée des zones de profit**
 
 Résultats complets de l'analyse des patterns:
@@ -113,7 +133,61 @@ score, breakdown, rec = calculate_signal_score(alert)
 
 ---
 
-#### 5. **[import_railway_data.py](import_railway_data.py)**
+#### 5. **[dynamic_targets_calculator.py](dynamic_targets_calculator.py)** ⭐⭐⭐
+```bash
+python dynamic_targets_calculator.py
+```
+**Calcul automatique des TP1/TP2/TP3/SL/TS dynamiques:**
+- Recalcul à chaque nouvelle alerte
+- Ajustements basés sur évolution prix/liquidité/volume
+- Position sizing adaptatif (3-10% capital)
+- Multiplicateurs par réseau et conditions
+- Exit distribution dynamique (50/30/20 ou 70/20/10 ou 30/40/30)
+
+**Usage en code:**
+```python
+from dynamic_targets_calculator import calculate_dynamic_targets
+
+# Première alerte
+targets = calculate_dynamic_targets(current_alert)
+
+# Alertes suivantes (avec historique)
+targets = calculate_dynamic_targets(
+    current_alert,
+    previous_alerts=history,
+    current_price=latest_price
+)
+
+# Résultat:
+# {
+#   'tp1': {'price': 0.000521, 'percent': 15.7, 'exit_amount': 50},
+#   'tp2': {'price': 0.000601, 'percent': 33.6, 'exit_amount': 30},
+#   'tp3': {'price': 0.000753, 'percent': 67.3, 'exit_amount': 20},
+#   'stop_loss': {'price': 0.000405, 'percent': -10},
+#   'position_size': 10.0,
+#   'reasoning': [...],
+#   'risk_level': 'LOW'
+# }
+```
+
+---
+
+#### 6. **[analyze_solana_ath_breakout.py](analyze_solana_ath_breakout.py)**
+```bash
+python analyze_solana_ath_breakout.py
+```
+**Vérifie la stratégie ATH breakout sur données SOLANA:**
+- Détecte les breakouts d'ATH dans l'historique
+- Mesure win rate et gains après breakout
+- Identifie pattern retracement (retrace → retour → pump)
+- Analyse zone $200K market cap
+- Compare stratégies et génère recommandations
+
+**Output:** Validation ou invalidation de stratégies proposées
+
+---
+
+#### 7. **[import_railway_data.py](import_railway_data.py)**
 ```bash
 python import_railway_data.py
 ```

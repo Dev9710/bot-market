@@ -6,6 +6,7 @@
     <title>Token Details - Scanner V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="trading_strategy.js"></script>
     <style>
         body {
             background: #0a0a0a;
@@ -49,6 +50,131 @@
         iframe {
             border-radius: 12px;
         }
+
+        /* Strategy Sections */
+        .strategy-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #1f1f1f 100%);
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .strategy-card.optimal {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #1a1a1a 0%, #1a2e1f 100%);
+        }
+
+        .strategy-card.strong-buy {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #1a1a1a 0%, #1f1a2e 100%);
+        }
+
+        .strategy-card.warning {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2e251a 100%);
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .score-badge.excellent {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .score-badge.good {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .score-badge.medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .score-badge.low {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #0a0a0a;
+            margin-bottom: 8px;
+        }
+
+        .checklist-item.passed {
+            background: #1a2e1f;
+            border-left: 3px solid #22c55e;
+        }
+
+        .checklist-item.failed {
+            background: #2e1a1a;
+            border-left: 3px solid #ef4444;
+        }
+
+        .target-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #0a0a0a;
+        }
+
+        .target-line.sl {
+            border-left: 3px solid #ef4444;
+        }
+
+        .target-line.tp {
+            border-left: 3px solid #22c55e;
+        }
+
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #0a0a0a;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .breakdown-item.highlight {
+            background: linear-gradient(135deg, #1f1a2e 0%, #1a1a1a 100%);
+            border-left: 2px solid #8b5cf6;
+        }
+
+        .pattern-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pattern-badge.detected {
+            background: #1a2e1f;
+            color: #22c55e;
+            border: 1px solid #22c55e40;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen p-4 md:p-8">
@@ -88,6 +214,164 @@
                 </div>
             </div>
         </div>
+
+        <!-- ============ STRATÉGIE & SIGNAUX ============ -->
+
+        <!-- Signal Analysis -->
+        <div id="signalAnalysis" class="mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Score Auto & Recommandation -->
+                <div class="strategy-card" id="signalCard">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span>🎯</span>
+                        <span>Analyse du Signal</span>
+                    </h3>
+
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-sm text-gray-400 mb-1">Score Auto</div>
+                            <div id="autoScore" class="score-badge excellent">95/100</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-400 mb-1">Action</div>
+                            <div id="recommendation" class="text-2xl font-bold text-purple-400">🟢 STRONG BUY</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-xs text-gray-400 mb-1">Position Recommandée</div>
+                            <div id="positionRec" class="text-lg font-bold text-green-400">10% capital</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400 mb-1">Confiance</div>
+                            <div id="confidence" class="text-lg font-bold text-blue-400">95%+</div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown (collapsible) -->
+                    <div>
+                        <button onclick="toggleBreakdown()" class="text-sm text-gray-400 hover:text-white transition flex items-center gap-2 mb-2">
+                            <span id="breakdownIcon">▶</span>
+                            <span>Détails du scoring</span>
+                        </button>
+                        <div id="breakdownList" style="display: none;" class="space-y-1 mt-2">
+                            <!-- Breakdown items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zone Optimale & Patterns -->
+                <div class="strategy-card" id="patternsCard">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span>🔍</span>
+                        <span>Patterns Détectés</span>
+                    </h3>
+
+                    <!-- Zone optimale -->
+                    <div id="optimalZone" class="mb-4">
+                        <!-- Will be populated -->
+                    </div>
+
+                    <!-- Patterns badges -->
+                    <div id="patternsList" class="flex flex-wrap gap-2 mb-4">
+                        <!-- Pattern badges will be inserted here -->
+                    </div>
+
+                    <!-- Ultra-bullish signals -->
+                    <div id="bullishSignals">
+                        <!-- Will be populated if applicable -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Targets Dynamiques & Checklist -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Targets Dynamiques -->
+            <div class="strategy-card">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <span>🎯</span>
+                    <span>Targets Dynamiques</span>
+                    <span class="text-xs text-gray-400 font-normal">(Recalculés selon alertes)</span>
+                </h3>
+
+                <div class="space-y-2 mb-4">
+                    <div class="target-line" style="background: #1a1a2e; border-left: 3px solid #8b5cf6;">
+                        <span class="text-sm text-gray-300">Entry Price</span>
+                        <span id="dynamicEntry" class="font-bold text-blue-400">-</span>
+                    </div>
+
+                    <div class="target-line sl">
+                        <span class="text-sm text-gray-300">🛡️ Stop Loss</span>
+                        <span id="dynamicSL" class="font-bold text-red-400">-</span>
+                    </div>
+
+                    <div class="target-line tp">
+                        <span class="text-sm text-gray-300">TP1</span>
+                        <span id="dynamicTP1" class="font-bold text-green-400">-</span>
+                    </div>
+
+                    <div class="target-line tp">
+                        <span class="text-sm text-gray-300">TP2</span>
+                        <span id="dynamicTP2" class="font-bold text-green-400">-</span>
+                    </div>
+
+                    <div class="target-line tp">
+                        <span class="text-sm text-gray-300">TP3</span>
+                        <span id="dynamicTP3" class="font-bold text-green-400">-</span>
+                    </div>
+
+                    <div class="target-line" style="background: #1a1a2e; border-left: 3px solid #f59e0b;">
+                        <span class="text-sm text-gray-300">📊 Trail Stop</span>
+                        <span id="dynamicTS" class="font-bold text-yellow-400">-</span>
+                    </div>
+                </div>
+
+                <!-- Reasoning -->
+                <div>
+                    <div class="text-xs text-gray-400 mb-2">💡 Raisonnement:</div>
+                    <div id="targetReasoning" class="text-xs text-gray-400 space-y-1">
+                        <!-- Reasoning items will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Multiplicateur:</span>
+                        <span id="multiplierValue" class="text-sm font-bold text-purple-400">-</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-400">Risque:</span>
+                        <span id="riskLevel" class="text-sm font-bold">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist Pré-Trade -->
+            <div class="strategy-card">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <span>✅</span>
+                    <span>Checklist Pré-Trade</span>
+                </h3>
+
+                <div id="checklistCriteria" class="space-y-2 mb-4">
+                    <!-- Checklist items will be inserted here -->
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-300">Critères validés:</span>
+                        <span id="checklistScore" class="font-bold text-lg">-</span>
+                    </div>
+                    <div id="checklistResult" class="mt-3">
+                        <!-- Result message will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ FIN STRATÉGIE ============ -->
 
         <!-- Chart -->
         <div class="section mb-6">
@@ -346,9 +630,19 @@
                     // Render timeline and charts
                     renderTimeline(alertHistory);
                     renderEvolutionCharts(alertHistory);
+
+                    // Populate strategy analysis with full alert history
+                    const latestAlert = alertHistory[0] || alert;
+                    const previousAlerts = alertHistory.slice(1); // All alerts except latest
+                    populateStrategyAnalysis(latestAlert, previousAlerts);
+                } else {
+                    // Single alert - populate strategy without history
+                    populateStrategyAnalysis(alert, []);
                 }
             } catch (error) {
                 console.error('Error loading alert history:', error);
+                // Fallback to single alert analysis
+                populateStrategyAnalysis(alert, []);
             }
         }
 
@@ -844,6 +1138,232 @@
             setTimeout(() => {
                 msgEl.classList.add('hidden');
             }, 5000);
+        }
+
+        // ============================================================================
+        // STRATEGY INTEGRATION
+        // ============================================================================
+
+        function populateStrategyAnalysis(alert, previousAlerts = []) {
+            // Calculate auto score
+            const { score, breakdown } = calculateAutoScore(alert);
+            const recommendation = getRecommendation(score);
+
+            // Update Score & Recommendation
+            const scoreEl = document.getElementById('autoScore');
+            scoreEl.textContent = `${score}/100`;
+            scoreEl.className = 'score-badge ' + (score >= 85 ? 'excellent' : score >= 70 ? 'good' : score >= 55 ? 'medium' : 'low');
+
+            document.getElementById('recommendation').textContent = recommendation.action;
+            document.getElementById('positionRec').textContent = recommendation.position;
+            document.getElementById('confidence').textContent = recommendation.confidence;
+
+            // Style signal card based on score
+            const signalCard = document.getElementById('signalCard');
+            if (score >= 85) {
+                signalCard.classList.add('strong-buy');
+            } else if (score < 55) {
+                signalCard.classList.add('warning');
+            }
+
+            // Populate breakdown (collapsible)
+            const breakdownList = document.getElementById('breakdownList');
+            breakdownList.innerHTML = breakdown.map(item => `
+                <div class="breakdown-item ${item.highlight ? 'highlight' : ''}">
+                    <span>${item.label}</span>
+                    <span class="ml-auto font-bold text-purple-400">+${item.points}</span>
+                </div>
+            `).join('');
+
+            // Optimal Zone Detection
+            const zoneCheck = checkOptimalZone(alert);
+            const optimalZoneEl = document.getElementById('optimalZone');
+
+            if (zoneCheck && zoneCheck.isOptimal) {
+                optimalZoneEl.innerHTML = `
+                    <div class="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xl">🎯</span>
+                            <span class="font-bold text-green-400">${zoneCheck.name}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 space-y-1">
+                            <div>• Performance: ${zoneCheck.performance}</div>
+                            <div>• Win rate: ${zoneCheck.winRate}</div>
+                            <div>• Gain moyen: ${zoneCheck.avgGain}</div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('patternsCard').classList.add('optimal');
+            } else if (zoneCheck) {
+                optimalZoneEl.innerHTML = `
+                    <div class="text-sm text-gray-400">
+                        <div class="mb-2">${zoneCheck.name} (${zoneCheck.passedCount}/${zoneCheck.totalCount} critères)</div>
+                        <div class="text-xs">Manque: ${zoneCheck.criteriaResults.filter(c => !c.passed).map(c => c.criterion).join(', ')}</div>
+                    </div>
+                `;
+            }
+
+            // Pattern Detection
+            const patternsList = document.getElementById('patternsList');
+            const patterns = [];
+
+            // Retracement pattern
+            if (previousAlerts.length >= 3) {
+                const retracement = detectRetracement(previousAlerts);
+                if (retracement && retracement.detected) {
+                    patterns.push(`
+                        <div class="pattern-badge detected">
+                            ⚡ Pattern Retracement (${retracement.retracePct}% → +${retracement.expectedGain}% attendu)
+                        </div>
+                    `);
+                }
+            }
+
+            // Multiple alerts pattern
+            if (previousAlerts.length >= 5) {
+                patterns.push(`
+                    <div class="pattern-badge detected">
+                        🔥 Alertes Multiples (×${previousAlerts.length})
+                    </div>
+                `);
+            }
+
+            patternsList.innerHTML = patterns.join('');
+
+            // Ultra-bullish signals
+            const bullishSignals = detectUltraBullishSignals(alert, previousAlerts.length);
+            if (bullishSignals.length >= 3) {
+                document.getElementById('bullishSignals').innerHTML = `
+                    <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
+                        <div class="font-bold text-purple-400 mb-2">🚀 Signaux Ultra-Bullish (${bullishSignals.length}/5)</div>
+                        <div class="text-xs text-gray-300 space-y-1">
+                            ${bullishSignals.map(s => `<div>• ${s}</div>`).join('')}
+                        </div>
+                        ${bullishSignals.length >= 5 ? '<div class="mt-2 text-xs font-bold text-purple-400">→ ALL-IN 10% capital recommandé</div>' : ''}
+                    </div>
+                `;
+            }
+
+            // Dynamic Targets
+            const targets = calculateDynamicTargets(alert, previousAlerts);
+
+            document.getElementById('dynamicEntry').textContent = formatPrice(targets.entry);
+            document.getElementById('dynamicSL').textContent = `${formatPrice(targets.stopLoss.price)} (${targets.stopLoss.percent}%)`;
+            document.getElementById('dynamicTP1').textContent = `${formatPrice(targets.tp1.price)} (+${targets.tp1.percent.toFixed(1)}%) → Exit ${targets.tp1.exitAmount}%`;
+            document.getElementById('dynamicTP2').textContent = `${formatPrice(targets.tp2.price)} (+${targets.tp2.percent.toFixed(1)}%) → Exit ${targets.tp2.exitAmount}%`;
+            document.getElementById('dynamicTP3').textContent = `${formatPrice(targets.tp3.price)} (+${targets.tp3.percent.toFixed(1)}%) → Exit ${targets.tp3.exitAmount}%`;
+            document.getElementById('dynamicTS').textContent = `${targets.trailStop.percent}% ${targets.trailStop.activation}`;
+
+            // Reasoning
+            document.getElementById('targetReasoning').innerHTML = targets.reasoning.map(r => `
+                <div class="text-xs">${r}</div>
+            `).join('');
+
+            document.getElementById('multiplierValue').textContent = `×${targets.multiplier}`;
+
+            const riskEl = document.getElementById('riskLevel');
+            riskEl.textContent = targets.riskLevel;
+            riskEl.className = `text-sm font-bold ${targets.riskLevel === 'LOW' ? 'text-green-400' : targets.riskLevel === 'HIGH' ? 'text-red-400' : 'text-yellow-400'}`;
+
+            // Checklist
+            const checklist = generateChecklist(alert, zoneCheck);
+            const checklistEl = document.getElementById('checklistCriteria');
+
+            checklistEl.innerHTML = checklist.items.map(item => `
+                <div class="checklist-item ${item.passed ? 'passed' : 'failed'}">
+                    <span class="text-xl">${item.passed ? '✅' : '❌'}</span>
+                    <div class="flex-1">
+                        <div class="text-sm">${item.label}</div>
+                        <div class="text-xs text-gray-400">${item.value}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('checklistScore').textContent = `${checklist.passed}/${checklist.total}`;
+            document.getElementById('checklistScore').className = `font-bold text-lg ${checklist.passed === checklist.total ? 'text-green-400' : checklist.passed >= checklist.total * 0.7 ? 'text-yellow-400' : 'text-red-400'}`;
+
+            // Result message
+            const resultEl = document.getElementById('checklistResult');
+            if (checklist.passed === checklist.total) {
+                resultEl.innerHTML = `
+                    <div class="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-bold">
+                        🎯 Tous les critères validés - GO TRADE!
+                    </div>
+                `;
+            } else if (checklist.passed >= checklist.total * 0.7) {
+                resultEl.innerHTML = `
+                    <div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm">
+                        ⚠️ Entry possible mais prudent
+                    </div>
+                `;
+            } else {
+                resultEl.innerHTML = `
+                    <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                        🔴 Critères insuffisants - SKIP
+                    </div>
+                `;
+            }
+        }
+
+        function generateChecklist(alert, zoneCheck) {
+            const network = (alert.network || '').toLowerCase();
+            const vol = alert.volume_24h || 0;
+            const liq = alert.liquidity || 0;
+            const score = alert.score || 0;
+            const ageMinutes = (alert.age_hours || 0) * 60;
+            const accel = alert.volume_acceleration_1h_vs_6h || 0;
+
+            const items = [];
+
+            if (zoneCheck && zoneCheck.criteria) {
+                for (const [criterion, passed] of Object.entries(zoneCheck.criteria)) {
+                    let label = '';
+                    let value = '';
+
+                    switch (criterion) {
+                        case 'volume':
+                            label = 'Volume dans zone optimale';
+                            value = `$${formatNumber(vol)}`;
+                            break;
+                        case 'liquidity':
+                            label = 'Liquidité optimale';
+                            value = `$${formatNumber(liq)}`;
+                            break;
+                        case 'score':
+                            label = 'Score suffisant';
+                            value = `${score}/100`;
+                            break;
+                        case 'freshness':
+                            label = 'Freshness optimal';
+                            value = ageMinutes < 60 ? `${Math.floor(ageMinutes)}min` : `${(ageMinutes / 60).toFixed(1)}h`;
+                            break;
+                        case 'acceleration':
+                            label = 'Accélération suffisante';
+                            value = `${accel.toFixed(1)}x`;
+                            break;
+                    }
+
+                    items.push({ label, value, passed });
+                }
+            }
+
+            const passed = items.filter(i => i.passed).length;
+            const total = items.length;
+
+            return { items, passed, total };
+        }
+
+        function toggleBreakdown() {
+            const list = document.getElementById('breakdownList');
+            const icon = document.getElementById('breakdownIcon');
+
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                list.style.display = 'none';
+                icon.textContent = '▶';
+            }
         }
 
         // Init
