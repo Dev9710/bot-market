@@ -362,7 +362,10 @@ if __name__ == '__main__':
     print("  GET /api/networks")
     print("  GET /api/alerts/:id")
     print("  GET /api/recent")
-    print(f"\nAcces: http://localhost:5000")
-    print(f"Glossaire: http://localhost:5000/glossary.html\n")
+    # Port from environment variable (Railway) or default 5000
+    port = int(os.environ.get('PORT', 5000))
 
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print(f"\nAcces: http://localhost:{port}")
+    print(f"Glossaire: http://localhost:{port}/glossary.html\n")
+
+    app.run(host='0.0.0.0', port=port, debug=True)
