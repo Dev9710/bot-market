@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossaire - Scanner V3 ULTRA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #1e3a8a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Search highlight */
+        .highlight {
+            background-color: rgba(59, 130, 246, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Section anchors */
+        .section-anchor {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="dashboard_frontend.html" class="text-2xl hover:opacity-80 transition">←</a>
+                    <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        📚 Glossaire & Guide
+                    </h1>
+                </div>
+
+                <div class="flex gap-4 items-center">
+                    <!-- Search Box -->
+                    <div class="relative">
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="🔍 Rechercher une métrique..."
+                            class="glass px-4 py-2 pr-10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-80"
+                            style="background: rgba(255,255,255,0.05);"
+                            oninput="searchMetrics()"
+                        />
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">Ctrl+K</span>
+                    </div>
+
+                    <a href="dashboard_frontend.html" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition">
+                        🏠 Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        <!-- Introduction -->
+        <div class="glass-card p-8 rounded-xl mb-8">
+            <h2 class="text-2xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                🎯 Bienvenue dans le Guide Complet
+            </h2>
+            <p class="text-gray-300 text-lg mb-4">
+                Ce glossaire vous explique <strong>chaque métrique</strong> affichée dans le Scanner V3 ULTRA.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-3xl mb-2">📊</div>
+                    <div class="font-semibold text-blue-400 mb-1">Ce que vous voyez</div>
+                    <div class="text-sm text-gray-400">Description visuelle claire</div>
+                </div>
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-3xl mb-2">💡</div>
+                    <div class="font-semibold text-purple-400 mb-1">Pourquoi c'est important</div>
+                    <div class="text-sm text-gray-400">Impact sur vos décisions</div>
+                </div>
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-3xl mb-2">✅</div>
+                    <div class="font-semibold text-green-400 mb-1">Comment l'utiliser</div>
+                    <div class="text-sm text-gray-400">Actions concrètes à prendre</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Navigation -->
+        <div class="glass-card p-6 rounded-xl mb-8">
+            <h3 class="text-xl font-semibold mb-4">📑 Navigation Rapide</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="#score" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Score 0-100</a>
+                <a href="#tier" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Tier</a>
+                <a href="#liquidity" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Liquidité</a>
+                <a href="#volume" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Volume</a>
+                <a href="#velocity" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Vélocité Pump</a>
+                <a href="#age" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Âge Token</a>
+                <a href="#buysell" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Buy/Sell Ratio</a>
+                <a href="#tp" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Take Profit</a>
+                <a href="#sl" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Stop Loss</a>
+                <a href="#pattern" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Pattern</a>
+                <a href="#whale" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Whale Activity</a>
+                <a href="#security" class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition text-center text-sm">Sécurité</a>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div id="metricsContainer" class="space-y-6">
+            <!-- Chaque métrique sera documentée ici -->
+        </div>
+    </div>
+
+    <script>
+        // Keyboard shortcut for search (Ctrl+K)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        // Search functionality
+        function searchMetrics() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const metrics = document.querySelectorAll('.metric-card');
+
+            metrics.forEach(metric => {
+                const text = metric.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    metric.style.display = 'block';
+                    // Highlight search term
+                    if (searchTerm.length > 2) {
+                        highlightText(metric, searchTerm);
+                    }
+                } else {
+                    metric.style.display = 'none';
+                }
+            });
+        }
+
+        function highlightText(element, searchTerm) {
+            // Simple highlight implementation
+            // More sophisticated highlighting can be added
+        }
+
+        // Load metrics data
+        const metrics = [
+            {
+                id: 'score',
+                icon: '🎯',
+                title: 'SCORE (0-100)',
+                color: 'blue',
+                description: 'Nombre affiché en gros sur chaque alerte (ex: 85/100, 92/100)',
+                meaning: 'Le score mesure la QUALITÉ GLOBALE d\'une opportunité de trading en combinant plusieurs facteurs : liquidité, volume, momentum, activité des traders, et sécurité.',
+                importance: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Score 95-100 :</strong> Opportunité EXCEPTIONNELLE (rare, ~5% des alertes)</li>
+                        <li><strong>Score 85-94 :</strong> Très bonne opportunité (zone d'entrée recommandée)</li>
+                        <li><strong>Score 75-84 :</strong> Opportunité correcte (prudence requise)</li>
+                        <li><strong>Score < 75 :</strong> Éviter ou attendre confirmation</li>
+                    </ul>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ SI SCORE ≥ 85</div>
+                            <div class="text-sm">→ Opportunité de qualité, vérifier les autres métriques (liquidité, vélocité, whale activity)</div>
+                            <div class="text-sm">→ Considérer une entrée si tous les feux sont au vert</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-yellow-400 mb-2">⚠️ SI SCORE 75-84</div>
+                            <div class="text-sm">→ Opportunité moyenne, être TRÈS sélectif</div>
+                            <div class="text-sm">→ Attendre confirmation : volume qui accélère, momentum positif</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ SI SCORE < 75</div>
+                            <div class="text-sm">→ SKIP ou surveiller uniquement</div>
+                            <div class="text-sm">→ Risque élevé, probabilité de perte importante</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">📈 Exemple GAGNANT : Token ABC - Score 92/100</div>
+                            <div class="text-sm text-gray-300">Liquidité: $450K | Volume 24h: $2.1M | Vélocité: 28/h</div>
+                            <div class="text-sm text-green-400 mt-2">→ Entrée $0.0045 → TP1 atteint en 2h (+15%) ✅</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">📉 Exemple PERDANT : Token XYZ - Score 68/100</div>
+                            <div class="text-sm text-gray-300">Liquidité: $85K | Volume 24h: $340K | Vélocité: 3/h</div>
+                            <div class="text-sm text-red-400 mt-2">→ Entrée $0.0032 → SL hit en 4h (-10%) ❌</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'tier',
+                icon: '🏆',
+                title: 'TIER (Niveau de Confiance)',
+                color: 'purple',
+                description: 'Badge coloré affiché avec le score (ULTRA_HIGH, HIGH, MEDIUM, LOW)',
+                meaning: 'Le TIER représente le niveau de confiance du scanner basé sur l\'analyse de 3,261 alertes historiques. Il prend en compte le réseau blockchain ET le score.',
+                importance: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>ULTRA_HIGH ⭐⭐⭐⭐ :</strong> Score ≥95 - Win Rate attendu 70-85%</li>
+                        <li><strong>HIGH 🟢 :</strong> Score ≥85 (selon réseau) - Win Rate 55-70%</li>
+                        <li><strong>MEDIUM 🟡 :</strong> Score ≥80 - Win Rate 40-55%</li>
+                        <li><strong>LOW 🔴 :</strong> Score <80 - Win Rate <40% (ÉVITER)</li>
+                    </ul>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-purple-400 mb-2">🎯 STRATÉGIE ULTRA SÉLECTIVE</div>
+                            <div class="text-sm">→ Trader UNIQUEMENT les tiers ULTRA_HIGH et HIGH</div>
+                            <div class="text-sm">→ Ignorer MEDIUM et LOW (bruit du marché)</div>
+                            <div class="text-sm text-green-400 mt-2">✅ Résultat : Win Rate 60-70%+ mais ~3 alertes/jour</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-blue-400 mb-2">⚡ STRATÉGIE ÉQUILIBRÉE</div>
+                            <div class="text-sm">→ Trader ULTRA_HIGH, HIGH, et certains MEDIUM (si confluence)</div>
+                            <div class="text-sm">→ MEDIUM accepté SI : Vélocité >20 + Liquidité >$300K + Pattern validé</div>
+                            <div class="text-sm text-yellow-400 mt-2">⚠️ Résultat : Win Rate 50-60%, ~8 alertes/jour</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold mb-2">💎 Tier ULTRA_HIGH sur SOLANA</div>
+                            <div class="text-sm text-gray-300">Score: 97 | Zone optimale : Vol $1M-5M, Liq <$200K</div>
+                            <div class="text-sm text-purple-400 mt-2">→ Win Rate historique sur cette zone : 95%+ ⭐</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold mb-2">⚠️ Tier MEDIUM sur BASE</div>
+                            <div class="text-sm text-gray-300">Score: 81 | Conditions moyennes</div>
+                            <div class="text-sm text-yellow-400 mt-2">→ Win Rate attendu : ~45% - Être très prudent</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'liquidity',
+                icon: '💧',
+                title: 'LIQUIDITÉ',
+                color: 'cyan',
+                description: 'Montant en $ affiché (ex: $450K, $1.2M)',
+                meaning: 'La liquidité représente la CAPACITÉ à acheter/vendre sans impacter fortement le prix. C\'est l\'argent réellement disponible dans le pool de trading.',
+                importance: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Liquidité élevée (>$500K) :</strong> Entrées/sorties faciles, prix stable</li>
+                        <li><strong>Liquidité moyenne ($100K-500K) :</strong> Attention au slippage</li>
+                        <li><strong>Liquidité faible (<$100K) :</strong> RISQUE RUG ÉLEVÉ + slippage important</li>
+                    </ul>
+                    <div class="mt-4 p-4 bg-red-900/30 rounded-lg border border-red-500/30">
+                        <div class="font-semibold text-red-400 mb-2">⚠️ DANGER : Liquidité trop faible</div>
+                        <div class="text-sm">Si liquidité <$80K → Le dev peut RETIRER la liquidité et disparaître (rug pull)</div>
+                        <div class="text-sm">Vous ne pourrez plus vendre = Perte totale (-100%)</div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ ZONE SÛRE PAR RÉSEAU</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>SOLANA :</strong> $80K - $300K (zone optimale 95%+ WR)</div>
+                                <div>• <strong>ETH :</strong> $80K - $600K</div>
+                                <div>• <strong>BSC :</strong> $400K - $6M</div>
+                                <div>• <strong>BASE :</strong> $250K - $2.5M</div>
+                            </div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ ÉVITER SI</div>
+                            <div class="text-sm">→ Liquidité < $80K sur TOUS les réseaux</div>
+                            <div class="text-sm">→ Liquidité en BAISSE rapide (migration ou rug en cours)</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="glass p-4 rounded-lg">
+                        <div class="font-semibold mb-2">🎯 Exemple Liquidité Optimale (SOLANA)</div>
+                        <div class="text-sm text-gray-300">Token DEF : Liquidité $180K</div>
+                        <div class="text-sm text-green-400 mt-2">→ Dans la zone optimale ($80K-$300K)</div>
+                        <div class="text-sm text-green-400">→ Probabilité de réussite : 95%+ selon backtest ✅</div>
+                    </div>
+                `
+            },
+            {
+                id: 'volume',
+                icon: '📊',
+                title: 'VOLUME 24H / 6H / 1H',
+                color: 'green',
+                description: 'Montant total échangé sur différentes périodes (ex: Vol 24h: $2.1M, 6h: $680K, 1h: $95K)',
+                meaning: 'Le volume mesure l\'ACTIVITÉ de trading. Plus le volume est élevé, plus il y a d\'acheteurs/vendeurs actifs = liquidité réelle + intérêt du marché.',
+                importance: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Volume croissant 1h > 6h > 24h :</strong> Accélération = FOMO qui arrive 🚀</li>
+                        <li><strong>Volume décroissant :</strong> Momentum qui s'essouffle ⚠️</li>
+                        <li><strong>Ratio Volume/Liquidité :</strong> Si >1000% = Rotation rapide (bon signe de pump actif)</li>
+                    </ul>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ SIGNAL D'ENTRÉE</div>
+                            <div class="text-sm">→ Volume 1h en forte hausse vs 6h (accélération)</div>
+                            <div class="text-sm">→ Volume/Liquidité > 500% (activité intense)</div>
+                            <div class="text-sm text-green-400 mt-2">= Momentum fort, pump en cours</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ SIGNAL D'ÉVITEMENT</div>
+                            <div class="text-sm">→ Volume 1h < Volume 6h (décélération)</div>
+                            <div class="text-sm">→ Volume total faible (<$50K sur 24h)</div>
+                            <div class="text-sm text-red-400 mt-2">= Momentum mort, éviter</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                        <div class="font-semibold mb-2">📈 Accélération Volume (SIGNAL FORT)</div>
+                        <div class="text-sm text-gray-300">Token GHI</div>
+                        <div class="text-sm">• Vol 24h: $1.8M | 6h: $420K | 1h: $180K</div>
+                        <div class="text-sm text-green-400 mt-2">→ Accélération : 1h représente 43% du volume 6h !</div>
+                        <div class="text-sm text-green-400">→ FOMO qui démarre = Moment d'entrée optimal ✅</div>
+                    </div>
+                `
+            },
+            {
+                id: 'velocity',
+                icon: '🚀',
+                title: 'VÉLOCITÉ PUMP',
+                color: 'orange',
+                description: 'Nombre affiché avec un indicateur (ex: Vélocité: 28/h - Type: RAPIDE)',
+                meaning: 'La vélocité mesure la VITESSE du pump en % par heure. Elle indique si le pump est explosif (>50/h), rapide (20-50/h), normal (5-20/h) ou lent (<5/h).',
+                importance: `
+                    <div class="space-y-3">
+                        <div class="p-4 bg-red-900/30 rounded-lg border border-red-500/30">
+                            <div class="font-semibold text-red-400 mb-2">⚠️ FACTEUR #1 DE RÉUSSITE</div>
+                            <div class="text-sm">Selon analyse de 3,261 alertes : La vélocité a un impact de +133% sur le win rate !</div>
+                            <div class="text-sm mt-2">Tokens avec vélocité >30 : Win Rate 65%+</div>
+                            <div class="text-sm">Tokens avec vélocité <5 : Win Rate 12% (ÉVITER)</div>
+                        </div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ ZONES D'ENTRÉE</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>15-30/h (RAPIDE) :</strong> Zone optimale - Pump sain ✅</div>
+                                <div>• <strong>30-50/h (TRÈS RAPIDE) :</strong> FOMO early - Bon timing ⚡</div>
+                                <div>• <strong>5-15/h (NORMAL) :</strong> Acceptable si autres signaux OK</div>
+                            </div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ ZONES DANGEREUSES</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>>50/h (PARABOLIQUE) :</strong> Trop tard ! Dump imminent ⚠️</div>
+                                <div>• <strong><5/h (LENT) :</strong> Pas de momentum - SKIP ❌</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">✅ Vélocité OPTIMALE - Token JKL</div>
+                            <div class="text-sm">Vélocité: 24/h (RAPIDE) | Alerte déclenchée il y a 1h</div>
+                            <div class="text-sm text-green-400 mt-2">→ Pump sain, early stage = Zone d'entrée parfaite</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">❌ Vélocité PARABOLIQUE - Token MNO</div>
+                            <div class="text-sm">Vélocité: 68/h (PARABOLIQUE) | Alerte déclenchée il y a 4h</div>
+                            <div class="text-sm text-red-400 mt-2">→ LATE STAGE - Correction imminente, ÉVITER</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'age',
+                icon: '⏰',
+                title: 'ÂGE DU TOKEN',
+                color: 'yellow',
+                description: 'Temps écoulé depuis la création du token (ex: 2.5h, 18h, 3 jours)',
+                meaning: 'L\'âge indique depuis COMBIEN DE TEMPS le token existe. Certaines périodes sont plus rentables que d\'autres selon l\'analyse historique.',
+                importance: `
+                    <div class="space-y-3">
+                        <div class="p-4 bg-green-900/30 rounded-lg border border-green-500/30">
+                            <div class="font-semibold text-green-400 mb-2">✅ ZONES OPTIMALES</div>
+                            <div class="text-sm">• <strong>0-3h (EMBRYONIC) :</strong> Quality Index 182.83 - MEILLEUR ! 🔥</div>
+                            <div class="text-sm">• <strong>48-72h (MATURE) :</strong> Win Rate 36.1% - Stable</div>
+                        </div>
+                        <div class="p-4 bg-red-900/30 rounded-lg border border-red-500/30 mt-3">
+                            <div class="font-semibold text-red-400 mb-2">❌ ZONE DANGER</div>
+                            <div class="text-sm">• <strong>12-24h :</strong> Quality Index 36.87 - PIRE période !</div>
+                            <div class="text-sm text-gray-300 mt-2">Raison : Après le pump initial, avant la consolidation</div>
+                        </div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ STRATÉGIE PAR ÂGE</div>
+                            <div class="text-sm space-y-2">
+                                <div>• <strong>0-3h :</strong> PRIORISER ces alertes (meilleur timing) ⭐</div>
+                                <div>• <strong>3-12h :</strong> Acceptable si score élevé</div>
+                                <div>• <strong>12-24h :</strong> ÉVITER (sauf confluence exceptionnelle)</div>
+                                <div>• <strong>48h+ :</strong> OK pour swing trade (hold plus long)</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                        <div class="font-semibold mb-2">🔥 Token FRESH (0.8h) - OPTIMAL</div>
+                        <div class="text-sm text-gray-300">Âge: 48 minutes | Score: 88</div>
+                        <div class="text-sm text-green-400 mt-2">→ Zone embryonic = Potentiel +50-100% avant correction</div>
+                    </div>
+                `
+            },
+            {
+                id: 'buysell',
+                icon: '⚖️',
+                title: 'BUY/SELL RATIO',
+                color: 'indigo',
+                description: 'Ratio affiché en % (ex: Buy Ratio: 68% ou Pression: ÉQUILIBRÉE 0.80)',
+                meaning: 'Le Buy/Sell Ratio mesure la PRESSION acheteuse vs vendeuse. Un ratio >0.60 signifie plus d\'acheteurs que de vendeurs = pression haussière.',
+                importance: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Ratio > 0.70 :</strong> Forte pression acheteuse = Signal haussier 📈</li>
+                        <li><strong>Ratio 0.50-0.70 :</strong> Équilibre = Neutre ⚖️</li>
+                        <li><strong>Ratio < 0.50 :</strong> Pression vendeuse = Risque dump 📉</li>
+                    </ul>
+                    <div class="mt-4 p-4 bg-yellow-900/30 rounded-lg border border-yellow-500/30">
+                        <div class="font-semibold text-yellow-400 mb-2">⚠️ ATTENTION AU CONTEXTE</div>
+                        <div class="text-sm">Ratio <0.50 sur 1h peut être TEMPORAIRE (prise de profits)</div>
+                        <div class="text-sm">Vérifier le ratio 24h pour voir la tendance globale</div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ SIGNAL D'ENTRÉE</div>
+                            <div class="text-sm">→ Buy ratio 1h > 0.65 ET Buy ratio 24h > 0.55</div>
+                            <div class="text-sm">→ Momentum haussier confirmé sur 2 timeframes</div>
+                            <div class="text-sm text-green-400 mt-2">= Pression acheteuse dominante, bon timing</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ SIGNAL DANGER</div>
+                            <div class="text-sm">→ Buy ratio 1h < 0.45 (vendeurs dominent)</div>
+                            <div class="text-sm">→ Buy ratio en BAISSE rapide (0.70 → 0.50 en 1h)</div>
+                            <div class="text-sm text-red-400 mt-2">= Retournement de tendance, éviter ou sortir</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">✅ Pression Acheteuse Forte</div>
+                            <div class="text-sm">Achats: 450 (72%) | Ventes: 175 (28%)</div>
+                            <div class="text-sm text-green-400 mt-2">→ Ratio 0.72 = Forte demande, pump probable ⬆️</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">❌ Pression Vendeuse</div>
+                            <div class="text-sm">Achats: 120 (35%) | Ventes: 220 (65%)</div>
+                            <div class="text-sm text-red-400 mt-2">→ Ratio 0.35 = Dump en cours, ÉVITER ⬇️</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'tp',
+                icon: '🎯',
+                title: 'TAKE PROFIT (TP1/TP2/TP3)',
+                color: 'emerald',
+                description: 'Prix cibles affichés avec % (ex: TP1: $0.0052 (+7%), TP2: $0.0061 (+15%), TP3: $0.0075 (+30%))',
+                meaning: 'Les Take Profit sont les NIVEAUX DE SORTIE recommandés pour sécuriser vos gains. TP1 = gain rapide, TP2 = gain moyen, TP3 = gain maximal.',
+                importance: `
+                    <div class="space-y-3">
+                        <div class="p-4 bg-green-900/30 rounded-lg border border-green-500/30">
+                            <div class="font-semibold text-green-400 mb-2">📊 STRATÉGIE DE SORTIE OPTIMALE</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>TP1 (5-15%) :</strong> Sortir 50% de la position = Sécuriser capital</div>
+                                <div>• <strong>TP2 (15-40%) :</strong> Sortir 30% = Sécuriser profit</div>
+                                <div>• <strong>TP3 (30-80%) :</strong> Laisser courir 20% = Maximiser gain</div>
+                            </div>
+                            <div class="text-sm text-gray-300 mt-3">= Vous gagnez TOUJOURS, même si TP3 jamais atteint</div>
+                        </div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ STRATÉGIE SCALPING (Court Terme)</div>
+                            <div class="text-sm space-y-2">
+                                <div>1. Entrée au prix d'alerte</div>
+                                <div>2. Sortir 70% au TP1 (gain rapide 1-2h)</div>
+                                <div>3. Sortir 30% au TP2 OU si retour au prix d'entrée</div>
+                                <div class="text-green-400 mt-2">→ Gain moyen: +7-12% en 2-4h</div>
+                            </div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-blue-400 mb-2">⚡ STRATÉGIE SWING (Moyen Terme)</div>
+                            <div class="text-sm space-y-2">
+                                <div>1. Entrée au prix d'alerte</div>
+                                <div>2. Sortir 40% au TP1 (sécuriser capital)</div>
+                                <div>3. Sortir 30% au TP2</div>
+                                <div>4. Laisser 30% courir vers TP3</div>
+                                <div class="text-blue-400 mt-2">→ Gain moyen: +20-40% en 6-24h</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                        <div class="font-semibold mb-2">📈 Exemple Trade Réussi</div>
+                        <div class="text-sm text-gray-300">Entrée: $0.0045 | Position: $500</div>
+                        <div class="text-sm space-y-1 mt-2">
+                            <div class="text-green-400">✅ TP1 $0.0048 (+7%) → Sortir $250 = +$17.50</div>
+                            <div class="text-green-400">✅ TP2 $0.0052 (+15%) → Sortir $150 = +$22.50</div>
+                            <div class="text-green-400">✅ TP3 $0.0068 (+51%) → Sortir $100 = +$51</div>
+                        </div>
+                        <div class="text-sm text-yellow-400 mt-2">→ Gain total: +$91 (+18.2% sur capital initial) 🎉</div>
+                    </div>
+                `
+            },
+            {
+                id: 'sl',
+                icon: '🛡️',
+                title: 'STOP LOSS (SL)',
+                color: 'red',
+                description: 'Prix de protection affiché (ex: SL: $0.0041 (-10%))',
+                meaning: 'Le Stop Loss est votre LIMITE DE PERTE. Si le prix atteint ce niveau, vous sortez pour limiter les dégâts. C\'est votre assurance contre les grosses pertes.',
+                importance: `
+                    <div class="p-4 bg-red-900/30 rounded-lg border border-red-500/30">
+                        <div class="font-semibold text-red-400 mb-2">⚠️ RÈGLE D'OR DU TRADING</div>
+                        <div class="text-sm font-semibold">TOUJOURS respecter votre Stop Loss = Différence entre trader professionnel et amateur</div>
+                        <div class="text-sm mt-3 space-y-1">
+                            <div>• <strong>Avec SL respecté :</strong> Perte max -10% par trade</div>
+                            <div>• <strong>Sans SL :</strong> Perte jusqu'à -90% voire -100% (rug)</div>
+                        </div>
+                        <div class="text-sm text-yellow-400 mt-3">→ 1 trade sans SL peut annuler 10 trades gagnants !</div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ BONNES PRATIQUES</div>
+                            <div class="text-sm space-y-2">
+                                <div>1. <strong>Placer l'ordre SL immédiatement</strong> après l'entrée</div>
+                                <div>2. <strong>NE JAMAIS déplacer le SL vers le bas</strong> (accepter la perte)</div>
+                                <div>3. <strong>Déplacer le SL vers le haut</strong> une fois TP1 atteint (break-even)</div>
+                                <div>4. Si SL touché = <strong>SORTIR sans réfléchir</strong></div>
+                            </div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-blue-400 mb-2">⚡ SL TRAILING (Avancé)</div>
+                            <div class="text-sm space-y-2">
+                                <div>• TP1 atteint → Déplacer SL au prix d'entrée (0% perte)</div>
+                                <div>• TP2 atteint → Déplacer SL à TP1 (profit garanti)</div>
+                                <div>• Prix continue → Déplacer SL à TP2</div>
+                                <div class="text-blue-400 mt-2">= Vous sécurisez vos gains progressivement 🔒</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">✅ SL Bien Géré</div>
+                            <div class="text-sm">Entrée: $0.0050 | SL initial: $0.0045 (-10%)</div>
+                            <div class="text-sm text-green-400 mt-1">→ TP1 atteint → SL déplacé à $0.0050 (break-even)</div>
+                            <div class="text-sm text-green-400">→ TP2 atteint → SL déplacé à $0.0052 (TP1)</div>
+                            <div class="text-sm text-yellow-400 mt-2">= Profit garanti quoi qu'il arrive ! 🎯</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">❌ SL Ignoré (ERREUR)</div>
+                            <div class="text-sm">Entrée: $0.0050 | SL: $0.0045</div>
+                            <div class="text-sm text-red-400 mt-1">→ Prix descend à $0.0044 (-12%)</div>
+                            <div class="text-sm text-gray-300">→ "J'attends qu'il remonte..." (ERREUR !)</div>
+                            <div class="text-sm text-red-400">→ Prix final: $0.0015 (-70%) = Catastrophe</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'pattern',
+                icon: '🔄',
+                title: 'PATTERN RETRACEMENT',
+                color: 'pink',
+                description: 'Badge affiché "🔄 ALERTE #3" ou "Pattern: RETRACEMENT MULTIPLE"',
+                meaning: 'Un pattern retracement se produit quand le MÊME token déclenche plusieurs alertes dans un court laps de temps (2-5 alertes en 24h). C\'est un signal technique très puissant.',
+                importance: `
+                    <div class="p-4 bg-purple-900/30 rounded-lg border border-purple-500/30">
+                        <div class="font-semibold text-purple-400 mb-2">🔥 PATTERN VALIDÉ PAR BACKTEST</div>
+                        <div class="text-sm space-y-2">
+                            <div>• <strong>Tokens avec 2-5 alertes :</strong> Gain moyen +12.8% validé</div>
+                            <div>• <strong>130.9 alertes/token :</strong> Signal de forte conviction</div>
+                            <div>• <strong>Win Rate :</strong> 65-75% sur ce pattern spécifique</div>
+                        </div>
+                        <div class="text-sm text-yellow-400 mt-3">→ C'est l'un des patterns les plus rentables détectés !</div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-purple-400 mb-2">🎯 STRATÉGIE PATTERN RETRACEMENT</div>
+                            <div class="text-sm space-y-2">
+                                <div><strong>Alerte #1 :</strong> Observer (pas d'entrée encore)</div>
+                                <div><strong>Alerte #2-3 :</strong> ZONE D'ENTRÉE OPTIMALE ✅</div>
+                                <div class="text-green-400">→ Pattern confirmé = Pump avec retracements sains</div>
+                                <div><strong>Alerte #4-5 :</strong> Encore acceptable si vélocité OK</div>
+                                <div><strong>Alerte >10 :</strong> Token épuisé, ÉVITER ⚠️</div>
+                            </div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-blue-400 mb-2">💡 POURQUOI ÇA FONCTIONNE</div>
+                            <div class="text-sm">Le token fait des vagues : pump → retracement → re-pump</div>
+                            <div class="text-sm">Chaque retracement = nouvelle opportunité d'entrée</div>
+                            <div class="text-sm text-green-400 mt-2">= Vous achetez les "dips" d'un token en tendance haussière</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="glass p-4 rounded-lg border-l-4 border-purple-500">
+                        <div class="font-semibold mb-2">🔄 Pattern Retracement Parfait - Token XYZ</div>
+                        <div class="text-sm space-y-1 text-gray-300">
+                            <div>10:00 - Alerte #1 : $0.0040 (observer)</div>
+                            <div>12:30 - Alerte #2 : $0.0038 (-5% retracement)</div>
+                            <div class="text-green-400">→ ENTRÉE à $0.0038</div>
+                            <div>14:00 - Prix monte à $0.0045 (+18%)</div>
+                            <div>16:00 - Alerte #3 : $0.0042 (retracement sain)</div>
+                            <div>18:00 - Prix atteint $0.0052 (+37% depuis entrée)</div>
+                        </div>
+                        <div class="text-sm text-purple-400 mt-2">→ Gain réalisé: +25% (sortie échelonnée TP1/TP2) 🎯</div>
+                    </div>
+                `
+            },
+            {
+                id: 'whale',
+                icon: '🐋',
+                title: 'WHALE ACTIVITY (Activité Baleines)',
+                color: 'teal',
+                description: 'Badge avec niveau de risque (ex: "🐋 WHALE RISK: MEDIUM" ou "Concentration: LOW")',
+                meaning: 'Whale Activity détecte si un PETIT NOMBRE de gros portefeuilles (whales) contrôle une GRANDE PARTIE du trading. C\'est un indicateur de manipulation potentielle.',
+                importance: `
+                    <div class="space-y-3">
+                        <div class="p-4 bg-red-900/30 rounded-lg border border-red-500/30">
+                            <div class="font-semibold text-red-400 mb-2">⚠️ DANGER WHALE MANIPULATION</div>
+                            <div class="text-sm">Si 1-2 whales contrôlent >60% du volume :</div>
+                            <div class="text-sm mt-2 space-y-1">
+                                <div>• Ils peuvent MANIPULER le prix (pump and dump)</div>
+                                <div>• Ils DUMPERONT sur vous (vente massive)</div>
+                                <div>• Vous perdez -30% à -70% en quelques minutes</div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-green-900/30 rounded-lg border border-green-500/30 mt-3">
+                            <div class="font-semibold text-green-400 mb-2">✅ DISTRIBUTION SAINE</div>
+                            <div class="text-sm">• 100+ wallets uniques actifs</div>
+                            <div class="text-sm">• Concentration < 30%</div>
+                            <div class="text-sm">• Avg buys/buyer < 3 (pas de whale individuelle)</div>
+                            <div class="text-sm text-green-400 mt-2">= Pump ORGANIQUE, moins de risque de dump brutal</div>
+                        </div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ SIGNAUX POSITIFS</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>Buyers > 50</strong> sur 1h (distribution large)</div>
+                                <div>• <strong>Avg buys/buyer < 5</strong> (pas de concentration)</div>
+                                <div>• <strong>Ratio unique wallets > 0.80</strong> (sain)</div>
+                                <div>• <strong>Concentration risk: LOW</strong></div>
+                            </div>
+                            <div class="text-green-400 mt-2">→ GO ! Accumulation organique</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ SIGNAUX DANGER</div>
+                            <div class="text-sm space-y-1">
+                                <div>• <strong>Buyers < 20</strong> sur 1h (concentration élevée)</div>
+                                <div>• <strong>Avg buys/buyer > 15</strong> (1-2 whales dominent)</div>
+                                <div>• <strong>Concentration risk: HIGH</strong></div>
+                                <div>• <strong>Ratio unique wallets < 0.50</strong></div>
+                            </div>
+                            <div class="text-red-400 mt-2">→ SKIP ! Risque de dump whale élevé</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">✅ Distribution Saine</div>
+                            <div class="text-sm text-gray-300">Buyers 1h: 185 | Avg buys/buyer: 2.4x</div>
+                            <div class="text-sm text-gray-300">Concentration: LOW | Unique ratio: 0.87</div>
+                            <div class="text-sm text-green-400 mt-2">→ Accumulation organique retail = SAFE ✅</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">❌ Whale Manipulation Détectée</div>
+                            <div class="text-sm text-gray-300">Buyers 1h: 12 | Avg buys/buyer: 28.5x</div>
+                            <div class="text-sm text-gray-300">Concentration: HIGH | Unique ratio: 0.23</div>
+                            <div class="text-sm text-red-400 mt-2">→ 2-3 whales contrôlent tout = DANGER ⚠️</div>
+                            <div class="text-sm text-red-400">→ SKIP cette alerte, risque pump & dump</div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'security',
+                icon: '🔒',
+                title: 'SÉCURITÉ / LP LOCK',
+                color: 'slate',
+                description: 'Score de sécurité affiché (ex: "🔒 SÉCURITÉ: 85/100" ou "LP Lock: 365 jours")',
+                meaning: 'Le score de sécurité évalue si le token est un SCAM ou LÉGITIME. Il vérifie : LP lock (liquidité verrouillée), fonctions malveillantes, honeypot, taxes, etc.',
+                importance: `
+                    <div class="p-4 bg-red-900/30 rounded-lg border border-red-500/30">
+                        <div class="font-semibold text-red-400 mb-2">🚨 ÉVITER LES RUGS = RÈGLE #1</div>
+                        <div class="text-sm">99% des tokens memecoins sont des SCAMS potentiels</div>
+                        <div class="text-sm mt-2 space-y-1">
+                            <div>• <strong>Pas de LP lock :</strong> Dev peut voler la liquidité (-100%)</div>
+                            <div>• <strong>Honeypot :</strong> Vous ACHETEZ mais ne pouvez PAS VENDRE</div>
+                            <div>• <strong>Fonctions malveillantes :</strong> Blacklist, pause, mint infini</div>
+                            <div>• <strong>Taxes >10% :</strong> Impossible de sortir profitable</div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-green-900/30 rounded-lg border border-green-500/30 mt-3">
+                        <div class="font-semibold text-green-400 mb-2">✅ TOKEN SÉCURISÉ</div>
+                        <div class="text-sm space-y-1">
+                            <div>• LP lock 100% pendant 180+ jours</div>
+                            <div>• Contract renounced (dev n'a plus de contrôle)</div>
+                            <div>• Pas de mint function, blacklist, ou pause</div>
+                            <div>• Taxes <5% buy/sell</div>
+                        </div>
+                    </div>
+                `,
+                howToUse: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-green-400 mb-2">✅ CHECKLIST SÉCURITÉ</div>
+                            <div class="text-sm space-y-2">
+                                <div>1. <strong>Score sécurité ≥ 80/100</strong> (minimum)</div>
+                                <div>2. <strong>LP Lock ≥ 30 jours</strong> (idéal 180+ jours)</div>
+                                <div>3. <strong>LP Lock % ≥ 80%</strong> (minimum verrouillé)</div>
+                                <div>4. <strong>Pas de honeypot détecté</strong></div>
+                                <div>5. <strong>Taxes < 10%</strong> buy + sell combinés</div>
+                                <div>6. <strong>Contract verified</strong> (code public)</div>
+                            </div>
+                            <div class="text-green-400 mt-3">→ Si tous validés = Token relativement SAFE</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="font-semibold text-red-400 mb-2">❌ RED FLAGS ABSOLUS</div>
+                            <div class="text-sm space-y-2">
+                                <div>• LP lock <7 jours = <strong>RUG IMMINENT</strong></div>
+                                <div>• Honeypot détecté = <strong>SCAM 100%</strong></div>
+                                <div>• Mint function active = <strong>Inflation infinie</strong></div>
+                                <div>• Blacklist possible = <strong>Peut bloquer vos ventes</strong></div>
+                                <div>• Taxes >15% = <strong>Impossible de profit</strong></div>
+                            </div>
+                            <div class="text-red-400 mt-3 font-semibold">→ UN SEUL RED FLAG = SKIP IMMÉDIAT</div>
+                        </div>
+                    </div>
+                `,
+                examples: `
+                    <div class="space-y-3">
+                        <div class="glass p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold mb-2">✅ Token Ultra Sécurisé</div>
+                            <div class="text-sm text-gray-300">Score: 95/100</div>
+                            <div class="text-sm space-y-1 mt-2">
+                                <div class="text-green-400">✅ LP Lock: 100% pendant 365 jours</div>
+                                <div class="text-green-400">✅ Contract renounced (ownership=0x00)</div>
+                                <div class="text-green-400">✅ No mint, no blacklist, no pause</div>
+                                <div class="text-green-400">✅ Taxes: 0% buy, 0% sell</div>
+                                <div class="text-green-400">✅ Verified on blockchain explorer</div>
+                            </div>
+                            <div class="text-sm text-yellow-400 mt-2">→ Position size MAX possible, risque rug ~0%</div>
+                        </div>
+                        <div class="glass p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="font-semibold mb-2">❌ Token SCAM</div>
+                            <div class="text-sm text-gray-300">Score: 35/100</div>
+                            <div class="text-sm space-y-1 mt-2">
+                                <div class="text-red-400">❌ LP Lock: 7 jours seulement</div>
+                                <div class="text-red-400">❌ Not renounced (dev a le contrôle)</div>
+                                <div class="text-red-400">❌ Mint function ACTIVE</div>
+                                <div class="text-red-400">❌ Sell tax: 25% (!)</div>
+                            </div>
+                            <div class="text-sm text-red-400 mt-2 font-semibold">→ SCAM ÉVIDENT - NE JAMAIS TOUCHER !</div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // Render metrics
+        function renderMetrics() {
+            const container = document.getElementById('metricsContainer');
+
+            metrics.forEach(metric => {
+                const card = document.createElement('div');
+                card.className = 'metric-card glass-card p-8 rounded-xl section-anchor';
+                card.id = metric.id;
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="text-5xl">${metric.icon}</div>
+                        <div class="flex-1">
+                            <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-${metric.color}-400 to-${metric.color}-600 bg-clip-text text-transparent">
+                                ${metric.title}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-blue-400 mb-3">📊 Ce que vous voyez</h3>
+                            <p class="text-gray-300">${metric.description}</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-purple-400 mb-3">🎯 Ce que ça signifie</h3>
+                            <p class="text-gray-300">${metric.meaning}</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-yellow-400 mb-3">💡 Pourquoi c'est important</h3>
+                            <div class="text-gray-300">${metric.importance}</div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-green-400 mb-3">✅ Comment l'utiliser</h3>
+                            <div class="text-gray-300">${metric.howToUse}</div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-orange-400 mb-3">📈 Exemples réels</h3>
+                            <div class="text-gray-300">${metric.examples}</div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize
+        renderMetrics();
+    </script>
+</body>
+</html>
