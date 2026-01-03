@@ -19,8 +19,9 @@ import os
 app = Flask(__name__)
 CORS(app)  # Permettre les requêtes depuis le frontend
 
-# Path vers la base de données
-DB_PATH = os.path.join(os.path.dirname(__file__), 'alerts_tracker.db')
+# Path vers la base de données et fichiers statiques
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'alerts_tracker.db')
 
 def get_db_connection():
     """Connexion à la base de données SQLite."""
@@ -51,17 +52,17 @@ def parse_alert_data(alert_row):
 @app.route('/')
 def index():
     """Serve dashboard homepage."""
-    return send_from_directory('.', 'dashboard_frontend.html')
+    return send_from_directory(BASE_DIR, 'dashboard_frontend.html')
 
 @app.route('/glossary.html')
 def glossary():
     """Serve glossary page."""
-    return send_from_directory('.', 'glossary.html')
+    return send_from_directory(BASE_DIR, 'glossary.html')
 
 @app.route('/compare.html')
 def compare():
     """Serve compare page."""
-    return send_from_directory('.', 'compare.html')
+    return send_from_directory(BASE_DIR, 'compare.html')
 
 @app.route('/api/health', methods=['GET'])
 def health():
