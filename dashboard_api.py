@@ -8,7 +8,7 @@ Endpoints:
 - GET /api/alerts/:id - Détail d'une alerte
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import json
@@ -47,6 +47,21 @@ def parse_alert_data(alert_row):
         'timestamp': alert_row['timestamp'],
         'created_at': alert_row['created_at'],
     }
+
+@app.route('/')
+def index():
+    """Serve dashboard homepage."""
+    return send_from_directory('.', 'dashboard_frontend.html')
+
+@app.route('/glossary.html')
+def glossary():
+    """Serve glossary page."""
+    return send_from_directory('.', 'glossary.html')
+
+@app.route('/compare.html')
+def compare():
+    """Serve compare page."""
+    return send_from_directory('.', 'compare.html')
 
 @app.route('/api/health', methods=['GET'])
 def health():
@@ -333,7 +348,11 @@ if __name__ == '__main__':
         print("Lancez d'abord le scanner pour créer la base de données.")
     else:
         print(f"API Dashboard démarrée - DB: {DB_PATH}")
-        print("Endpoints disponibles:")
+        print("Pages disponibles:")
+        print("  GET / (dashboard)")
+        print("  GET /glossary.html")
+        print("  GET /compare.html")
+        print("\nEndpoints API:")
         print("  GET /api/health")
         print("  GET /api/alerts")
         print("  GET /api/stats")
