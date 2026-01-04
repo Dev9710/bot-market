@@ -113,11 +113,14 @@ from utils.api_client import (
     parse_pool_data,
 )
 
+from data.cache import (
+    update_buy_ratio_history,
+    get_buy_ratio_change,
+)
+
 # ============================================
 # CACHE SIMPLIFIÉ
 # ============================================
-# On garde seulement buy_ratio history (pas fourni par API)
-buy_ratio_history = defaultdict(lambda: defaultdict(list))
 
 # Multi-pool tracking
 token_pools = defaultdict(list)  # [base_token] = [pool_data, pool_data, ...]
@@ -218,48 +221,6 @@ def should_send_alert(token_address: str, current_price: float, tracker, regle5_
         return True, f"Pump PARABOLIQUE détecté - Alerte SORTIR urgente"
 
     # Aucune raison de re-alerter → SPAM PREVENTION
-    return False, f"Pas de changement significatif (prix: ${current_price:.6f}, entry: ${entry_price:.6f})"
-# HISTORIQUE BUY RATIO (SIMPLIFIÉ)
-# ============================================
-def update_buy_ratio_history(pool_data: Dict):
-    """Met à jour seulement l'historique buy ratio (pas fourni par API)."""
-    base_token = pool_data["base_token_name"]
-    pool_addr = pool_data["pool_address"]
-    now = time.time()
-
-    # Buy ratio 24h
-    buy_ratio = pool_data["buys_24h"] / pool_data["sells_24h"] if pool_data["sells_24h"] > 0 else 1.0
-    buy_ratio_history[base_token][pool_addr].append((now, buy_ratio))
-
-    # Nettoyer historique (garder 2h seulement - on a besoin que de 1h)
-    cutoff = now - 7200  # 2h
-    buy_ratio_history[base_token][pool_addr] = [
-        (t, v) for t, v in buy_ratio_history[base_token][pool_addr] if t > cutoff
-    ]
-
-def get_buy_ratio_change(base_token: str, pool_addr: str) -> Optional[float]:
-    """Calcule variation buy ratio sur 1h."""
-    hist = buy_ratio_history[base_token][pool_addr]
-
-    if not hist or len(hist) < 2:
-        return None
-
-    now = time.time()
-    one_hour_ago = now - 3600  # 1h
-
-    # Trouver valeur la plus proche d'il y a 1h
-    past_values = [v for t, v in hist if t < one_hour_ago]
-    if not past_values:
-        return None
-
-    past = past_values[-1]  # Plus récente valeur avant 1h
-    current = hist[-1][1]
-
-    if past == 0:
-        return None
-
-    return ((current - past) / past) * 100
-
 def get_price_momentum_from_api(pool_data: Dict) -> Dict[str, Optional[float]]:
     """
     SIMPLIFIÉ: Utilise directement les données de l'API au lieu de recalculer.
