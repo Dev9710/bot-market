@@ -38,205 +38,60 @@ from alert_tracker import AlertTracker
 # UTF-8 pour emojis Windows
 if sys.platform == "win32":
     import io
-    if hasattr(sys.stdout, 'buffer'):
+    if hasattr(sys.stdout, 'buffer') and not isinstance(sys.stdout, io.TextIOWrapper):
         try:
             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
         except (ValueError, AttributeError):
             pass
 
 # ============================================
-# CONFIGURATION V3 - CANAL TELEGRAM SÉPARÉ
+# CONFIGURATION V3 - Importée depuis config/
 # ============================================
 
-# Charger variables d'environnement depuis .env.v3 (si disponible)
-try:
-    from dotenv import load_dotenv
-    # Charger .env.v3 en priorité, sinon .env par défaut
-    env_v3_path = os.path.join(os.path.dirname(__file__), '.env.v3')
-    if os.path.exists(env_v3_path):
-        load_dotenv(env_v3_path)
-        print("🔧 V3: Configuration chargée depuis .env.v3")
-    else:
-        load_dotenv()
-        print("⚠️ V3: .env.v3 non trouvé, utilisation .env par défaut")
-except ImportError:
-    print("⚠️ V3: python-dotenv non installé, variables système utilisées")
+from config.settings import (
+    GECKOTERMINAL_API,
+    TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID,
+    NETWORKS,
+    NETWORK_NAMES,
+    build_network_thresholds,
+    DASHBOARD_CONFIG,
+    MIN_VELOCITE_PUMP,
+    NETWORK_SCORE_FILTERS,
+    NETWORK_THRESHOLDS,
+    OPTIMAL_VELOCITE_PUMP,
+    EXPLOSIVE_VELOCITE_PUMP,
+    ALLOWED_PUMP_TYPES,
+    REJECTED_PUMP_TYPES,
+    MIN_TOKEN_AGE_HOURS,
+    EMBRYONIC_AGE_MAX_HOURS,
+    OPTIMAL_TOKEN_AGE_MIN_HOURS,
+    OPTIMAL_TOKEN_AGE_MAX_HOURS,
+    MAX_TOKEN_AGE_HOURS,
+    DANGER_ZONE_AGE_MIN,
+    DANGER_ZONE_AGE_MAX,
+    WATCHLIST_TOKENS,
+    VOLUME_LIQUIDITY_RATIO,
+    TRADERS_SPIKE_THRESHOLD,
+    BUY_RATIO_THRESHOLD,
+    BUY_RATIO_CHANGE_THRESHOLD,
+    ACCELERATION_THRESHOLD,
+    VOLUME_SPIKE_THRESHOLD,
+    COOLDOWN_SECONDS,
+    MAX_ALERTS_PER_SCAN,
+    MIN_PRICE_CHANGE_PERCENT,
+    MIN_TIME_HOURS_FOR_REALERT,
+    ENABLE_SMART_REALERT,
+    ENABLE_ACTIVE_TRACKING,
+    ACTIVE_TRACKING_MAX_AGE_HOURS,
+    ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES,
+)
 
-GECKOTERMINAL_API = "https://api.geckoterminal.com/api/v2"
-
-# Configuration Telegram V3 (peut être différente de V2 si .env.v3 utilisé)
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
-
-# Afficher configuration au démarrage
-if TELEGRAM_CHAT_ID and TELEGRAM_BOT_TOKEN:
-    print(f"✅ V3 Telegram configuré: Chat ID = {TELEGRAM_CHAT_ID}")
-    print(f"   Bot Token: {TELEGRAM_BOT_TOKEN[:20]}...")
-else:
-    print(f"⚠️ WARNING: Telegram NON configuré!")
-    print(f"   TELEGRAM_BOT_TOKEN: {'✅ OK' if TELEGRAM_BOT_TOKEN else '❌ MANQUANT'}")
-    print(f"   TELEGRAM_CHAT_ID: {'✅ OK' if TELEGRAM_CHAT_ID else '❌ MANQUANT'}")
-
-# Réseaux à surveiller - V3.1: ARBITRUM DÉSACTIVÉ (4.4% quality rate)
-# V3.2: Ajout Polygon et Avalanche pour augmenter volume d'opportunités
-# Polygon: Très actif memecoins, frais bas
-# Avalanche: Écosystème DeFi mature, bonne qualité
-NETWORKS = ["eth", "bsc", "base", "solana", "polygon_pos", "avax"]  # V3.2: +Polygon +Avalanche
-
-# ============================================
-# SEUILS PAR RÉSEAU - Configuration centralisée
-# ============================================
-
-# Fonction pour construire NETWORK_THRESHOLDS selon le mode actif
-def build_network_thresholds(mode_config):
-    """Construit NETWORK_THRESHOLDS avec limites de liquidité du mode actif."""
-    liq = mode_config['LIQUIDITY']
-    return {
-        "solana": {
-            "min_liquidity": liq['solana'][0],
-            "max_liquidity": liq['solana'][1],
-            "min_volume": 50000,
-            "min_txns": 100
-        },
-        "bsc": {
-            "min_liquidity": liq['bsc'][0],
-            "max_liquidity": liq['bsc'][1],
-            "min_volume": 100000,
-            "min_txns": 100
-        },
-        "eth": {
-            "min_liquidity": liq['eth'][0],
-            "max_liquidity": liq['eth'][1],
-            "min_volume": 50000,
-            "min_txns": 100
-        },
-        "base": {
-            "min_liquidity": liq['base'][0],
-            "max_liquidity": liq['base'][1],
-            "min_volume": 1000000,
-            "min_txns": 150
-        },
-        "arbitrum": {
-            "min_liquidity": 100000,
-            "max_liquidity": 1000000,
-            "min_volume": 50000,
-            "min_txns": 100
-        },
-        "avax": {
-            "min_liquidity": liq.get('avax', (100000, 800000))[0],
-            "max_liquidity": liq.get('avax', (100000, 800000))[1],
-            "min_volume": 50000,
-            "min_txns": 100
-        },
-        "polygon_pos": {
-            "min_liquidity": liq.get('polygon_pos', (50000, 500000))[0],
-            "max_liquidity": liq.get('polygon_pos', (50000, 500000))[1],
-            "min_volume": 30000,  # Plus bas car frais très bas sur Polygon
-            "min_txns": 80
-        },
-        "default": {
-            "min_liquidity": 100000,
-            "min_volume": 50000,
-            "min_txns": 100
-        }
-    }
-
-# ============================================
-# V3.1: CONFIGURATION ULTRA_RENTABLE - Qualité maximale (2.7 alertes/jour)
-# ============================================
-# Objectif: 2.7 alertes/jour | Score 95.9 | WR 55-70% | ROI +10-15%/mois
-# Basé sur analyse de 4252 alertes Railway
-
-print("=" * 80)
-print("V3.2.2 DASHBOARD - DEBUG VALEURS API - 2025-12-30 23:45")
-print("Objectif: 8-10 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois")
-print("DEBUG: Log valeurs brutes API pour vérifier si reserve_in_usd vraiment 0")
-print("=" * 80)
-
-# Configuration DASHBOARD (5 alertes/jour)
-DASHBOARD_CONFIG = {
-    'MIN_VELOCITE_PUMP': 5.0,
-    'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 78, 'min_velocity': 5},
-        'base': {'min_score': 82, 'min_velocity': 8},
-        'bsc': {'min_score': 80, 'min_velocity': 6},
-        'solana': {'min_score': 72, 'min_velocity': 5},
-        'polygon_pos': {'min_score': 75, 'min_velocity': 5},  # V3.2: Moins strict car frais bas
-        'avax': {'min_score': 80, 'min_velocity': 6},  # V3.2: Similar à BSC
-    },
-    'LIQUIDITY': {
-        'eth': (80000, 600000),
-        'base': (250000, 2500000),
-        'bsc': (400000, 6000000),
-        'solana': (80000, 300000),
-        'polygon_pos': (50000, 500000),  # V3.2: Plus bas car frais très bas
-        'avax': (100000, 800000),  # V3.2: Similar à ETH
-    }
-}
-
-# Appliquer la configuration
-MIN_VELOCITE_PUMP = DASHBOARD_CONFIG['MIN_VELOCITE_PUMP']
-NETWORK_SCORE_FILTERS = DASHBOARD_CONFIG['NETWORK_SCORE_FILTERS']
-NETWORK_THRESHOLDS = build_network_thresholds(DASHBOARD_CONFIG)
-
-# ============================================
-# V3: NOUVEAUX FILTRES (Backtest Phase 2)
-# ============================================
-
-OPTIMAL_VELOCITE_PUMP = 30.0     # Bonus si > 30
-EXPLOSIVE_VELOCITE_PUMP = 50.0   # Bonus supplémentaire si > 50
-
-# Filtre TYPE PUMP (73% des losers sont "LENT")
-ALLOWED_PUMP_TYPES = ["RAPIDE", "TRES_RAPIDE", "PARABOLIQUE"]  # Rejeter LENT, STAGNANT
-REJECTED_PUMP_TYPES = ["LENT", "STAGNANT", "STABLE"]
-
-# Filtre ÂGE TOKEN - V3.1 STRATÉGIE HYBRIDE
-# Analyse 4252 alertes:
-# - Zone EMBRYONIC 0-3h: Quality Index 182.83 (MEILLEUR!)
-# - Zone DANGER 12-24h: Quality Index 36.87 (PIRE)
-# - Zone MATURE 48-72h: Win Rate 36.1% (stable)
-# V3.1: Accepter 0-3h (embryonic) + 48-72h (mature), éviter 12-24h
-MIN_TOKEN_AGE_HOURS = 0.0        # V3.1: CRITIQUE - Accepter embryonic 0-3h
-EMBRYONIC_AGE_MAX_HOURS = 3.0    # Zone embryonic: 0-3h (QI 182.83)
-OPTIMAL_TOKEN_AGE_MIN_HOURS = 48.0   # Zone mature: 48-72h (WR 36.1%)
-OPTIMAL_TOKEN_AGE_MAX_HOURS = 72.0
-MAX_TOKEN_AGE_HOURS = 168.0      # Max 7 jours
-DANGER_ZONE_AGE_MIN = 12.0       # Éviter zone danger 12-24h
-DANGER_ZONE_AGE_MAX = 24.0       # Quality Index 36.87 (PIRE)
-
-# Watchlist automatique (tokens "Money Printer")
-# snowball/SOL: 100% WR sur 81 alertes!
-# RTX/USDT: 100% WR sur 20 alertes
-# TTD/USDT: 77.8% WR sur 45 alertes
-# FIREBALL/SOL: 77.4% WR sur 31 alertes
-WATCHLIST_TOKENS = [
-    "snowball", "RTX", "TTD", "FIREBALL",
-    # Ajouter d'autres tokens avec historique exceptionnel
-]
-
-# Seuils globaux (hérités, conservés pour compatibilité)
-VOLUME_LIQUIDITY_RATIO = 0.5    # Vol24h/Liquidité > 50%
-
-# Seuils pour signaux avancés
-TRADERS_SPIKE_THRESHOLD = 0.5   # +50% traders
-BUY_RATIO_THRESHOLD = 0.8       # 80% buy ratio
-BUY_RATIO_CHANGE_THRESHOLD = 0.15  # +15% variation
-ACCELERATION_THRESHOLD = 0.05   # +5% en 1h
-VOLUME_SPIKE_THRESHOLD = 0.5    # +50% volume
-
-# Cooldown et limites
-COOLDOWN_SECONDS = 0  # DÉSACTIVÉ pour backtesting - collecte toutes les occurrences
-MAX_ALERTS_PER_SCAN = 10  # Augmenté de 5 à 10 pour collecte max
-
-# NOUVEAU: Paramètres de re-alerting intelligent (Bug #1 fix)
-MIN_PRICE_CHANGE_PERCENT = 5.0  # Re-alerter si variation ±5% depuis entry
-MIN_TIME_HOURS_FOR_REALERT = 4.0  # Re-alerter après 4h même sans changement
-ENABLE_SMART_REALERT = False  # DÉSACTIVÉ pour phase backtesting (collecte max de données)
-
-# TRACKING ACTIF: Paramètres pour suivre les pools alertés (BACKTESTING)
-ENABLE_ACTIVE_TRACKING = True  # Activer le tracking actif des pools alertés
-ACTIVE_TRACKING_MAX_AGE_HOURS = 24  # Suivre les alertes des dernières 24h
-ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES = 15  # Cooldown 15min entre mises à jour
+from config.constants import (
+    COOLDOWN_REGLE_4,
+    COOLDOWN_REGLE_5,
+    MAX_LIQUIDITY_THRESHOLD,
+)
 
 # ============================================
 # CACHE SIMPLIFIÉ
@@ -251,22 +106,6 @@ alert_cooldown = {}
 # Système de sécurité et tracking (initialisés dans main())
 security_checker = None
 alert_tracker = None
-
-# ============================================
-# UTILITAIRES
-# ============================================
-# Mapping des networks pour affichage lisible
-NETWORK_NAMES = {
-    "eth": "Ethereum",
-    "bsc": "BSC (Binance Smart Chain)",
-    "arbitrum": "Arbitrum",
-    "base": "Base",
-    "solana": "Solana",
-    "polygon_pos": "Polygon",
-    "avax": "Avalanche",
-    "optimism": "Optimism",
-    "fantom": "Fantom",
-}
 
 def get_network_display_name(network_id: str) -> str:
     """Convertit ID network en nom lisible."""
