@@ -94,6 +94,19 @@ from config.constants import (
 )
 
 # ============================================
+# UTILITAIRES - Importés depuis utils/
+# ============================================
+
+from utils.helpers import (
+    get_network_display_name,
+    log,
+    extract_base_token,
+    format_price,
+)
+
+from utils.telegram import send_telegram
+
+# ============================================
 # CACHE SIMPLIFIÉ
 # ============================================
 # On garde seulement buy_ratio history (pas fourni par API)
@@ -107,45 +120,15 @@ alert_cooldown = {}
 security_checker = None
 alert_tracker = None
 
-def get_network_display_name(network_id: str) -> str:
-    """Convertit ID network en nom lisible."""
-    return NETWORK_NAMES.get(network_id.lower(), network_id.upper())
-
-def log(msg: str):
-    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {msg}")
-
-def send_telegram(message: str) -> bool:
-    """Envoie alerte Telegram."""
-    try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        data = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": message,
-            "parse_mode": "Markdown",
-            "disable_web_page_preview": True
-        }
-        response = requests.post(url, json=data, timeout=10)
-        return response.status_code == 200
-    except Exception as e:
-        log(f"❌ Erreur Telegram: {e}")
-        return False
-
-def extract_base_token(pool_name: str) -> str:
-    """Extrait le nom du base token depuis le nom du pool."""
-    # Ex: "LAVA / USDT 0.01%" -> "LAVA"
-    if "/" in pool_name:
-        return pool_name.split("/")[0].strip()
-    return pool_name.strip()
 
 def check_cooldown(alert_key: str) -> bool:
-    """Vérifie si alerte en cooldown (LEGACY - utiliser should_send_alert à la place)."""
-    now = time.time()
-    if alert_key in alert_cooldown:
-        elapsed = now - alert_cooldown[alert_key]
-        if elapsed < COOLDOWN_SECONDS:
-            return False
-    alert_cooldown[alert_key] = now
-    return True
+    """
+    Vérifie si alerte en cooldown (LEGACY - utiliser should_send_alert à la place).
+
+    Note: Utilise la variable globale alert_cooldown
+    """
+    from utils.helpers import check_cooldown as _check_cooldown
+    return _check_cooldown(alert_key, alert_cooldown)
 
 
 def should_send_alert(token_address: str, current_price: float, tracker, regle5_data: Dict = None) -> Tuple[bool, str]:
@@ -2078,21 +2061,6 @@ def analyser_alerte_suivante(previous_alert: Dict, current_price: float, pool_da
 # ============================================
 # GÉNÉRATION ALERTE COMPLÈTE
 # ============================================
-def format_price(price: float) -> str:
-    """
-    Formate le prix de manière intelligente et cohérente (FIX HARMONISATION):
-    - Prix >= $1: 2 décimales (ex: $1.23)
-    - Prix >= $0.01: 4 décimales (ex: $0.1574) - ÉVITE PROBLÈMES ARRONDI TP
-    - Prix < $0.01: 8 décimales (ex: $0.00012345)
-    """
-    if price >= 1.0:
-        return f"${price:.2f}"
-    elif price >= 0.01:
-        # 4 décimales pour précision TP (évite arrondi $0.1574 → $0.16)
-        return f"${price:.4f}"
-    else:
-        # Pour les très petits prix, garder 8 décimales
-        return f"${price:.8f}"
 
 def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, momentum_bonus: int,
                             momentum: Dict, multi_pool_data: Dict, signals: List[str],
