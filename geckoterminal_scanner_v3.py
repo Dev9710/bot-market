@@ -1498,13 +1498,11 @@ def generer_alerte_complete(pool_data: Dict, score: int, base_score: int, moment
 # SCAN PRINCIPAL
 # ============================================
 def scan_geckoterminal():
-    """Scan GeckoTerminal avec analyse avancée."""
+    """Scan GeckoTerminal avec analyse avancée - VERSION REFACTORISÉE."""
 
     log("=" * 80)
     log("🦎 GECKOTERMINAL SCANNER V3.2.5 - DASHBOARD + Liquidity Quality Check")
     log("=" * 80)
-
-    all_pools = []
 
     # Statistiques sources de liquidité
     liquidity_stats = {
@@ -1515,467 +1513,40 @@ def scan_geckoterminal():
         'none': 0
     }
 
-    # Collecter tous les pools
-    for network in NETWORKS:
-        log(f"\n🔍 Scan réseau: {network.upper()}")
+    # ÉTAPE 1: Collecter tous les pools depuis les réseaux
+    from core.scanner_steps import (
+        collect_pools_from_networks,
+        update_price_max_for_tracked_tokens,
+        analyze_and_filter_tokens,
+        process_and_send_alerts,
+        track_active_alerts,
+        report_liquidity_stats,
+    )
 
-        # Trending pools - 1 page seulement (20 pools)
-        trending = get_trending_pools(network)
-        if trending:
-            for pool in trending:
-                pool_data = parse_pool_data(pool, network, liquidity_stats)
-                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                    all_pools.append(pool_data)
-            log(f"   📊 {len(trending)} pools trending trouvés")
+    all_pools = collect_pools_from_networks(liquidity_stats)
 
-        time.sleep(2)
-
-        # New pools - 1 page seulement (20 pools)
-        new_pools = get_new_pools(network)
-        if new_pools:
-            for pool in new_pools:
-                pool_data = parse_pool_data(pool, network, liquidity_stats)
-                if pool_data and pool_data["age_hours"] <= MAX_TOKEN_AGE_HOURS:
-                    all_pools.append(pool_data)
-            log(f"   🆕 {len(new_pools)} nouveaux pools trouvés")
-
-        time.sleep(2)
-
-    log(f"\n📊 Total pools collectés: {len(all_pools)}")
-
-    # Mettre à jour historique (seulement buy ratio)
+    # ÉTAPE 2: Mettre à jour historique buy ratio
     for pool_data in all_pools:
         update_buy_ratio_history(pool_data)
 
-    # NOUVEAU: Mettre à jour le prix MAX en temps réel pour TOUS les tokens trackés
-    # CRITIQUE pour backtesting : capture les pics de prix entre chaque scan
-    if alert_tracker is not None:
-        for pool_data in all_pools:
-            token_address = pool_data.get('token_address')
-            current_price = pool_data.get('price', 0)
-
-            if token_address and current_price > 0:
-                # Vérifier si ce token a une alerte active
-                previous_alert = alert_tracker.get_last_alert_for_token(token_address)
-                if previous_alert:
-                    alert_id = previous_alert.get('id')
-                    # Mettre à jour le prix MAX en DB
-                    alert_tracker.update_price_max_realtime(alert_id, current_price)
-
-    # Grouper par token
-    grouped = group_pools_by_token(all_pools)
-
-    log(f"🔗 Tokens uniques détectés: {len(grouped)}")
-
-    # Analyser chaque token
-    opportunities = []
-    tokens_rejected = 0  # Initialiser ici pour éviter UnboundLocalError
-
-    for base_token, pools in grouped.items():
-        # Multi-pool analysis
-        multi_pool_data = analyze_multi_pool(pools)
-
-        # Analyser chaque pool
-        for pool_data in pools:
-            # Momentum - SIMPLIFIÉ: depuis API directement
-            momentum = get_price_momentum_from_api(pool_data)
-
-            # Résistance - SIMPLIFIÉ: calcul basique
-            resistance_data = find_resistance_simple(pool_data)
-
-            # Score (avec analyse whale)
-            score, base_score, momentum_bonus, whale_analysis = calculate_final_score(pool_data, momentum, multi_pool_data)
-
-            # NOUVEAU: Rejeter immédiatement si WHALE DUMP détecté
-            if whale_analysis['pattern'] == 'WHALE_SELLING':
-                log(f"   🚨 {pool_data['name']}: WHALE DUMP détecté - REJETÉ")
-                tokens_rejected += 1
-                continue
-
-            # FILTRE SCORE PAR RÉSEAU (maintenant que le score est calculé!)
-            network = pool_data.get('network', '').lower()
-            min_score_required = NETWORK_SCORE_FILTERS.get(network, {}).get('min_score', 85)
-
-            # Token watchlist: bypass filtre score
-            if not check_watchlist_token(pool_data) and score < min_score_required:
-                log(f"   ⏭️  {pool_data['name']}: [V3 REJECT] Score insuffisant: {score} < {min_score_required} ({network.upper()})")
-                tokens_rejected += 1
-                continue
-
-            # Validation
-            is_valid, reason = is_valid_opportunity(pool_data, score)
-
-            if is_valid:
-                # Détecter signaux
-                signals = detect_signals(pool_data, momentum, multi_pool_data)
-
-                # Ajouter signaux whale aux signaux existants
-                if whale_analysis['signals']:
-                    signals.extend(whale_analysis['signals'])
-
-                opportunities.append({
-                    "pool_data": pool_data,
-                    "score": score,
-                    "base_score": base_score,
-                    "momentum_bonus": momentum_bonus,
-                    "whale_analysis": whale_analysis,  # NOUVEAU
-                    "momentum": momentum,
-                    "multi_pool_data": multi_pool_data,
-                    "signals": signals,
-                    "resistance_data": resistance_data,
-                })
-
-                log(f"   ✅ Opportunité: {pool_data['name']} (Score: {score})")
-            else:
-                log(f"   ⏭️  {pool_data['name']}: {reason}")
-
-    # Trier par score
-    opportunities.sort(key=lambda x: x["score"], reverse=True)
-
-    log(f"\n📊 TOTAL: {len(opportunities)} opportunités détectées")
-
-    # Envoyer alertes
-    alerts_sent = 0
-    # tokens_rejected déjà initialisé ligne 2078
-
-    for opp in opportunities:
-        base_token = opp["pool_data"]["base_token_name"]
-        pool_addr = opp["pool_data"]["pool_address"]
-        alert_key = f"{base_token}_{pool_addr}"
-
-        # ==========================================
-        # VÉRIFICATION DE SÉCURITÉ
-        # ==========================================
-        # Utiliser pool_address comme token_address (c'est l'adresse du pool/token)
-        token_address = opp["pool_data"]["pool_address"]
-        network = opp["pool_data"]["network"]
-
-        log(f"\n🔒 Vérification sécurité: {opp['pool_data']['name']}")
-
-        security_result = security_checker.check_token_security(token_address, network)
-
-        # Vérifier si le token passe les critères de sécurité
-        should_send, reason = security_checker.should_send_alert(security_result, min_security_score=50)
-
-        if not should_send:
-            log(f"⛔ Token rejeté: {reason}")
-            log(f"   Score sécurité: {security_result['security_score']}/100")
-            log(f"   Niveau risque: {security_result['risk_level']}")
-            tokens_rejected += 1
-            continue
-
-        log(f"✅ Sécurité validée (Score: {security_result['security_score']}/100)")
-
-        # ==========================================
-        # ENVOI DE L'ALERTE (après validation sécurité)
-        # ==========================================
-
-        # Vérifier si c'est la première alerte pour ce token
-        is_first_alert = not alert_tracker.token_already_alerted(token_address)
-
-        # Générer le message d'alerte (pour récupérer regle5_data)
-        alert_msg, regle5_data = generer_alerte_complete(
-            opp["pool_data"],
-            opp["score"],
-            opp["base_score"],
-            opp["momentum_bonus"],
-            opp["momentum"],
-            opp["multi_pool_data"],
-            opp["signals"],
-            opp["resistance_data"],
-            opp.get("whale_analysis"),  # NOUVEAU: Passer analyse whale
-            is_first_alert,
-            alert_tracker  # Passer le tracker pour l'analyse TP
-        )
-
-        # NOUVEAU: Vérifier si on doit envoyer l'alerte (FIX BUG #1 - SPAM)
-        price = opp["pool_data"].get("price_usd", 0)
-        should_send, send_reason = should_send_alert(token_address, price, alert_tracker, regle5_data)
-
-        if not should_send:
-            log(f"⏸️ Alerte bloquée (anti-spam): {opp['pool_data']['name']}")
-            log(f"   Raison: {send_reason}")
-            continue
-
-        # Legacy cooldown check (pour compatibilité)
-        if check_cooldown(alert_key):
-            # Ajouter les infos de sécurité à l'alerte
-            security_info = security_checker.format_security_warning(security_result)
-            alert_msg = alert_msg + "\n" + security_info
-
-            if send_telegram(alert_msg):
-                log(f"✅ Alerte envoyée: {opp['pool_data']['name']} (Score: {opp['score']})")
-
-                # ==========================================
-                # SAUVEGARDE EN BASE DE DONNÉES + TRACKING AUTO
-                # ==========================================
-                try:
-                    # Préparer les données pour la DB
-                    price = opp["pool_data"].get("price_usd", 0)
-                    entry_price = price
-                    stop_loss_price = price * 0.90  # -10%
-                    tp1_price = price * 1.05  # +5%
-                    tp2_price = price * 1.10  # +10%
-                    tp3_price = price * 1.15  # +15%
-
-                    alert_data = {
-                        'token_name': opp["pool_data"]["name"],
-                        'token_address': token_address,
-                        'network': network,
-                        'price_at_alert': price,
-                        'score': opp["score"],
-                        'base_score': opp["base_score"],
-                        'momentum_bonus': opp["momentum_bonus"],
-                        'confidence_score': security_result['security_score'],
-                        'volume_24h': opp["pool_data"].get("volume_24h", 0),
-                        'volume_6h': opp["pool_data"].get("volume_6h", 0),
-                        'volume_1h': opp["pool_data"].get("volume_1h", 0),
-                        'liquidity': opp["pool_data"].get("liquidity", 0),
-                        'buys_24h': opp["pool_data"].get("buys_24h", 0),
-                        'sells_24h': opp["pool_data"].get("sells_24h", 0),
-                        'buy_ratio': opp["pool_data"].get("buy_ratio", 0),
-                        'total_txns': opp["pool_data"].get("total_txns", 0),
-                        'age_hours': opp["pool_data"].get("age_hours", 0),
-                        'volume_acceleration_1h_vs_6h': opp["pool_data"].get("volume_acceleration_1h_vs_6h", 0),
-                        'volume_acceleration_6h_vs_24h': opp["pool_data"].get("volume_acceleration_6h_vs_24h", 0),
-                        'entry_price': entry_price,
-                        'stop_loss_price': stop_loss_price,
-                        'stop_loss_percent': -10,
-                        'tp1_price': tp1_price,
-                        'tp1_percent': 5,
-                        'tp2_price': tp2_price,
-                        'tp2_percent': 10,
-                        'tp3_price': tp3_price,
-                        'tp3_percent': 15,
-                        'alert_message': alert_msg,
-                        # RÈGLE 5: Données de vélocité du pump
-                        'velocite_pump': regle5_data['velocite_pump'],
-                        'type_pump': regle5_data['type_pump'],
-                        'decision_tp_tracking': regle5_data['decision_tp_tracking'],
-                        'temps_depuis_alerte_precedente': regle5_data['temps_depuis_alerte_precedente'],
-                        'is_alerte_suivante': regle5_data['is_alerte_suivante']
-                    }
-
-                    alert_id = alert_tracker.save_alert(alert_data)
-                    if alert_id > 0:
-                        log(f"   💾 Sauvegardé en DB (ID: {alert_id}) - Tracking auto démarré")
-                    else:
-                        log(f"   ⚠️ Échec sauvegarde DB (token déjà existant?)")
-
-                except Exception as e:
-                    log(f"   ⚠️ Erreur sauvegarde DB: {e}")
-
-                alerts_sent += 1
-            else:
-                log(f"❌ Échec alerte: {opp['pool_data']['name']}")
-
-            if alerts_sent >= MAX_ALERTS_PER_SCAN:
-                log(f"⚠️ Limite {MAX_ALERTS_PER_SCAN} alertes atteinte")
-                break
-
-            time.sleep(1)
-        else:
-            # Cooldown actif - alerte bloquée (ne devrait jamais arriver avec COOLDOWN_SECONDS = 0)
-            log(f"⏰ Alerte bloquée (cooldown actif): {opp['pool_data']['name']}")
-
-    # ==========================================
-    # TRACKING ACTIF DES ALERTES (BACKTESTING)
-    # ==========================================
-    if ENABLE_ACTIVE_TRACKING and alert_tracker is not None:
-        log(f"\n📡 TRACKING ACTIF: Vérification des pools alertés...")
-
-        active_alerts = alert_tracker.get_active_alerts(max_age_hours=ACTIVE_TRACKING_MAX_AGE_HOURS)
-        log(f"   🔍 {len(active_alerts)} alertes actives à tracker (< {ACTIVE_TRACKING_MAX_AGE_HOURS}h)")
-
-        updates_sent = 0
-        for alert in active_alerts:
-            try:
-                alert_id = alert['id']
-                token_name = alert['token_name']
-                pool_address = alert['token_address']
-                network = alert['network']
-                created_at_str = alert['created_at']
-
-                # Vérifier cooldown (éviter spam)
-                from datetime import datetime
-                created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
-                now = datetime.now(created_at.tzinfo) if created_at.tzinfo else datetime.now()
-                minutes_elapsed = (now - created_at).total_seconds() / 60
-
-                # Vérifier si dernière mise à jour était il y a moins de COOLDOWN minutes
-                # Pour simplifier, on considère que si l'alerte a moins de COOLDOWN minutes, on skip
-                if minutes_elapsed < ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES:
-                    continue  # Trop récent, skip
-
-                # Récupérer données actuelles du pool
-                pool_data = get_pool_by_address(network, pool_address)
-
-                if not pool_data or not isinstance(pool_data, dict):
-                    # Pool plus disponible (delisted, erreur API, etc.)
-                    log(f"   ⚠️ Pool data invalide pour {token_name}: {type(pool_data)}")
-                    continue
-
-                current_price = pool_data.get('price_usd', 0)
-
-                if current_price <= 0:
-                    continue
-
-                # Mettre à jour le prix MAX en temps réel
-                alert_tracker.update_price_max_realtime(alert_id, current_price)
-
-                # Vérifier si on doit envoyer une mise à jour Telegram
-                should_send, reason = should_send_alert(pool_address, current_price, alert_tracker, None)
-
-                if should_send:
-                    log(f"   🔄 Mise à jour: {token_name} - {reason}")
-
-                    # Récupérer momentum et multi-pool (optionnel pour mises à jour)
-                    momentum = get_price_momentum_from_api(pool_data)
-                    multi_pool_data = {}  # Optionnel pour updates
-
-                    # Calculer score et whale analysis
-                    score, base_score, momentum_bonus, whale_analysis = calculate_final_score(pool_data, momentum, multi_pool_data)
-
-                    # Générer message d'alerte (is_first_alert = False)
-                    try:
-                        alert_msg, regle5_data = generer_alerte_complete(
-                            pool_data, score, base_score, momentum_bonus, momentum,
-                            multi_pool_data, [], None, whale_analysis,
-                            is_first_alert=False,  # C'est une mise à jour
-                            tracker=alert_tracker
-                        )
-                    except Exception as gen_error:
-                        log(f"   ❌ Erreur génération alerte pour {token_name}: {gen_error}")
-                        import traceback
-                        log(f"   Traceback: {traceback.format_exc()}")
-                        continue  # Skip cette alerte
-
-                    # Envoyer via Telegram
-                    success = send_telegram(alert_msg)
-
-                    if success:
-                        updates_sent += 1
-                        log(f"   ✅ Mise à jour envoyée pour {token_name}")
-
-                        # Limiter le nombre de mises à jour par scan
-                        if updates_sent >= 5:  # Max 5 mises à jour par scan
-                            log(f"   ⚠️ Limite 5 mises à jour atteinte")
-                            break
-                    else:
-                        log(f"   ❌ Échec envoi mise à jour: {token_name}")
-
-                    time.sleep(1)  # Pause entre mises à jour
-
-            except Exception as e:
-                log(f"   ❌ Erreur tracking {alert.get('token_name', 'unknown')}: {e}")
-
-        log(f"   📊 Tracking terminé: {updates_sent} mises à jour envoyées")
-
-    # ==========================================
-    # STATISTIQUES SOURCES DE LIQUIDITÉ
-    # ==========================================
-    log(f"\n📊 STATISTIQUES SOURCES DE LIQUIDITÉ:")
-    log(f"   Total pools analysés: {sum(liquidity_stats.values())}")
-
-    total_pools = sum(liquidity_stats.values())
-    if total_pools > 0:
-        real_reserve = liquidity_stats.get('reserve_in_usd', 0)
-        fdv_estimate = liquidity_stats.get('fdv_usd(10%)', 0)
-        mcap_estimate = liquidity_stats.get('market_cap(15%)', 0)
-        vol_estimate = liquidity_stats.get('volume_24h(x5)', 0)
-        none_liq = liquidity_stats.get('none', 0)
-
-        # Calculer pourcentages
-        real_pct = (real_reserve / total_pools) * 100
-        fdv_pct = (fdv_estimate / total_pools) * 100
-        mcap_pct = (mcap_estimate / total_pools) * 100
-        vol_pct = (vol_estimate / total_pools) * 100
-        none_pct = (none_liq / total_pools) * 100
-
-        log(f"   ✅ reserve_in_usd (REAL):      {real_reserve:4d} pools ({real_pct:5.1f}%)")
-
-        if fdv_estimate + mcap_estimate + vol_estimate + none_liq > 0:
-            log(f"   ⚠️  ESTIMATIONS (FALLBACK):")
-            if fdv_estimate > 0:
-                log(f"      • fdv_usd (10%):           {fdv_estimate:4d} pools ({fdv_pct:5.1f}%)")
-            if mcap_estimate > 0:
-                log(f"      • market_cap (15%):        {mcap_estimate:4d} pools ({mcap_pct:5.1f}%)")
-            if vol_estimate > 0:
-                log(f"      • volume_24h (x5):         {vol_estimate:4d} pools ({vol_pct:5.1f}%)")
-            if none_liq > 0:
-                log(f"      • none (LIQ=0):            {none_liq:4d} pools ({none_pct:5.1f}%)")
-
-        # Résumé qualité des données
-        if real_pct >= 90:
-            log(f"   🎯 EXCELLENT: {real_pct:.1f}% de données réelles")
-        elif real_pct >= 70:
-            log(f"   ✅ BON: {real_pct:.1f}% de données réelles")
-        elif real_pct >= 50:
-            log(f"   ⚠️  MOYEN: Seulement {real_pct:.1f}% de données réelles")
-        else:
-            log(f"   🚨 CRITIQUE: Seulement {real_pct:.1f}% de données réelles!")
+    # ÉTAPE 3: Mettre à jour prix MAX pour tokens trackés
+    update_price_max_for_tracked_tokens(all_pools, alert_tracker)
+
+    # ÉTAPE 4: Analyser et filtrer les opportunités
+    opportunities, tokens_rejected = analyze_and_filter_tokens(all_pools, security_checker)
+
+    # ÉTAPE 5: Traiter et envoyer les alertes
+    alerts_sent, tokens_rejected_alerts = process_and_send_alerts(
+        opportunities, alert_tracker, security_checker
+    )
+    tokens_rejected += tokens_rejected_alerts
+
+    # ÉTAPE 6: Tracking actif des alertes existantes
+    updates_sent = track_active_alerts(alert_tracker)
+
+    # ÉTAPE 7: Rapport des statistiques de liquidité
+    report_liquidity_stats(liquidity_stats)
 
     log(f"\n✅ Scan terminé: {alerts_sent} alertes envoyées, {tokens_rejected} tokens rejetés (sécurité)")
     log("=" * 80)
 
-# ============================================
-# MAIN
-# ============================================
-def main():
-    """Boucle principale."""
-    global security_checker, alert_tracker
-
-    log("=" * 80)
-    log("🚀 GeckoTerminal Scanner V3.2.5 - Liquidity Quality Check")
-    log("=" * 80)
-    log("✅ CONFIGURATION DASHBOARD ACTIVE")
-    log("   Objectif: 5 alertes/jour | Score 91.4 | WR 45-58%")
-    log("🔍 NOUVEAU: Tracking permanent des sources de liquidité")
-    log("   Vérifie si reserve_in_usd (REAL) vs fallback estimations")
-    log("=" * 80)
-    log(f"📡 Réseaux surveillés: {', '.join([n.upper() for n in NETWORKS])}")
-    log(f"📋 Scores min par réseau:")
-    log(f"   • ETH: 78+ | BASE: 82+ | BSC: 80+ | SOLANA: 72+")
-    log(f"   • POLYGON: 75+ | AVALANCHE: 80+")
-    log(f"⏰ Age max: {MAX_TOKEN_AGE_HOURS}h")
-    log(f"🔄 Scan toutes les 5 minutes (1 page/réseau)")
-    log(f"🎯 Max {MAX_ALERTS_PER_SCAN} alertes par scan")
-    log("=" * 80)
-
-    # Initialiser le système de sécurité et tracking
-    log("\n🔒 Initialisation du système de sécurité...")
-    security_checker = SecurityChecker()
-
-    # Chemin DB : volume persistant Railway (/data) ou local
-    db_path = os.getenv("DB_PATH", "/data/alerts_history.db")
-    alert_tracker = AlertTracker(db_path=db_path)
-    log(f"💾 Base de données: {db_path}")
-
-    log("✅ Système de sécurité activé")
-
-    while True:
-        try:
-            scan_geckoterminal()
-
-            log("\n💤 Pause 5 min avant prochain scan...\n")
-            time.sleep(300)
-
-        except KeyboardInterrupt:
-            log("\n⏹️  Arrêt du scanner")
-            break
-
-        except Exception as e:
-            log(f"❌ Erreur: {e}")
-            import traceback
-            traceback.print_exc()
-            log("⏳ Pause 60s avant retry...")
-            time.sleep(60)
-
-    # Fermer proprement les connexions
-    if alert_tracker:
-        log("🔒 Fermeture de la base de données...")
-        alert_tracker.close()
-        log("✅ Base de données fermée")
-
-if __name__ == "__main__":
-    main()

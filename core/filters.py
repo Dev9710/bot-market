@@ -269,3 +269,69 @@ def apply_v3_filters(pool_data: Dict) -> Tuple[bool, List[str]]:
 
     # Tous les filtres V3.1 passés!
     return True, reasons
+
+
+def is_valid_opportunity(pool_data: Dict, score: int) -> Tuple[bool, str]:
+    """
+    Vérifie si pool est une opportunité valide.
+    V3: Applique TOUS les filtres backtest avant validation classique.
+    """
+
+    # ===== V3: APPLIQUER FILTRES BACKTEST EN PRIORITÉ =====
+    passes_v3, v3_reasons = apply_v3_filters(pool_data)
+
+    # Stocker les raisons V3 dans pool_data pour affichage ultérieur
+    pool_data['v3_filter_reasons'] = v3_reasons
+
+    # Si échec filtres V3, rejeter immédiatement (sauf watchlist)
+    if not passes_v3:
+        # Concaténer toutes les raisons d'échec
+        failed_reasons = [r for r in v3_reasons if r.startswith('✗')]
+        if failed_reasons:
+            return False, f"[V3 REJECT] {failed_reasons[0].replace('✗ ', '')}"
+        return False, "[V3 REJECT] Filtres backtest non satisfaits"
+
+    # ===== VALIDATION CLASSIQUE (si V3 passé) =====
+
+    # Récupérer seuils par réseau (avec fallback sur default)
+    network = pool_data.get("network", "")
+    thresholds = NETWORK_THRESHOLDS.get(network, NETWORK_THRESHOLDS["default"])
+
+    min_liq = thresholds["min_liquidity"]
+    min_vol = thresholds["min_volume"]
+    min_txns = thresholds["min_txns"]
+
+    # Check liquidité min (déjà vérifié par V3 mais double sécurité)
+    if pool_data["liquidity"] < min_liq:
+        return False, f"❌ Liquidité trop faible: ${pool_data['liquidity']:,.0f}"
+
+    # Check volume min
+    if pool_data["volume_24h"] < min_vol:
+        return False, f"⚠️ Volume trop faible: ${pool_data['volume_24h']:,.0f}"
+
+    # Check transactions min
+    if pool_data["total_txns"] < min_txns:
+        return False, f"⚠️ Pas assez de txns: {pool_data['total_txns']}"
+
+    # Check age max (déjà vérifié par V3)
+    if pool_data["age_hours"] > MAX_TOKEN_AGE_HOURS:
+        return False, f"⏳ Token trop ancien: {pool_data['age_hours']:.0f}h"
+
+    # Check score minimum (ASSOUPLI pour backtesting: 55 → 50)
+    if score < 50:
+        return False, f"📉 Score trop faible: {score}/100"
+
+    # Check ratio volume/liquidité
+    from config.settings import VOLUME_LIQUIDITY_RATIO
+    ratio = pool_data["volume_24h"] / pool_data["liquidity"] if pool_data["liquidity"] > 0 else 0
+    if ratio < VOLUME_LIQUIDITY_RATIO:
+        return False, f"📉 Ratio Vol/Liq trop faible: {ratio:.1%}"
+
+    # Check pump & dump potentiel
+    buy_sell_ratio = pool_data["buys_24h"] / pool_data["sells_24h"] if pool_data["sells_24h"] > 0 else 999
+    if buy_sell_ratio > 5:
+        return False, f"🚨 Trop d'achats vs ventes (pump?): {buy_sell_ratio:.1f}"
+    if buy_sell_ratio < 0.2:
+        return False, f"📉 Trop de ventes vs achats (dump?): {buy_sell_ratio:.1f}"
+
+    return True, "✅ Opportunité valide [V3 APPROVED]"
