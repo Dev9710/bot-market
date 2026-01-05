@@ -146,7 +146,6 @@ from core.scoring import (
 )
 
 from core.alerts import (
-    check_cooldown,
     should_send_alert,
     evaluer_conditions_marche,
     analyser_alerte_suivante,
