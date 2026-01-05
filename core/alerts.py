@@ -19,18 +19,7 @@ from config.settings import (
 )
 
 
-# Note: alert_cooldown global variable is managed in main scanner
-# This file provides pure functions for alert logic
-def check_cooldown(alert_key: str) -> bool:
-    """
-    Vérifie si alerte en cooldown (LEGACY - utiliser should_send_alert à la place).
-
-    Note: Utilise la variable globale alert_cooldown
-    """
-    from utils.helpers import check_cooldown as _check_cooldown
-    return _check_cooldown(alert_key, alert_cooldown)
-
-
+# Note: This file provides pure functions for alert logic
 def should_send_alert(token_address: str, current_price: float, tracker, regle5_data: Dict = None) -> Tuple[bool, str]:
     """
     Détermine si une alerte doit être envoyée pour un token (FIX BUG #1 - SPAM).

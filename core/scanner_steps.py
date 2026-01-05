@@ -30,7 +30,7 @@ from data.cache import update_buy_ratio_history
 from core.signals import get_price_momentum_from_api, find_resistance_simple, group_pools_by_token, analyze_multi_pool, detect_signals
 from core.scoring import calculate_final_score
 from core.filters import check_watchlist_token, is_valid_opportunity
-from core.alerts import should_send_alert, generer_alerte_complete, check_cooldown
+from core.alerts import should_send_alert, generer_alerte_complete
 
 
 def collect_pools_from_networks(liquidity_stats: Dict) -> List[Dict]:
@@ -268,11 +268,6 @@ def process_and_send_alerts(
         if not should_send_now:
             log(f"⏸️ Alerte bloquée (anti-spam): {opp['pool_data']['name']}")
             log(f"   Raison: {send_reason}")
-            continue
-
-        # Legacy cooldown check (pour compatibilité)
-        if not check_cooldown(alert_key):
-            log(f"⏰ Alerte bloquée (cooldown actif): {opp['pool_data']['name']}")
             continue
 
         # Ajouter les infos de sécurité à l'alerte
