@@ -137,6 +137,14 @@ from core.signals import (
     detect_signals,
 )
 
+from core.scoring import (
+    calculate_base_score,
+    calculate_momentum_bonus,
+    calculate_confidence_tier,
+    calculate_final_score,
+    calculate_confidence_score,
+)
+
 # ============================================
 # CACHE SIMPLIFIÉ
 # ============================================
