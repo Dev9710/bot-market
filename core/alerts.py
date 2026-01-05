@@ -11,6 +11,7 @@ Fonctions de gestion d'alertes:
 from typing import Dict, Tuple, List
 from datetime import datetime
 from utils.helpers import log, format_price, get_network_display_name
+from core.scoring import calculate_confidence_score, calculate_confidence_tier
 from config.settings import (
     ENABLE_SMART_REALERT,
     MIN_PRICE_CHANGE_PERCENT,
