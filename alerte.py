@@ -12,7 +12,7 @@ from datetime import datetime
 
 # Import des fonctions des bots
 import run_binance_bot
-import geckoterminal_scanner_v3 as geckoterminal_scanner  # Utilise la V3 avec améliorations backtest
+import geckoterminal_scanner_v3_main as geckoterminal_scanner  # Utilise la V3 avec améliorations backtest
 
 
 # =========================
