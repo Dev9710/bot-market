@@ -350,7 +350,7 @@ if __name__ == '__main__':
         print("[!] Lancez le scanner pour creer la base de donnees.")
         print("\n[OK] Le serveur demarre quand meme pour servir les pages HTML (glossaire, etc.)\n")
 
-    print(f"[START] API Dashboard demarree - Port: 5000")
+    print(f"[START] API Dashboard demarree")
     print("Pages disponibles:")
     print("  GET / (dashboard)")
     print("  GET /glossary.html")
@@ -362,10 +362,17 @@ if __name__ == '__main__':
     print("  GET /api/networks")
     print("  GET /api/alerts/:id")
     print("  GET /api/recent")
+
     # Port from environment variable (Railway) or default 5000
     port = int(os.environ.get('PORT', 5000))
 
-    print(f"\nAcces: http://localhost:{port}")
-    print(f"Glossaire: http://localhost:{port}/glossary.html\n")
+    # Detect production environment (Railway)
+    is_production = os.environ.get('RAILWAY_ENVIRONMENT') is not None
 
-    app.run(host='0.0.0.0', port=port, debug=True)
+    print(f"\nEnvironment: {'PRODUCTION (Railway)' if is_production else 'DEVELOPMENT'}")
+    print(f"Port: {port}")
+    print(f"Acces: http://localhost:{port}" if not is_production else f"Acces: https://bot-market-production.up.railway.app")
+    print(f"Glossaire: http://localhost:{port}/glossary.html\n" if not is_production else f"Glossaire: https://bot-market-production.up.railway.app/glossary.html\n")
+
+    # En production, désactiver debug mode
+    app.run(host='0.0.0.0', port=port, debug=not is_production)
