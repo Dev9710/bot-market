@@ -15,7 +15,7 @@ sleep 3
 
 # Lancer le scanner V3
 echo "🔍 Démarrage du Scanner V3..."
-python geckoterminal_scanner_v3.py &
+python geckoterminal_scanner_v3_main.py &
 SCANNER_PID=$!
 
 # Fonction pour arrêter proprement les deux processus

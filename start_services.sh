@@ -4,7 +4,7 @@
 monitor_scanner() {
     while true; do
         echo "[MONITOR] Démarrage du Scanner V3..."
-        python geckoterminal_scanner_v3.py
+        python geckoterminal_scanner_v3_main.py
 
         EXIT_CODE=$?
         echo "[MONITOR] Scanner arrêté avec code: $EXIT_CODE"

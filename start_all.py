@@ -12,7 +12,7 @@ import signal
 def run_scanner():
     """Lance le scanner V3"""
     print("🔍 Démarrage du Scanner V3...")
-    subprocess.run([sys.executable, "geckoterminal_scanner_v3.py"])
+    subprocess.run([sys.executable, "geckoterminal_scanner_v3_main.py"])
 
 def run_api():
     """Lance l'API Dashboard avec Gunicorn"""
