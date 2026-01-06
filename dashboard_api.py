@@ -31,22 +31,34 @@ def get_db_connection():
 
 def parse_alert_data(alert_row):
     """Parse une alerte de la DB en dict exploitable."""
+    # Try to get velocite_pump and type_pump from direct columns first (preferred)
+    # Fallback to parsing alert_data JSON if columns don't exist
+    try:
+        velocite_pump = alert_row.get('velocite_pump', 0) or 0
+        type_pump = alert_row.get('type_pump', '') or ''
+    except (KeyError, TypeError):
+        # Fallback to JSON parsing for backward compatibility
+        velocite_pump = json.loads(alert_row['alert_data']).get('velocite_pump', 0) if alert_row.get('alert_data') else 0
+        type_pump = json.loads(alert_row['alert_data']).get('type_pump', '') if alert_row.get('alert_data') else ''
+
     return {
         'id': alert_row['id'],
-        'pool_address': alert_row['pool_address'],
+        'pool_address': alert_row.get('token_address', alert_row.get('pool_address', '')),
         'network': alert_row['network'],
         'token_name': alert_row['token_name'],
-        'token_symbol': alert_row['token_symbol'],
+        'token_symbol': alert_row.get('token_symbol', ''),
         'score': alert_row['score'],
-        'tier': alert_row['tier'],
-        'price': alert_row['price'],
-        'liquidity': alert_row['liquidity'],
-        'volume_24h': alert_row['volume_24h'],
-        'age_hours': alert_row['age_hours'],
-        'velocite_pump': json.loads(alert_row['alert_data']).get('velocite_pump', 0) if alert_row['alert_data'] else 0,
-        'type_pump': json.loads(alert_row['alert_data']).get('type_pump', '') if alert_row['alert_data'] else '',
-        'timestamp': alert_row['timestamp'],
-        'created_at': alert_row['created_at'],
+        'tier': alert_row.get('tier', 'UNKNOWN'),
+        'price': alert_row.get('price_at_alert', alert_row.get('price', 0)),
+        'liquidity': alert_row.get('liquidity', 0),
+        'volume_24h': alert_row.get('volume_24h', 0),
+        'age_hours': alert_row.get('age_hours', 0),
+        'velocite_pump': velocite_pump,
+        'type_pump': type_pump,
+        'base_score': alert_row.get('base_score', 0),
+        'momentum_bonus': alert_row.get('momentum_bonus', 0),
+        'timestamp': alert_row.get('timestamp', ''),
+        'created_at': alert_row.get('created_at', ''),
     }
 
 @app.route('/')
