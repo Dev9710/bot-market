@@ -143,7 +143,8 @@ def debug():
     try:
         conn = get_db_connection()
         days = request.args.get('days', type=int, default=1)
-        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+        # Use space format to match DB: "2026-01-05 01:39:21" not "2026-01-05T01:39:21"
+        cutoff_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
 
         # Get total alerts
         cursor = conn.execute("SELECT COUNT(*) as total FROM alerts")
@@ -198,8 +199,8 @@ def get_alerts():
         query = "SELECT * FROM alerts WHERE 1=1"
         params = []
 
-        # Filtre date
-        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+        # Filtre date - Use space format to match DB
+        cutoff_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
         query += " AND created_at >= ?"
         params.append(cutoff_date)
 
@@ -251,7 +252,8 @@ def get_stats():
     """Statistiques globales."""
     try:
         days = request.args.get('days', type=int, default=7)
-        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+        # Use space format to match DB
+        cutoff_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
 
         conn = get_db_connection()
 
@@ -364,7 +366,8 @@ def get_networks():
     """Statistiques par réseau."""
     try:
         days = request.args.get('days', type=int, default=7)
-        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+        # Use space format to match DB
+        cutoff_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
 
         conn = get_db_connection()
 
