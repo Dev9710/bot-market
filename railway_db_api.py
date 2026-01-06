@@ -117,19 +117,58 @@ def health():
         conn = get_db_connection()
         cursor = conn.execute("SELECT COUNT(*) as count FROM alerts")
         total = cursor.fetchone()['count']
+
+        # Get last 3 alerts with their dates
+        cursor = conn.execute("SELECT id, token_name, created_at FROM alerts ORDER BY created_at DESC LIMIT 3")
+        recent = [dict(row) for row in cursor.fetchall()]
+
         conn.close()
 
         return jsonify({
             'status': 'ok',
             'timestamp': datetime.now().isoformat(),
             'total_alerts': total,
-            'db_path': DB_PATH
+            'db_path': DB_PATH,
+            'recent_alerts': recent
         })
     except Exception as e:
         return jsonify({
             'status': 'error',
             'error': str(e)
         }), 500
+
+@app.route('/api/debug', methods=['GET'])
+def debug():
+    """Debug endpoint to see what's happening with date filters."""
+    try:
+        conn = get_db_connection()
+        days = request.args.get('days', type=int, default=1)
+        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+
+        # Get total alerts
+        cursor = conn.execute("SELECT COUNT(*) as total FROM alerts")
+        total = cursor.fetchone()['total']
+
+        # Get alerts with created_at >= cutoff_date
+        cursor = conn.execute("SELECT COUNT(*) as count FROM alerts WHERE created_at >= ?", [cutoff_date])
+        filtered_count = cursor.fetchone()['count']
+
+        # Get last 5 alerts with dates
+        cursor = conn.execute("SELECT id, token_name, created_at, timestamp FROM alerts ORDER BY created_at DESC LIMIT 5")
+        recent = [dict(row) for row in cursor.fetchall()]
+
+        conn.close()
+
+        return jsonify({
+            'total_alerts': total,
+            'cutoff_date': cutoff_date,
+            'now': datetime.now().isoformat(),
+            'days_param': days,
+            'filtered_count': filtered_count,
+            'recent_5': recent
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/alerts', methods=['GET'])
 def get_alerts():
