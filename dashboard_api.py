@@ -74,17 +74,39 @@ def parse_alert_data(alert_row):
 @app.route('/')
 def index():
     """Serve dashboard homepage."""
-    return send_from_directory(BASE_DIR, 'dashboard_frontend.html')
+    try:
+        return send_from_directory(BASE_DIR, 'dashboard_frontend.html')
+    except FileNotFoundError:
+        return jsonify({'error': 'dashboard_frontend.html not found', 'base_dir': BASE_DIR}), 404
 
 @app.route('/glossary.html')
 def glossary():
     """Serve glossary page."""
-    return send_from_directory(BASE_DIR, 'glossary.html')
+    try:
+        # Try multiple possible locations
+        if os.path.exists(os.path.join(BASE_DIR, 'glossary.html')):
+            return send_from_directory(BASE_DIR, 'glossary.html')
+        # On Railway, check current working directory
+        elif os.path.exists('glossary.html'):
+            return send_from_directory('.', 'glossary.html')
+        else:
+            return jsonify({
+                'error': 'glossary.html not found',
+                'base_dir': BASE_DIR,
+                'cwd': os.getcwd(),
+                'files_in_base': os.listdir(BASE_DIR) if os.path.exists(BASE_DIR) else [],
+                'files_in_cwd': os.listdir('.') if os.path.exists('.') else []
+            }), 404
+    except Exception as e:
+        return jsonify({'error': str(e), 'base_dir': BASE_DIR, 'cwd': os.getcwd()}), 500
 
 @app.route('/compare.html')
 def compare():
     """Serve compare page."""
-    return send_from_directory(BASE_DIR, 'compare.html')
+    try:
+        return send_from_directory(BASE_DIR, 'compare.html')
+    except FileNotFoundError:
+        return jsonify({'error': 'compare.html not found', 'base_dir': BASE_DIR}), 404
 
 @app.route('/api/health', methods=['GET'])
 def health():
