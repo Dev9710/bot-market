@@ -80,6 +80,8 @@ def index():
         return jsonify({'error': 'dashboard_frontend.html not found', 'base_dir': BASE_DIR}), 404
 
 @app.route('/glossary.html')
+@app.route('/glossary')
+@app.route('/glossaire')
 def glossary():
     """Serve glossary page."""
     try:
@@ -397,7 +399,7 @@ if __name__ == '__main__':
     print(f"[START] API Dashboard demarree")
     print("Pages disponibles:")
     print("  GET / (dashboard)")
-    print("  GET /glossary.html")
+    print("  GET /glossary.html, /glossary, /glossaire")
     print("  GET /compare.html")
     print("\nEndpoints API:")
     print("  GET /api/health")
@@ -416,7 +418,7 @@ if __name__ == '__main__':
     print(f"\nEnvironment: {'PRODUCTION (Railway)' if is_production else 'DEVELOPMENT'}")
     print(f"Port: {port}")
     print(f"Acces: http://localhost:{port}" if not is_production else f"Acces: https://bot-market-production.up.railway.app")
-    print(f"Glossaire: http://localhost:{port}/glossary.html\n" if not is_production else f"Glossaire: https://bot-market-production.up.railway.app/glossary.html\n")
+    print(f"Glossaire: http://localhost:{port}/glossary\n" if not is_production else f"Glossaire: https://bot-market-production.up.railway.app/glossary\n")
 
     # En production, désactiver debug mode
     app.run(host='0.0.0.0', port=port, debug=not is_production)
