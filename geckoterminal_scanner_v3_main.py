@@ -3,6 +3,7 @@ Module principal pour lancer le scanner GeckoTerminal V3 en boucle continue.
 Ce fichier ajoute la fonction main() manquante.
 """
 
+import os
 import time
 from geckoterminal_scanner_v3 import (
     scan_geckoterminal,
@@ -23,8 +24,11 @@ def init_systems():
         log("✅ SecurityChecker initialisé")
 
     if alert_tracker is None:
-        alert_tracker = AlertTracker()
-        log("✅ AlertTracker initialisé")
+        # Use environment variable DB_PATH if set (Railway: /data/alerts_history.db)
+        # Otherwise use default alerts_history.db
+        db_path = os.getenv('DB_PATH', '/data/alerts_history.db' if os.path.exists('/data') else 'alerts_history.db')
+        alert_tracker = AlertTracker(db_path=db_path)
+        log(f"✅ AlertTracker initialisé (DB: {db_path})")
 
 
 def main():

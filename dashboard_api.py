@@ -21,7 +21,17 @@ CORS(app)  # Permettre les requêtes depuis le frontend
 
 # Path vers la base de données et fichiers statiques
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'alerts_tracker.db')
+
+# Use environment variable DB_PATH if set (Railway: /data/alerts_history.db)
+# Otherwise fall back to alerts_history.db to match scanner V3 default
+DB_PATH = os.getenv('DB_PATH')
+if not DB_PATH:
+    # Check if we're on Railway (volume mounted at /data)
+    if os.path.exists('/data/alerts_history.db'):
+        DB_PATH = '/data/alerts_history.db'
+    else:
+        # Local development - use alerts_history.db to match scanner V3
+        DB_PATH = os.path.join(BASE_DIR, 'alerts_history.db')
 
 def get_db_connection():
     """Connexion à la base de données SQLite."""
