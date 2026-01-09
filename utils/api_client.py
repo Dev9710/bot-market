@@ -169,16 +169,17 @@ def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict 
             except (ValueError, TypeError):
                 pass  # Continue vers fallbacks
 
-        # FALLBACK 1: Si reserve_in_usd est 0, essayer fdv_usd (10% du FDV)
+        # FALLBACK 1: Si reserve_in_usd est 0, essayer fdv_usd (25% du FDV)
         if liquidity == 0:
             fdv_value = attrs.get("fdv_usd")
             if fdv_value not in [None, "", "null"]:
                 try:
                     fdv = float(fdv_value)
                     if fdv > 0:
-                        # Estimer liquidité à 10% du FDV (conservateur)
-                        liquidity = fdv * 0.10
-                        liquidity_source = "fdv_usd(10%)"
+                        # FIXED: Estimer liquidité à 25% du FDV (plus réaliste pour meme coins)
+                        # Anciennement 10% était trop conservateur
+                        liquidity = fdv * 0.25
+                        liquidity_source = "fdv_usd(25%)"
                     else:
                         # DEBUG: FDV est 0
                         if parse_pool_data._debug_count < 10:
@@ -187,31 +188,36 @@ def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict 
                     if parse_pool_data._debug_count < 10:
                         log(f"   [DEBUG-FDV-ERROR] {name[:30]}: fdv_value={fdv_value}, error={e}")
 
-        # FALLBACK 2: Si toujours 0, essayer market_cap_usd (15% du market cap)
+        # FALLBACK 2: Si toujours 0, essayer market_cap_usd (30% du market cap)
         if liquidity == 0:
             mcap_value = attrs.get("market_cap_usd")
             if mcap_value not in [None, "", "null"]:
                 try:
                     mcap = float(mcap_value)
                     if mcap > 0:
-                        # Estimer liquidité à 15% du market cap
-                        liquidity = mcap * 0.15
-                        liquidity_source = "market_cap(15%)"
+                        # FIXED: Estimer liquidité à 30% du market cap (plus réaliste)
+                        # Anciennement 15% était trop conservateur
+                        liquidity = mcap * 0.30
+                        liquidity_source = "market_cap(30%)"
                 except (ValueError, TypeError):
                     pass
 
-        # FALLBACK 3: Si TOUJOURS 0, estimer depuis volume_24h (ratio 5:1)
+        # FALLBACK 3: Si TOUJOURS 0, estimer depuis volume_24h (ratio plus généreux)
         if liquidity == 0 and volume_24h > 0:
-            # Ratio conservateur: liquidité = 5x le volume 24h
-            liquidity = volume_24h * 5
-            liquidity_source = "volume_24h(x5)"
+            # FIXED: Ratio plus réaliste pour ETH/BSC: liquidité = 8-10x le volume 24h
+            # (Sur Solana c'est ~5x, mais sur ETH/BSC les pools sont plus profonds)
+            if network in ['eth', 'bsc', 'base']:
+                liquidity = volume_24h * 10  # Ratio plus élevé pour L1/BSC
+            else:
+                liquidity = volume_24h * 6   # Ratio modéré pour autres réseaux
+            liquidity_source = f"volume_24h(x{10 if network in ['eth', 'bsc', 'base'] else 6})"
 
         # Log PERMANENT de la source de liquidité (CRITIQUE pour vérifier qualité données)
         if liquidity == 0:
-            log(f"   ⚠️ [LIQ=0] {name}: reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
+            log(f"   ⚠️ [LIQ=0] {name} ({network.upper()}): reserve={reserve_value}, fdv={attrs.get('fdv_usd')}, mcap={attrs.get('market_cap_usd')}, vol24h={volume_24h}")
         elif liquidity_source != "reserve_in_usd":
             # ALERTE: Utilisation d'estimation au lieu de donnée réelle!
-            log(f"   ⚠️ [LIQ-ESTIMATE] {name}: ${liquidity:,.0f} from {liquidity_source} (NOT REAL RESERVE!)")
+            log(f"   📊 [LIQ-ESTIMATE] {name} ({network.upper()}): ${liquidity:,.0f} from {liquidity_source}")
 
         # Mettre à jour les statistiques de sources de liquidité
         if liquidity_stats is not None:
