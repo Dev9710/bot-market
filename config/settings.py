@@ -126,12 +126,12 @@ DASHBOARD_CONFIG = {
         'avax': {'min_score': 72, 'min_velocity': 5},     # V3.3: Reduced 80→72
     },
     'LIQUIDITY': {
-        'eth': (30000, 600000),         # V3.4: Reduced 80K→30K to catch early pools
-        'base': (100000, 2500000),      # V3.4: Reduced 250K→100K
-        'bsc': (20000, 6000000),        # V3.4: Reduced 400K→20K (NEW pools have only $4K-$20K!)
-        'solana': (30000, 300000),      # V3.4: Reduced 80K→30K for consistency
-        'polygon_pos': (20000, 500000), # V3.4: Reduced 50K→20K
-        'avax': (30000, 800000),        # V3.4: Reduced 100K→30K
+        'eth': (30000, 5000000),        # V3.5: Increased max 600K→5M pour volumes viraux
+        'base': (100000, 10000000),     # V3.5: Increased max 2.5M→10M pour forte activité
+        'bsc': (20000, 50000000),       # V3.5: Increased max 6M→50M pour tokens viraux (7M+ volume)
+        'solana': (30000, 2000000),     # V3.5: Increased max 300K→2M pour cohérence
+        'polygon_pos': (20000, 3000000),# V3.5: Increased max 500K→3M
+        'avax': (30000, 5000000),       # V3.5: Increased max 800K→5M
     }
 }
 

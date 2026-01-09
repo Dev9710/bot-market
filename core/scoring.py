@@ -120,7 +120,11 @@ def calculate_base_score(pool_data: Dict) -> int:
     elif 0.3 <= vol_liq < 0.5 or 1.5 < vol_liq <= 2.0:
         score += 10
     elif vol_liq > 2.0:
-        score += 5  # Trop actif (pump?)
+        # CORRECTION: Si volume très élevé (>2M), un ratio élevé est POSITIF (viralité)
+        if vol > 2000000:
+            score += 12  # Volume exceptionnel = bon signe malgré ratio élevé
+        else:
+            score += 5  # Trop actif (pump?)
 
     # Buy/Sell balance (max 15 points)
     buy_ratio = pool_data["buys_24h"] / pool_data["sells_24h"] if pool_data["sells_24h"] > 0 else 1.0

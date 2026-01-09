@@ -12,5 +12,11 @@ def dashboard():
     """Serve the dashboard HTML file."""
     return send_file('dashboard_frontend.html')
 
+@app.route('/glossary')
+@app.route('/glossaire')
+def glossary():
+    """Serve the glossary HTML file."""
+    return send_file('glossary.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

@@ -206,11 +206,26 @@ def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict 
         if liquidity == 0 and volume_24h > 0:
             # FIXED: Ratio plus réaliste pour ETH/BSC: liquidité = 8-10x le volume 24h
             # (Sur Solana c'est ~5x, mais sur ETH/BSC les pools sont plus profonds)
+            # CORRECTION: Réduire le multiplicateur pour volumes très élevés (>2M)
             if network in ['eth', 'bsc', 'base']:
-                liquidity = volume_24h * 10  # Ratio plus élevé pour L1/BSC
+                # Ajustement dynamique selon le volume
+                if volume_24h > 5000000:  # Volume > 5M = token viral
+                    multiplier = 3  # Ratio plus conservateur
+                elif volume_24h > 2000000:  # Volume > 2M = forte activité
+                    multiplier = 5
+                else:
+                    multiplier = 10  # Ratio normal pour volumes standards
+                liquidity = volume_24h * multiplier
             else:
-                liquidity = volume_24h * 6   # Ratio modéré pour autres réseaux
-            liquidity_source = f"volume_24h(x{10 if network in ['eth', 'bsc', 'base'] else 6})"
+                # Même ajustement pour autres réseaux
+                if volume_24h > 5000000:
+                    multiplier = 2
+                elif volume_24h > 2000000:
+                    multiplier = 4
+                else:
+                    multiplier = 6
+                liquidity = volume_24h * multiplier
+            liquidity_source = f"volume_24h(x{multiplier})"
 
         # Log PERMANENT de la source de liquidité (CRITIQUE pour vérifier qualité données)
         if liquidity == 0:
