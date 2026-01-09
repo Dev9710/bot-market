@@ -28,7 +28,7 @@ from utils.api_client import get_trending_pools, get_new_pools, get_pool_by_addr
 from utils.telegram import send_telegram
 from data.cache import update_buy_ratio_history
 from core.signals import get_price_momentum_from_api, find_resistance_simple, group_pools_by_token, analyze_multi_pool, detect_signals
-from core.scoring import calculate_final_score
+from core.scoring import calculate_final_score, calculate_confidence_tier
 from core.filters import check_watchlist_token, is_valid_opportunity
 from core.alerts import should_send_alert, generer_alerte_complete
 
@@ -288,12 +288,16 @@ def process_and_send_alerts(
                 tp2_price = price * 1.10  # +10%
                 tp3_price = price * 1.15  # +15%
 
+                # Calculate tier for confidence level (CRITICAL for dashboard display)
+                tier = calculate_confidence_tier(opp["pool_data"])
+
                 alert_data = {
                     'token_name': opp["pool_data"]["name"],
                     'token_address': token_address,
                     'network': network,
                     'price_at_alert': price,
                     'score': opp["score"],
+                    'tier': tier,  # CRITICAL: Added for dashboard filtering
                     'base_score': opp["base_score"],
                     'momentum_bonus': opp["momentum_bonus"],
                     'confidence_score': security_result.get('security_score', 0),

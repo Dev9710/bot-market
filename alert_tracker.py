@@ -194,6 +194,13 @@ class AlertTracker:
         except sqlite3.OperationalError:
             pass  # Colonne existe déjà
 
+        # Ajouter colonne tier (confidence level: HIGH/MEDIUM/LOW)
+        try:
+            cursor.execute("ALTER TABLE alerts ADD COLUMN tier TEXT DEFAULT 'UNKNOWN'")
+            print("✅ Colonne tier ajoutée")
+        except sqlite3.OperationalError:
+            pass  # Colonne existe déjà
+
         self.conn.commit()
         print("✅ Tables créées avec succès")
 
@@ -213,7 +220,7 @@ class AlertTracker:
             cursor.execute("""
                 INSERT INTO alerts (
                     token_name, token_address, network,
-                    price_at_alert, score, base_score, momentum_bonus, confidence_score,
+                    price_at_alert, score, tier, base_score, momentum_bonus, confidence_score,
                     volume_24h, volume_6h, volume_1h, liquidity,
                     buys_24h, sells_24h, buy_ratio, total_txns, age_hours,
                     entry_price, stop_loss_price, stop_loss_percent,
@@ -222,13 +229,14 @@ class AlertTracker:
                     volume_acceleration_1h_vs_6h, volume_acceleration_6h_vs_24h,
                     velocite_pump, type_pump, decision_tp_tracking,
                     temps_depuis_alerte_precedente, is_alerte_suivante, version
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 alert_data['token_name'],
                 alert_data['token_address'],
                 alert_data['network'],
                 alert_data['price_at_alert'],
                 alert_data['score'],
+                alert_data.get('tier', 'UNKNOWN'),  # CRITICAL: tier for dashboard filtering
                 alert_data.get('base_score'),
                 alert_data.get('momentum_bonus'),
                 alert_data.get('confidence_score'),
