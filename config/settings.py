@@ -126,12 +126,12 @@ DASHBOARD_CONFIG = {
         'avax': {'min_score': 72, 'min_velocity': 5},     # V3.3: Reduced 80→72
     },
     'LIQUIDITY': {
-        'eth': (80000, 600000),
-        'base': (250000, 2500000),
-        'bsc': (400000, 6000000),
-        'solana': (80000, 300000),
-        'polygon_pos': (50000, 500000),  # V3.2: Plus bas car frais très bas
-        'avax': (100000, 800000),  # V3.2: Similar à ETH
+        'eth': (30000, 600000),         # V3.4: Reduced 80K→30K to catch early pools
+        'base': (100000, 2500000),      # V3.4: Reduced 250K→100K
+        'bsc': (20000, 6000000),        # V3.4: Reduced 400K→20K (NEW pools have only $4K-$20K!)
+        'solana': (30000, 300000),      # V3.4: Reduced 80K→30K for consistency
+        'polygon_pos': (20000, 500000), # V3.4: Reduced 50K→20K
+        'avax': (30000, 800000),        # V3.4: Reduced 100K→30K
     }
 }
 
