@@ -114,16 +114,16 @@ def build_network_thresholds(mode_config):
 # ============================================
 # Objectif: 8-10 alertes/jour | Score 91.4 | WR 45-58% | ROI +4-7%/mois
 
-# Configuration DASHBOARD (5 alertes/jour)
+# Configuration DASHBOARD (8-10 alertes/jour) - V3.3: Thresholds reduced for better coverage
 DASHBOARD_CONFIG = {
     'MIN_VELOCITE_PUMP': 5.0,
     'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 78, 'min_velocity': 5},
-        'base': {'min_score': 82, 'min_velocity': 8},
-        'bsc': {'min_score': 80, 'min_velocity': 6},
-        'solana': {'min_score': 72, 'min_velocity': 5},
-        'polygon_pos': {'min_score': 75, 'min_velocity': 5},  # V3.2: Moins strict car frais bas
-        'avax': {'min_score': 80, 'min_velocity': 6},  # V3.2: Similar à BSC
+        'eth': {'min_score': 70, 'min_velocity': 5},      # V3.3: Reduced 78→70 for more ETH alerts
+        'base': {'min_score': 75, 'min_velocity': 7},     # V3.3: Reduced 82→75
+        'bsc': {'min_score': 72, 'min_velocity': 5},      # V3.3: Reduced 80→72 for more BSC alerts
+        'solana': {'min_score': 68, 'min_velocity': 5},   # V3.3: Reduced 72→68 (already performing)
+        'polygon_pos': {'min_score': 70, 'min_velocity': 5},  # V3.3: Reduced 75→70
+        'avax': {'min_score': 72, 'min_velocity': 5},     # V3.3: Reduced 80→72
     },
     'LIQUIDITY': {
         'eth': (80000, 600000),
