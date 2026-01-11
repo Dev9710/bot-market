@@ -121,4 +121,4 @@ def migrate_database():
     conn.close()
 
 if __name__ == '__main__':
-    migrate_railway_db()
+    migrate_database()
