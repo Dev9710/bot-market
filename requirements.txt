@@ -3,6 +3,7 @@ requests==2.31.0
 beautifulsoup4==4.12.2
 schedule==1.2.0
 python-dotenv==1.0.1
+psycopg2-binary==2.9.9
 
 # Dashboard Streamlit
 streamlit==1.29.0

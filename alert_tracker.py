@@ -274,8 +274,9 @@ class AlertTracker:
 
             print(f"✅ Alerte sauvegardée - ID: {alert_id} - Token: {alert_data['token_name']}")
 
-            # Démarrer le tracking automatique en arrière-plan
-            self.start_price_tracking(alert_id, alert_data['token_address'], alert_data['network'])
+            # NOTE: Le tracking prix est maintenant géré par le cron job Railway (price_tracker_cron_railway.py)
+            # Pas besoin de créer des threads ici pour éviter "can't start new thread"
+            # self.start_price_tracking(alert_id, alert_data['token_address'], alert_data['network'])
 
             return alert_id
 
