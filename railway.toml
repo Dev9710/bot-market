@@ -5,3 +5,9 @@ builder = "nixpacks"
 startCommand = "bash start_services.sh"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+# Cron job - Price Tracker (toutes les heures)
+# Execute price_tracker_cron_railway.py pour tracker les prix des alertes
+[[crons]]
+schedule = "0 * * * *"
+command = "python price_tracker_cron_railway.py"

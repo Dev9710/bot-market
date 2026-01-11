@@ -118,10 +118,11 @@ def build_network_thresholds(mode_config):
 DASHBOARD_CONFIG = {
     'MIN_VELOCITE_PUMP': 5.0,
     'NETWORK_SCORE_FILTERS': {
-        'eth': {'min_score': 70, 'min_velocity': 5},      # V3.3: Reduced 78→70 for more ETH alerts
-        'base': {'min_score': 75, 'min_velocity': 7},     # V3.3: Reduced 82→75
-        'bsc': {'min_score': 72, 'min_velocity': 5},      # V3.3: Reduced 80→72 for more BSC alerts
-        'solana': {'min_score': 68, 'min_velocity': 5},   # V3.3: Reduced 72→68 (already performing)
+        'eth': {'min_score': 90, 'min_velocity': 5},      # V3.6: 70→90 (Backtest: 81.2% WR, improve to 85%+)
+        'base': {'min_score': 85, 'min_velocity': 7},     # V3.6: 75→85 (Backtest: 63.6% WR, improve to 70%+)
+        'bsc': {'min_score': 95, 'min_velocity': 5},      # V3.6: 72→95 (Backtest: 89.0% WR, improve to 92%+)
+        'solana': {'min_score': 95, 'min_velocity': 5},   # V3.6: 68→95 (Backtest: 76.7% WR, improve to 80%+)
+        'arbitrum': {'min_score': 98, 'min_velocity': 5}, # V3.6: NEW - Filter very strict (52% WR, -0.2% EV)
         'polygon_pos': {'min_score': 70, 'min_velocity': 5},  # V3.3: Reduced 75→70
         'avax': {'min_score': 72, 'min_velocity': 5},     # V3.3: Reduced 80→72
     },
