@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Exécuter la migration de la base de données au démarrage
-echo "🔧 Vérification et migration de la base de données..."
-python migrate_railway_db.py
+# Créer la table alerts dans PostgreSQL si elle n'existe pas
+echo "🔧 Création de la table alerts dans PostgreSQL..."
+python create_alerts_table_postgres.py
 echo ""
+
+# Exécuter la migration de la base de données (déjà fait si table créée ci-dessus)
+# echo "🔧 Vérification et migration de la base de données..."
+# python migrate_railway_db.py
+# echo ""
 
 # Script de surveillance qui redémarre le scanner s'il crash
 monitor_scanner() {
