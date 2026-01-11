@@ -862,9 +862,16 @@
 
         // Render metrics
         function renderMetrics() {
+            console.log('🎨 Rendering metrics...', metrics.length, 'metrics to render');
             const container = document.getElementById('metricsContainer');
 
+            if (!container) {
+                console.error('❌ Container #metricsContainer not found!');
+                return;
+            }
+
             metrics.forEach(metric => {
+                console.log('📝 Rendering metric:', metric.id, 'color:', metric.color);
                 const card = document.createElement('div');
                 card.className = 'metric-card glass-card p-8 rounded-xl section-anchor';
                 card.id = metric.id;
@@ -911,10 +918,14 @@
 
                 container.appendChild(card);
             });
+
+            console.log('✅ All metrics rendered successfully!');
         }
 
         // Initialize
+        console.log('🚀 Initializing glossary page...');
         renderMetrics();
+        console.log('✅ Glossary page initialized!');
     </script>
 </body>
 </html>
