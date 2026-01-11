@@ -925,7 +925,18 @@
             `}).join('');
         }
 
-        // View alert detail
+        // Strategy thresholds by network (V3.6)
+        const STRATEGY_THRESHOLDS = {
+            'eth': { min_score: 90, min_velocity: 5, min_liq: 30000, max_liq: 5000000 },
+            'base': { min_score: 85, min_velocity: 7, min_liq: 100000, max_liq: 10000000 },
+            'bsc': { min_score: 95, min_velocity: 5, min_liq: 20000, max_liq: 50000000 },
+            'solana': { min_score: 95, min_velocity: 5, min_liq: 30000, max_liq: 2000000 },
+            'arbitrum': { min_score: 98, min_velocity: 5, min_liq: 100000, max_liq: 1000000 },
+            'polygon_pos': { min_score: 70, min_velocity: 5, min_liq: 20000, max_liq: 3000000 },
+            'avax': { min_score: 72, min_velocity: 5, min_liq: 30000, max_liq: 5000000 },
+        };
+
+        // View alert detail with strategy validation
         async function viewAlert(alertId) {
             const alert = state.alerts.find(a => a.id === alertId);
             if (!alert) return;
@@ -933,56 +944,120 @@
             const modal = document.getElementById('modal');
             const content = document.getElementById('modalContent');
 
+            const network = alert.network.toLowerCase();
+            const thresholds = STRATEGY_THRESHOLDS[network] || { min_score: 85, min_velocity: 5, min_liq: 50000, max_liq: 1000000 };
+
+            // Calculate validation status
+            const validations = {
+                score: alert.score >= thresholds.min_score,
+                velocity: (alert.velocite_pump || 0) >= thresholds.min_velocity,
+                liquidity: alert.liquidity >= thresholds.min_liq && alert.liquidity <= thresholds.max_liq,
+                age: (alert.age_hours || 0) >= 1 && (alert.age_hours || 0) <= 12,
+                buy_ratio: (alert.buy_ratio || 0) >= 0.6,
+            };
+
+            const allValid = Object.values(validations).every(v => v);
+            const validCount = Object.values(validations).filter(v => v).length;
+
             content.innerHTML = `
                 <h3 class="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    ${alert.token_symbol} - Détails
+                    ${alert.token_symbol || alert.token_name} - Strategy Validation
                 </h3>
 
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Pool Address</div>
-                        <div class="font-mono text-xs break-all">${alert.pool_address}</div>
+                <!-- Strategy Summary -->
+                <div class="glass p-4 rounded-lg mb-6 ${allValid ? 'border-green-500' : 'border-yellow-500'} border-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-lg font-bold">${alert.network.toUpperCase()} Strategy</div>
+                        <div class="text-2xl">${allValid ? '✓' : '⚠'}</div>
                     </div>
-
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Réseau</div>
-                        <div class="font-semibold">${alert.network.toUpperCase()}</div>
+                    <div class="text-sm text-gray-300 mb-3">
+                        ${validCount}/5 conditions validated | Min Score: ${thresholds.min_score} | Min Velocity: ${thresholds.min_velocity}x
                     </div>
-
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Score</div>
-                        <div class="text-2xl font-bold ${getScoreColorClass(alert.score)}">${alert.score}</div>
+                    <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full ${validCount >= 4 ? 'bg-green-500' : validCount >= 3 ? 'bg-yellow-500' : 'bg-red-500'}"
+                             style="width: ${(validCount / 5) * 100}%"></div>
                     </div>
+                </div>
 
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Tier</div>
-                        <div class="font-semibold">${alert.tier}</div>
+                <!-- Entry Conditions Checklist -->
+                <div class="glass p-4 rounded-lg mb-6">
+                    <div class="font-bold mb-3 text-blue-400">Entry Conditions Checklist</div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-2 rounded ${validations.score ? 'bg-green-900/30' : 'bg-red-900/30'}">
+                            <span>${validations.score ? '✓' : '✗'} Score ≥ ${thresholds.min_score}</span>
+                            <span class="font-bold ${getScoreColorClass(alert.score)}">${alert.score}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded ${validations.velocity ? 'bg-green-900/30' : 'bg-red-900/30'}">
+                            <span>${validations.velocity ? '✓' : '✗'} Velocity ≥ ${thresholds.min_velocity}x</span>
+                            <span class="font-bold">${(alert.velocite_pump || 0).toFixed(1)}x</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded ${validations.liquidity ? 'bg-green-900/30' : 'bg-red-900/30'}">
+                            <span>${validations.liquidity ? '✓' : '✗'} Liquidity Range</span>
+                            <span class="font-bold text-green-400">$${formatNumber(alert.liquidity)}</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded ${validations.age ? 'bg-green-900/30' : 'bg-red-900/30'}">
+                            <span>${validations.age ? '✓' : '✗'} Fresh Launch (1-12h)</span>
+                            <span class="font-bold">${(alert.age_hours || 0).toFixed(1)}h</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded ${validations.buy_ratio ? 'bg-green-900/30' : 'bg-red-900/30'}">
+                            <span>${validations.buy_ratio ? '✓' : '✗'} Buy Pressure ≥ 60%</span>
+                            <span class="font-bold">${((alert.buy_ratio || 0) * 100).toFixed(0)}%</span>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Prix</div>
-                        <div class="font-semibold">$${alert.price}</div>
+                <!-- TP/SL Targets -->
+                <div class="glass p-4 rounded-lg mb-6">
+                    <div class="font-bold mb-3 text-purple-400">Take Profit & Stop Loss Targets</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 rounded bg-blue-900/20">
+                            <div class="text-xs text-gray-400 mb-1">Entry Price</div>
+                            <div class="font-bold text-white">$${(alert.entry_price || alert.price || 0).toExponential(4)}</div>
+                        </div>
+                        <div class="p-3 rounded bg-red-900/20">
+                            <div class="text-xs text-gray-400 mb-1">Stop Loss (-10%)</div>
+                            <div class="font-bold text-red-400">$${(alert.stop_loss_price || 0).toExponential(4)}</div>
+                        </div>
+                        <div class="p-3 rounded bg-green-900/20">
+                            <div class="text-xs text-gray-400 mb-1">TP1 (+5%)</div>
+                            <div class="font-bold text-green-400">$${(alert.tp1_price || 0).toExponential(4)}</div>
+                        </div>
+                        <div class="p-3 rounded bg-green-900/20">
+                            <div class="text-xs text-gray-400 mb-1">TP2 (+10%)</div>
+                            <div class="font-bold text-green-400">$${(alert.tp2_price || 0).toExponential(4)}</div>
+                        </div>
+                        <div class="p-3 rounded bg-green-900/20 col-span-2">
+                            <div class="text-xs text-gray-400 mb-1">TP3 (+15%)</div>
+                            <div class="font-bold text-green-400">$${(alert.tp3_price || 0).toExponential(4)}</div>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Liquidité</div>
-                        <div class="font-semibold text-green-400">$${formatNumber(alert.liquidity)}</div>
-                    </div>
-
-                    <div class="glass p-4 rounded-lg">
+                <!-- Market Metrics -->
+                <div class="grid grid-cols-2 gap-4 text-sm mb-6">
+                    <div class="glass p-3 rounded-lg">
                         <div class="text-gray-400 mb-1">Volume 24h</div>
                         <div class="font-semibold">$${formatNumber(alert.volume_24h)}</div>
                     </div>
-
-                    <div class="glass p-4 rounded-lg">
-                        <div class="text-gray-400 mb-1">Âge</div>
-                        <div class="font-semibold">${(alert.age_hours || 0).toFixed(1)} heures</div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-gray-400 mb-1">Transactions</div>
+                        <div class="font-semibold">${alert.total_txns || 'N/A'}</div>
                     </div>
-
-                    <div class="glass p-4 rounded-lg col-span-2">
-                        <div class="text-gray-400 mb-1">Date de l'alerte</div>
-                        <div class="font-semibold">${formatDate(alert.created_at)}</div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-gray-400 mb-1">Buys / Sells</div>
+                        <div class="font-semibold text-green-400">${alert.buys_24h || 0}</div>
+                        <div class="font-semibold text-red-400">${alert.sells_24h || 0}</div>
                     </div>
+                    <div class="glass p-3 rounded-lg">
+                        <div class="text-gray-400 mb-1">Type Pump</div>
+                        <div class="font-semibold">${alert.type_pump || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <!-- Pool Info -->
+                <div class="glass p-3 rounded-lg">
+                    <div class="text-gray-400 mb-1 text-xs">Pool Address</div>
+                    <div class="font-mono text-xs break-all text-gray-300">${alert.pool_address}</div>
                 </div>
             `;
 
