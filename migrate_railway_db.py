@@ -5,6 +5,7 @@ Ajoute les 18 nouvelles colonnes pour le tracking prix
 
 import os
 import psycopg2
+from datetime import datetime
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
@@ -21,6 +22,7 @@ def migrate_database():
     print("=" * 80)
     print("MIGRATION BASE DE DONNEES RAILWAY - AJOUT COLONNES TRACKING")
     print("=" * 80)
+    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
 
     migrations = [
