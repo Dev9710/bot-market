@@ -321,6 +321,10 @@ def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict 
         else:
             type_pump = "LENT"
 
+        # ===== CALCULER BUY RATIO (CRITICAL FIX) =====
+        # Buy ratio 24h pour stratégies réseau
+        buy_ratio = buys_24h / sells_24h if sells_24h > 0 else 1.0
+
         # Ajouter token_name et token_symbol pour watchlist check
         token_name = base_token_name  # Déjà extrait
         token_symbol = base_token_name  # On utilise le nom de base comme symbole
@@ -348,6 +352,7 @@ def parse_pool_data(pool: Dict, network: str = "unknown", liquidity_stats: Dict 
             "sellers_6h": sellers_6h,
             "buyers_1h": buyers_1h,
             "sellers_1h": sellers_1h,
+            "buy_ratio": buy_ratio,  # CRITICAL FIX: Buy ratio pour stratégies
             "price_change_24h": price_change_24h,
             "price_change_6h": price_change_6h,
             "price_change_3h": price_change_3h,
