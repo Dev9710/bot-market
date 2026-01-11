@@ -9,9 +9,8 @@ import psycopg2
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if not DATABASE_URL:
-    print("ERROR: DATABASE_URL environment variable not found")
-    print("This script must be run on Railway or with DATABASE_URL set")
-    exit(1)
+    print("[SKIP] DATABASE_URL not found - Running locally (migration not needed)")
+    exit(0)
 
 def migrate_database():
     """Ajoute les colonnes manquantes pour le tracking"""

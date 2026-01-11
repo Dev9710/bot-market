@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Exécuter la migration de la base de données au démarrage
+echo "🔧 Vérification et migration de la base de données..."
+python migrate_railway_db.py
+echo ""
+
 # Script de surveillance qui redémarre le scanner s'il crash
 monitor_scanner() {
     while true; do
