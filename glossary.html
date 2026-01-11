@@ -844,6 +844,22 @@
             }
         ];
 
+        // Color mapping for Tailwind CSS (CDN doesn't support dynamic classes)
+        const colorClasses = {
+            'blue': 'from-blue-400 to-blue-600',
+            'purple': 'from-purple-400 to-purple-600',
+            'cyan': 'from-cyan-400 to-cyan-600',
+            'green': 'from-green-400 to-green-600',
+            'orange': 'from-orange-400 to-orange-600',
+            'yellow': 'from-yellow-400 to-yellow-600',
+            'indigo': 'from-indigo-400 to-indigo-600',
+            'emerald': 'from-emerald-400 to-emerald-600',
+            'red': 'from-red-400 to-red-600',
+            'pink': 'from-pink-400 to-pink-600',
+            'teal': 'from-teal-400 to-teal-600',
+            'slate': 'from-slate-400 to-slate-600'
+        };
+
         // Render metrics
         function renderMetrics() {
             const container = document.getElementById('metricsContainer');
@@ -853,11 +869,13 @@
                 card.className = 'metric-card glass-card p-8 rounded-xl section-anchor';
                 card.id = metric.id;
 
+                const gradientClass = colorClasses[metric.color] || 'from-blue-400 to-blue-600';
+
                 card.innerHTML = `
                     <div class="flex items-start gap-4 mb-6">
                         <div class="text-5xl">${metric.icon}</div>
                         <div class="flex-1">
-                            <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-${metric.color}-400 to-${metric.color}-600 bg-clip-text text-transparent">
+                            <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent">
                                 ${metric.title}
                             </h2>
                         </div>
