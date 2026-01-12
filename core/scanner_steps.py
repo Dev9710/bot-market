@@ -31,6 +31,7 @@ from core.signals import get_price_momentum_from_api, find_resistance_simple, gr
 from core.scoring import calculate_final_score, calculate_confidence_tier
 from core.filters import check_watchlist_token, is_valid_opportunity
 from core.alerts import should_send_alert, generer_alerte_complete
+from core.strategy_validator import check_and_send_vip_alert
 
 
 def collect_pools_from_networks(liquidity_stats: Dict) -> List[Dict]:
@@ -333,6 +334,12 @@ def process_and_send_alerts(
                 alert_id = alert_tracker.save_alert(alert_data)
                 if alert_id > 0:
                     log(f"   💾 Sauvegardé en DB (ID: {alert_id}) - Tracking auto démarré")
+
+                    # VALIDATION STRATÉGIE VIP: Vérifier si prête au trade
+                    try:
+                        check_and_send_vip_alert(alert_data, alert_id, send_telegram)
+                    except Exception as vip_error:
+                        log(f"   ⚠️ Erreur validation VIP: {vip_error}")
                 else:
                     log(f"   ⚠️ Échec sauvegarde DB (token déjà existant?)")
 
