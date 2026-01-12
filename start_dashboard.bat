@@ -1,37 +1,31 @@
 @echo off
-echo ================================================================================
-echo    DEMARRAGE DASHBOARD - Mode Local
-echo ================================================================================
+REM Dashboard Server Startup Script
+REM This script starts the Flask dashboard API server
+
+echo ===================================
+echo  Starting Dashboard Server
+echo ===================================
 echo.
 
-echo [1/3] Verification des dependances...
-pip show flask >nul 2>&1
-if errorlevel 1 (
-    echo    Installation Flask...
+REM Check if Flask is installed
+python -c "import flask" 2>nul
+if %errorlevel% neq 0 (
+    echo [!] Flask is not installed!
+    echo [i] Installing required packages...
     pip install flask flask-cors
+    echo.
 )
-echo    OK - Flask installe
+
+echo [OK] Starting server on http://localhost:5000
+echo.
+echo Pages available:
+echo   - Dashboard: http://localhost:5000/
+echo   - Glossary:  http://localhost:5000/glossary
+echo   - Compare:   http://localhost:5000/compare.html
+echo.
+echo Press CTRL+C to stop the server
+echo.
+echo ===================================
 echo.
 
-echo [2/3] Lancement de l'API...
-echo    Port: 5000
-echo    DB: alerts_history.db (ou alerts_tracker.db)
-echo.
-start "API Dashboard" cmd /k "python railway_db_api.py"
-timeout /t 3 >nul
-
-echo [3/3] Ouverture du dashboard...
-echo    URL API: http://localhost:5000
-echo.
-start dashboard_frontend.html
-
-echo.
-echo ================================================================================
-echo    Dashboard lance!
-echo ================================================================================
-echo.
-echo    API:       http://localhost:5000/api/health
-echo    Dashboard: Ouvert dans le navigateur
-echo.
-echo    Appuyez sur une touche pour arreter...
-pause >nul
+python dashboard_api.py
