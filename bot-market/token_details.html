@@ -13,575 +13,387 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        .section {
-            background: #1a1a1a;
+        .card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #1f1f1f 100%);
             border: 1px solid #2a2a2a;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 24px;
         }
 
-        .data-row {
-            display: flex;
-            justify-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            color: #9ca3af;
-            font-size: 14px;
-        }
-
-        .data-value {
-            color: #fff;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .freshness-fresh { color: #ef4444; font-weight: 600; }
-        .freshness-recent { color: #f59e0b; }
-        .freshness-active { color: #22c55e; }
-        .freshness-old { color: #6b7280; }
-
-        iframe {
-            border-radius: 12px;
-        }
-
-        /* Strategy Sections */
-        .strategy-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #1f1f1f 100%);
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .strategy-card.optimal {
+        .card-success {
             border-color: #22c55e;
             background: linear-gradient(135deg, #1a1a1a 0%, #1a2e1f 100%);
         }
 
-        .strategy-card.strong-buy {
-            border-color: #8b5cf6;
-            background: linear-gradient(135deg, #1a1a1a 0%, #1f1a2e 100%);
-        }
-
-        .strategy-card.warning {
+        .card-warning {
             border-color: #f59e0b;
             background: linear-gradient(135deg, #1a1a1a 0%, #2e251a 100%);
         }
 
-        .score-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 18px;
+        .card-danger {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2e1a1a 100%);
         }
 
-        .score-badge.excellent {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-        }
-
-        .score-badge.good {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-        }
-
-        .score-badge.medium {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .score-badge.low {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px;
-            border-radius: 8px;
-            background: #0a0a0a;
-            margin-bottom: 8px;
-        }
-
-        .checklist-item.passed {
-            background: #1a2e1f;
-            border-left: 3px solid #22c55e;
-        }
-
-        .checklist-item.failed {
-            background: #2e1a1a;
-            border-left: 3px solid #ef4444;
-        }
-
-        .target-line {
+        .metric-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            background: #0a0a0a;
+            padding: 14px 0;
+            border-bottom: 1px solid #2a2a2a;
         }
 
-        .target-line.sl {
-            border-left: 3px solid #ef4444;
+        .metric-row:last-child {
+            border-bottom: none;
         }
 
-        .target-line.tp {
-            border-left: 3px solid #22c55e;
-        }
-
-        .breakdown-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: #0a0a0a;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            font-size: 13px;
-        }
-
-        .breakdown-item.highlight {
-            background: linear-gradient(135deg, #1f1a2e 0%, #1a1a1a 100%);
-            border-left: 2px solid #8b5cf6;
-        }
-
-        .pattern-badge {
+        .badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
-            margin-right: 8px;
-            margin-bottom: 8px;
         }
 
-        .pattern-badge.detected {
-            background: #1a2e1f;
-            color: #22c55e;
-            border: 1px solid #22c55e40;
+        .badge-success { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e40; }
+        .badge-warning { background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b40; }
+        .badge-danger { background: #ef444420; color: #ef4444; border: 1px solid #ef444440; }
+        .badge-info { background: #3b82f620; color: #3b82f6; border: 1px solid #3b82f640; }
+        .badge-purple { background: #8b5cf620; color: #8b5cf6; border: 1px solid #8b5cf640; }
+
+        .decision-card {
+            border: 2px solid;
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
         }
+
+        .target-pill {
+            background: #0a0a0a;
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .target-pill.entry { border-color: #3b82f6; }
+        .target-pill.sl { border-color: #ef4444; }
+        .target-pill.tp { border-color: #22c55e; }
     </style>
 </head>
 <body class="text-white min-h-screen p-4 md:p-8">
     <!-- Header -->
     <div class="max-w-7xl mx-auto mb-6">
-        <a href="javascript:history.back()" class="text-gray-400 hover:text-white transition text-sm inline-block mb-4">
+        <a href="javascript:history.back()" class="text-gray-400 hover:text-white transition text-sm inline-flex items-center gap-2 mb-4">
             ← Retour
         </a>
-        <div class="flex items-center justify-between flex-wrap gap-4">
+
+        <div class="flex items-start justify-between flex-wrap gap-4">
             <div>
-                <h1 class="text-3xl md:text-4xl font-bold" id="tokenSymbol">-</h1>
-                <p class="text-gray-400 mt-1" id="tokenName">-</p>
+                <h1 class="text-4xl md:text-5xl font-bold mb-2" id="tokenSymbol">-</h1>
+                <p class="text-gray-400 text-lg" id="tokenName">-</p>
+                <div class="flex gap-2 mt-3">
+                    <span class="badge badge-info" id="networkBadge">-</span>
+                    <span class="badge" id="ageBadge">-</span>
+                </div>
             </div>
             <div class="text-right">
-                <div class="text-4xl font-bold" id="score">-</div>
-                <div class="text-sm text-gray-400" id="tier">-</div>
+                <div class="text-sm text-gray-400 mb-1">Quality Score</div>
+                <div class="text-5xl font-bold mb-2" id="scoreDisplay">-</div>
+                <div class="badge badge-purple" id="tierBadge">-</div>
             </div>
         </div>
     </div>
 
     <!-- Loading State -->
-    <div id="loading" class="max-w-7xl mx-auto text-center py-12">
-        <div class="text-gray-400">Chargement...</div>
+    <div id="loading" class="max-w-7xl mx-auto text-center py-20">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+        <div class="text-gray-400">Chargement des données...</div>
     </div>
 
     <!-- Content -->
-    <div id="content" class="max-w-7xl mx-auto" style="display: none;">
-        <!-- Alert History Badge -->
-        <div id="alertHistoryBadge" class="section mb-6" style="display: none;">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span class="text-orange-400 text-2xl">📊</span>
-                    <div>
-                        <h3 class="text-lg font-bold text-orange-400">Alertes Multiples Détectées</h3>
-                        <p class="text-sm text-gray-400">Ce token a été alerté <span id="totalAlertsCount" class="font-bold text-orange-400">-</span> fois. Consultez l'évolution ci-dessous.</p>
-                    </div>
-                </div>
+    <div id="content" class="max-w-7xl mx-auto space-y-6" style="display: none;">
+
+        <!-- ============ SECTION 1: TRADING DECISION (PRIORITY #1) ============ -->
+        <div class="decision-card" id="decisionCard">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold mb-2" id="decisionAction">-</h2>
+                <p class="text-lg text-gray-300" id="decisionConfidence">-</p>
             </div>
-        </div>
 
-        <!-- ============ STRATÉGIE & SIGNAUX ============ -->
-
-        <!-- Signal Analysis -->
-        <div id="signalAnalysis" class="mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Score Auto & Recommandation -->
-                <div class="strategy-card" id="signalCard">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <span>🎯</span>
-                        <span>Analyse du Signal</span>
-                    </h3>
-
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <div class="text-sm text-gray-400 mb-1">Score Auto</div>
-                            <div id="autoScore" class="score-badge excellent">95/100</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-400 mb-1">Action</div>
-                            <div id="recommendation" class="text-2xl font-bold text-purple-400">🟢 STRONG BUY</div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <div class="text-xs text-gray-400 mb-1">Position Recommandée</div>
-                            <div id="positionRec" class="text-lg font-bold text-green-400">10% capital</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-gray-400 mb-1">Confiance</div>
-                            <div id="confidence" class="text-lg font-bold text-blue-400">95%+</div>
-                        </div>
-                    </div>
-
-                    <!-- Breakdown (collapsible) -->
-                    <div>
-                        <button onclick="toggleBreakdown()" class="text-sm text-gray-400 hover:text-white transition flex items-center gap-2 mb-2">
-                            <span id="breakdownIcon">▶</span>
-                            <span>Détails du scoring</span>
-                        </button>
-                        <div id="breakdownList" style="display: none;" class="space-y-1 mt-2">
-                            <!-- Breakdown items will be inserted here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Zone Optimale & Patterns -->
-                <div class="strategy-card" id="patternsCard">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <span>🔍</span>
-                        <span>Patterns Détectés</span>
-                    </h3>
-
-                    <!-- Zone optimale -->
-                    <div id="optimalZone" class="mb-4">
-                        <!-- Will be populated -->
-                    </div>
-
-                    <!-- Patterns badges -->
-                    <div id="patternsList" class="flex flex-wrap gap-2 mb-4">
-                        <!-- Pattern badges will be inserted here -->
-                    </div>
-
-                    <!-- Ultra-bullish signals -->
-                    <div id="bullishSignals">
-                        <!-- Will be populated if applicable -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Targets Dynamiques & Checklist -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Targets Dynamiques -->
-            <div class="strategy-card">
-                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span>🎯</span>
-                    <span>Targets Dynamiques</span>
-                    <span class="text-xs text-gray-400 font-normal">(Recalculés selon alertes)</span>
-                </h3>
-
-                <div class="space-y-2 mb-4">
-                    <div class="target-line" style="background: #1a1a2e; border-left: 3px solid #8b5cf6;">
-                        <span class="text-sm text-gray-300">Entry Price</span>
-                        <span id="dynamicEntry" class="font-bold text-blue-400">-</span>
-                    </div>
-
-                    <div class="target-line sl">
-                        <span class="text-sm text-gray-300">🛡️ Stop Loss</span>
-                        <span id="dynamicSL" class="font-bold text-red-400">-</span>
-                    </div>
-
-                    <div class="target-line tp">
-                        <span class="text-sm text-gray-300">TP1</span>
-                        <span id="dynamicTP1" class="font-bold text-green-400">-</span>
-                    </div>
-
-                    <div class="target-line tp">
-                        <span class="text-sm text-gray-300">TP2</span>
-                        <span id="dynamicTP2" class="font-bold text-green-400">-</span>
-                    </div>
-
-                    <div class="target-line tp">
-                        <span class="text-sm text-gray-300">TP3</span>
-                        <span id="dynamicTP3" class="font-bold text-green-400">-</span>
-                    </div>
-
-                    <div class="target-line" style="background: #1a1a2e; border-left: 3px solid #f59e0b;">
-                        <span class="text-sm text-gray-300">📊 Trail Stop</span>
-                        <span id="dynamicTS" class="font-bold text-yellow-400">-</span>
-                    </div>
-                </div>
-
-                <!-- Reasoning -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                 <div>
-                    <div class="text-xs text-gray-400 mb-2">💡 Raisonnement:</div>
-                    <div id="targetReasoning" class="text-xs text-gray-400 space-y-1">
-                        <!-- Reasoning items will be inserted here -->
-                    </div>
+                    <div class="text-sm text-gray-400 mb-2">Position Recommandée</div>
+                    <div class="text-2xl font-bold" id="positionSize">-</div>
                 </div>
-
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Multiplicateur:</span>
-                        <span id="multiplierValue" class="text-sm font-bold text-purple-400">-</span>
-                    </div>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-xs text-gray-400">Risque:</span>
-                        <span id="riskLevel" class="text-sm font-bold">-</span>
-                    </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2">Risque</div>
+                    <div class="text-2xl font-bold" id="riskLevel">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2">Multiplicateur</div>
+                    <div class="text-2xl font-bold text-purple-400" id="multiplier">-</div>
                 </div>
             </div>
 
-            <!-- Checklist Pré-Trade -->
-            <div class="strategy-card" id="checklistCard">
-                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span>✅</span>
-                    <span id="checklistNetworkTitle">Checklist Pré-Trade</span>
-                </h3>
-
-                <!-- Strategy Status Banner -->
-                <div id="strategyStatusBanner" class="mb-4">
-                    <!-- Status banner will be inserted here -->
+            <!-- Checklist Progress -->
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-semibold" id="strategyName">Stratégie</span>
+                    <span class="text-lg font-bold" id="checklistProgress">-/-</span>
                 </div>
-
-                <div id="checklistCriteria" class="space-y-2 mb-4">
-                    <!-- Checklist items will be inserted here -->
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-300">Critères validés:</span>
-                        <span id="checklistScore" class="font-bold text-lg">-</span>
-                    </div>
-                    <div id="checklistResult" class="mt-3">
-                        <!-- Result message will be inserted here -->
-                    </div>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div id="progressBar" class="h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ============ FIN STRATÉGIE ============ -->
+        <!-- ============ SECTION 2: TARGETS & ENTRY ============ -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <span>🎯</span>
+                <span>Prix & Targets Dynamiques</span>
+            </h2>
 
-        <!-- Chart -->
-        <div class="section mb-6">
-            <h2 class="text-xl font-bold mb-4">📈 Graphique Prix (Temps Réel)</h2>
-            <div id="chartContainer" style="height: 500px;">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div class="target-pill entry">
+                    <div class="text-xs text-gray-400 mb-1">Entry Price</div>
+                    <div class="text-xl font-bold text-blue-400" id="entryPrice">-</div>
+                </div>
+
+                <div class="target-pill sl">
+                    <div class="text-xs text-gray-400 mb-1">Stop Loss</div>
+                    <div class="text-xl font-bold text-red-400" id="stopLoss">-</div>
+                </div>
+
+                <div class="target-pill tp">
+                    <div class="text-xs text-gray-400 mb-1">TP1 → Exit 50%</div>
+                    <div class="text-xl font-bold text-green-400" id="tp1">-</div>
+                </div>
+
+                <div class="target-pill tp">
+                    <div class="text-xs text-gray-400 mb-1">TP2 → Exit 30%</div>
+                    <div class="text-xl font-bold text-green-400" id="tp2">-</div>
+                </div>
+
+                <div class="target-pill tp">
+                    <div class="text-xs text-gray-400 mb-1">TP3 → Exit 20%</div>
+                    <div class="text-xl font-bold text-green-400" id="tp3">-</div>
+                </div>
+
+                <div class="target-pill" style="border-color: #f59e0b;">
+                    <div class="text-xs text-gray-400 mb-1">Trail Stop</div>
+                    <div class="text-lg font-bold text-yellow-400" id="trailStop">-</div>
+                </div>
+            </div>
+
+            <!-- Reasoning (Collapsible) -->
+            <details class="mt-4">
+                <summary class="cursor-pointer text-sm text-gray-400 hover:text-white transition flex items-center gap-2">
+                    <span>→</span>
+                    <span>Voir le raisonnement</span>
+                </summary>
+                <div id="targetReasoning" class="mt-3 space-y-1 text-sm text-gray-300 pl-4">
+                    <!-- Populated by JS -->
+                </div>
+            </details>
+        </div>
+
+        <!-- ============ SECTION 3: STRATEGY VALIDATION ============ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Strategy Checklist -->
+            <div class="card" id="checklistCard">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span>✓</span>
+                    <span id="checklistTitle">Validation Stratégie</span>
+                </h3>
+
+                <div id="checklistItems" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div id="checklistResult" class="mt-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Patterns & Signals -->
+            <div class="card">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span>🔍</span>
+                    <span>Patterns & Signaux</span>
+                </h3>
+
+                <div id="optimalZone" class="mb-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div id="patterns" class="mb-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div id="bullishSignals">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div id="scoreBreakdown" class="mt-4 pt-4 border-t border-gray-700">
+                    <details>
+                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white transition flex items-center gap-2">
+                            <span>→</span>
+                            <span>Détails du score (Score Auto: <span id="autoScore">-</span>/100)</span>
+                        </summary>
+                        <div id="breakdownList" class="mt-3 space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SECTION 4: PRICE CHART ============ -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span>📈</span>
+                <span>Graphique Prix (Temps Réel)</span>
+            </h2>
+            <div id="chartContainer" class="rounded-lg overflow-hidden" style="height: 500px;">
                 <!-- GeckoTerminal iframe will be inserted here -->
             </div>
         </div>
 
-        <!-- Timeline & Evolution Charts (only shown if multiple alerts) -->
-        <div id="timelineSection" class="mb-6" style="display: none;">
+        <!-- ============ SECTION 5: KEY METRICS ============ -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <span>📊</span>
+                <span>Métriques Clés</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Liquidité & Volume -->
+                <div>
+                    <h3 class="text-sm font-semibold text-green-400 mb-3">💰 Liquidité & Volume</h3>
+                    <div class="space-y-2">
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Liquidité</span>
+                            <span class="font-semibold" id="liquidity">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Volume 24h</span>
+                            <span class="font-semibold" id="volume24h">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Vol/Liq Ratio</span>
+                            <span class="font-semibold text-purple-400" id="volLiqRatio">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Momentum -->
+                <div>
+                    <h3 class="text-sm font-semibold text-blue-400 mb-3">⚡ Momentum</h3>
+                    <div class="space-y-2">
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Vélocité Pump</span>
+                            <span class="font-semibold" id="velocity">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Accél. 1h vs 6h</span>
+                            <span class="font-semibold" id="accel1h">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Accél. 6h vs 24h</span>
+                            <span class="font-semibold" id="accel6h">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions -->
+                <div>
+                    <h3 class="text-sm font-semibold text-purple-400 mb-3">🔄 Transactions 24h</h3>
+                    <div class="space-y-2">
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Buys</span>
+                            <span class="font-semibold text-green-400" id="buys">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Sells</span>
+                            <span class="font-semibold text-red-400" id="sells">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="text-sm text-gray-400">Buy Ratio</span>
+                            <span class="font-semibold" id="buyRatio">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SECTION 6: ALERT HISTORY (if multiple alerts) ============ -->
+        <div id="historySection" class="space-y-6" style="display: none;">
+            <!-- Alert Badge -->
+            <div class="card card-warning">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🔥</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-orange-400">Alertes Multiples Détectées</h3>
+                        <p class="text-sm text-gray-400">Ce token a été alerté <span id="alertCount" class="font-bold text-orange-400">-</span> fois</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Evolution Charts -->
-            <div class="space-y-6 mb-6">
-                <!-- Liquidité & Volume en haut (plus important) -->
-                <div class="section">
-                    <h3 class="text-lg font-bold mb-4 text-green-400">💰 Évolution Liquidité & Volume</h3>
-                    <div style="height: 350px;">
-                        <canvas id="liquidityEvolutionChart"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-lg font-bold mb-4 text-green-400">💰 Évolution Liquidité</h3>
+                    <div style="height: 250px;">
+                        <canvas id="liquidityChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Score en bas -->
-                <div class="section">
-                    <h3 class="text-lg font-bold mb-4 text-blue-400">📊 Évolution du Score</h3>
-                    <div style="height: 300px;">
-                        <canvas id="scoreEvolutionChart"></canvas>
+                <div class="card">
+                    <h3 class="text-lg font-bold mb-4 text-blue-400">📊 Évolution Score</h3>
+                    <div style="height: 250px;">
+                        <canvas id="scoreChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Timeline List -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-purple-400">🕒 Historique Complet des Alertes</h3>
+            <!-- Timeline -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-4 text-purple-400">🕒 Historique des Alertes</h3>
                 <div id="timelineList" class="space-y-3">
-                    <!-- Timeline items will be inserted here -->
+                    <!-- Populated by JS -->
                 </div>
             </div>
         </div>
 
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <!-- Prix & Targets -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-green-400">💰 Prix & Targets</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Prix Entry</span>
-                        <span class="data-value text-blue-400" id="entry_price">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Stop Loss (-10%)</span>
-                        <span class="data-value text-red-400" id="stop_loss">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">TP1 (+5%)</span>
-                        <span class="data-value text-green-400" id="tp1">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">TP2 (+10%)</span>
-                        <span class="data-value text-green-400" id="tp2">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">TP3 (+15%)</span>
-                        <span class="data-value text-green-400" id="tp3">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Volume -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-blue-400">📊 Volume</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Volume 24h</span>
-                        <span class="data-value" id="volume_24h">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Volume 6h</span>
-                        <span class="data-value" id="volume_6h">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Volume 1h</span>
-                        <span class="data-value" id="volume_1h">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Accél. 1h vs 6h</span>
-                        <span class="data-value" id="accel_1h">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Accél. 6h vs 24h</span>
-                        <span class="data-value" id="accel_6h">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Transactions -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-purple-400">🔄 Transactions</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Buys 24h</span>
-                        <span class="data-value text-green-400" id="buys">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Sells 24h</span>
-                        <span class="data-value text-red-400" id="sells">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Buy Ratio</span>
-                        <span class="data-value" id="buy_ratio">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Total Txns</span>
-                        <span class="data-value" id="total_txns">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Second Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <!-- Scoring -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-yellow-400">⭐ Scoring</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Score Total</span>
-                        <span class="data-value" id="score_total">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Score Base</span>
-                        <span class="data-value" id="base_score">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Bonus Momentum</span>
-                        <span class="data-value text-green-400" id="momentum_bonus">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Score Sécurité</span>
-                        <span class="data-value" id="security_score">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Risques -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-orange-400">⚠️ Risques</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Âge du Token</span>
-                        <span class="data-value" id="age">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Liquidité</span>
-                        <span class="data-value text-green-400" id="liquidity">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Réseau</span>
-                        <span class="data-value" id="network">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pump Analysis -->
-            <div class="section">
-                <h3 class="text-lg font-bold mb-4 text-red-400">🚀 Analyse Pump</h3>
-                <div class="space-y-3">
-                    <div class="data-row">
-                        <span class="data-label">Vélocité Pump</span>
-                        <span class="data-value" id="velocite_pump">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Type Pump</span>
-                        <span class="data-value" id="type_pump">-</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">TP Tracking</span>
-                        <span class="data-value text-xs" id="tp_tracking">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Alert Message (Raw Telegram) -->
-        <div class="section mb-6">
-            <h3 class="text-lg font-bold mb-4">📱 Message Telegram (Brut)</h3>
-            <pre class="text-sm text-gray-300 whitespace-pre-wrap font-mono bg-black/50 p-4 rounded" id="alert_message">-</pre>
-        </div>
-
-        <!-- Links -->
-        <div class="section">
-            <h3 class="text-lg font-bold mb-4">🔗 Liens & Actions</h3>
+        <!-- ============ SECTION 7: ACTIONS ============ -->
+        <div class="card">
             <div class="flex flex-wrap gap-4">
-                <button id="addToPortfolioBtn" onclick="addToPortfolio()" class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 transition border border-purple-500/30 font-semibold">
+                <button id="addToPortfolioBtn" onclick="addToPortfolio()"
+                    class="px-6 py-3 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition border border-purple-500/30 font-semibold">
                     + Ajouter au Portfolio
                 </button>
-                <a id="geckoLink" href="#" target="_blank" class="px-4 py-2 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition border border-green-500/30">
+                <a id="geckoLink" href="#" target="_blank"
+                    class="px-6 py-3 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition border border-green-500/30 font-semibold">
                     Voir sur GeckoTerminal →
                 </a>
-                <button onclick="history.back()" class="px-4 py-2 bg-gray-500/20 text-gray-400 rounded hover:bg-gray-500/30 transition border border-gray-500/30">
+                <button onclick="history.back()"
+                    class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-lg hover:bg-gray-500/30 transition border border-gray-500/30">
                     ← Retour
                 </button>
             </div>
             <div id="portfolioMessage" class="mt-4 hidden"></div>
         </div>
+
+        <!-- Debug: Raw Data (Collapsible) -->
+        <details class="card">
+            <summary class="cursor-pointer text-sm text-gray-400 hover:text-white transition">
+                → Données brutes (Debug)
+            </summary>
+            <pre class="mt-4 text-xs text-gray-400 whitespace-pre-wrap font-mono bg-black/50 p-4 rounded" id="rawData">-</pre>
+        </details>
     </div>
 
     <script>
@@ -590,7 +402,7 @@
         const alertId = urlParams.get('id');
 
         let alertHistory = [];
-        let currentAlert = null; // Store current alert globally
+        let currentAlert = null;
         let scoreChart = null;
         let liquidityChart = null;
 
@@ -604,14 +416,12 @@
                 const response = await fetch(`${API_URL}/alerts/${alertId}`);
                 const data = await response.json();
 
-                if (data.error) {
-                    throw new Error(data.error);
-                }
+                if (data.error) throw new Error(data.error);
 
+                currentAlert = data;
+                await loadAlertHistory(data.pool_address || data.token_address);
                 renderToken(data);
 
-                // Load alert history for this token
-                await loadAlertHistory(data.pool_address || data.token_address);
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('loading').innerHTML = `<div class="text-red-400">Erreur: ${error.message}</div>`;
@@ -627,74 +437,260 @@
 
                 if (data.alerts && data.alerts.length > 1) {
                     alertHistory = data.alerts;
-
-                    // Show badge and timeline
-                    document.getElementById('alertHistoryBadge').style.display = 'block';
-                    document.getElementById('totalAlertsCount').textContent = data.count;
-                    document.getElementById('timelineSection').style.display = 'block';
-
-                    // Render timeline and charts
+                    document.getElementById('historySection').style.display = 'block';
+                    document.getElementById('alertCount').textContent = data.count;
                     renderTimeline(alertHistory);
-                    renderEvolutionCharts(alertHistory);
-
-                    // Populate strategy analysis with full alert history
-                    const latestAlert = alertHistory[0] || currentAlert;
-                    const previousAlerts = alertHistory.slice(1); // All alerts except latest
-                    populateStrategyAnalysis(latestAlert, previousAlerts);
-                } else {
-                    // Single alert - populate strategy without history
-                    populateStrategyAnalysis(currentAlert, []);
+                    renderCharts(alertHistory);
                 }
             } catch (error) {
                 console.error('Error loading alert history:', error);
-                // Fallback to single alert analysis
-                populateStrategyAnalysis(currentAlert, []);
             }
         }
 
-        function renderTimeline(alerts) {
-            const container = document.getElementById('timelineList');
+        function renderToken(alert) {
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
 
-            // Sort by date descending (newest first)
-            const sortedAlerts = [...alerts].sort((a, b) =>
-                new Date(b.created_at) - new Date(a.created_at)
-            );
+            const fullData = alert.full_data || alert || {};
+            const network = (alert.network || 'Unknown').toUpperCase();
+            const ageHours = alert.age_hours || 0;
 
-            container.innerHTML = sortedAlerts.map((alert, index) => {
-                const fullData = alert.full_data || alert || {};
-                const isLatest = index === 0;
+            // ===== HEADER =====
+            document.getElementById('tokenSymbol').textContent = alert.token_symbol || 'N/A';
+            document.getElementById('tokenName').textContent = alert.token_name || 'N/A';
+            document.getElementById('networkBadge').textContent = network;
+            document.getElementById('ageBadge').innerHTML = getFreshnessDisplay(ageHours);
+            document.getElementById('scoreDisplay').textContent = alert.score || 0;
+            document.getElementById('scoreDisplay').className = `text-5xl font-bold mb-2 ${getScoreColor(alert.score)}`;
+            document.getElementById('tierBadge').textContent = alert.tier || 'N/A';
 
-                return `
-                    <div class="border border-gray-700 rounded-lg p-4 hover:bg-white/5 transition ${isLatest ? 'border-orange-500/50 bg-orange-500/5' : ''}">
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="font-bold text-lg ${getScoreColor(alert.score)}">${alert.score}</span>
-                                    <span class="text-xs px-2 py-0.5 rounded ${getTierBadgeClass(alert.tier)}">${alert.tier}</span>
-                                    ${isLatest ? '<span class="text-xs px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">DERNIÈRE</span>' : ''}
-                                </div>
-                                <div class="text-sm text-gray-400">
-                                    ${formatDate(alert.created_at)} • ${getFreshnessDisplay(alert.age_hours || 0)}
+            // ===== CALCULATE STRATEGY =====
+            const previousAlerts = alertHistory.filter(a => a.id !== alert.id);
+            const { score: autoScore, breakdown } = calculateAutoScore({
+                ...alert,
+                ...fullData,
+                alert_count: alertHistory.length || 1
+            });
+
+            const zoneCheck = checkOptimalZone(alert);
+            const checklist = generateChecklist(alert, zoneCheck);
+            const targets = calculateDynamicTargets(alert, previousAlerts);
+
+            const checklistRatio = checklist.passed / checklist.total;
+            const recommendation = getFinalRecommendation(autoScore, checklistRatio, checklist.passed, checklist.total);
+
+            // ===== TRADING DECISION CARD =====
+            const decisionCard = document.getElementById('decisionCard');
+
+            if (checklistRatio >= 1.0 && autoScore >= 85) {
+                decisionCard.className = 'decision-card border-green-500 bg-green-900/10';
+                decisionCard.querySelector('#decisionAction').className = 'text-3xl font-bold mb-2 text-green-400';
+            } else if (checklistRatio >= 0.6) {
+                decisionCard.className = 'decision-card border-yellow-500 bg-yellow-900/10';
+                decisionCard.querySelector('#decisionAction').className = 'text-3xl font-bold mb-2 text-yellow-400';
+            } else {
+                decisionCard.className = 'decision-card border-red-500 bg-red-900/10';
+                decisionCard.querySelector('#decisionAction').className = 'text-3xl font-bold mb-2 text-red-400';
+            }
+
+            document.getElementById('decisionAction').textContent = recommendation.action;
+            document.getElementById('decisionConfidence').textContent = recommendation.confidence;
+            document.getElementById('positionSize').textContent = recommendation.position;
+            document.getElementById('riskLevel').textContent = targets.riskLevel;
+            document.getElementById('riskLevel').className = `text-2xl font-bold ${targets.riskLevel === 'LOW' ? 'text-green-400' : targets.riskLevel === 'HIGH' ? 'text-red-400' : 'text-yellow-400'}`;
+            document.getElementById('multiplier').textContent = '×' + targets.multiplier;
+
+            // Progress bar
+            document.getElementById('strategyName').textContent = `Stratégie ${network}`;
+            document.getElementById('checklistProgress').textContent = `${checklist.passed}/${checklist.total}`;
+            const progressPct = (checklist.passed / checklist.total * 100).toFixed(0);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progressPct + '%';
+            progressBar.className = `h-3 rounded-full transition-all duration-500 ${checklistRatio >= 1.0 ? 'bg-green-400' : checklistRatio >= 0.6 ? 'bg-yellow-400' : 'bg-red-400'}`;
+
+            // ===== TARGETS =====
+            const price = fullData.entry_price || alert.price || 0;
+            document.getElementById('entryPrice').textContent = formatPrice(targets.entry || price);
+            document.getElementById('stopLoss').textContent = `${formatPrice(targets.stopLoss.price)} (${targets.stopLoss.percent}%)`;
+            document.getElementById('tp1').textContent = `${formatPrice(targets.tp1.price)} (+${targets.tp1.percent.toFixed(1)}%)`;
+            document.getElementById('tp2').textContent = `${formatPrice(targets.tp2.price)} (+${targets.tp2.percent.toFixed(1)}%)`;
+            document.getElementById('tp3').textContent = `${formatPrice(targets.tp3.price)} (+${targets.tp3.percent.toFixed(1)}%)`;
+            document.getElementById('trailStop').textContent = `${targets.trailStop.percent}% ${targets.trailStop.activation}`;
+
+            document.getElementById('targetReasoning').innerHTML = targets.reasoning.map(r =>
+                `<div class="text-sm">• ${r}</div>`
+            ).join('');
+
+            // ===== CHECKLIST =====
+            document.getElementById('checklistTitle').textContent = `Validation Stratégie ${network}`;
+            document.getElementById('checklistItems').innerHTML = checklist.items.map(item => {
+                if (item.isBonus) {
+                    return `
+                        <div class="p-3 rounded-lg ${item.passed ? 'bg-purple-900/30 border-l-4 border-purple-500' : 'bg-gray-900/30 border-l-4 border-gray-600'}">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">${item.passed ? '🚀' : '○'}</span>
+                                <div class="flex-1">
+                                    <div class="text-sm font-semibold flex items-center gap-2">
+                                        ${item.label}
+                                        <span class="badge badge-purple">BONUS</span>
+                                    </div>
+                                    <div class="text-xs ${item.passed ? 'text-purple-400' : 'text-gray-500'} font-semibold mt-1">${item.value}</div>
                                 </div>
                             </div>
                         </div>
+                    `;
+                }
+                return `
+                    <div class="p-3 rounded-lg ${item.passed ? 'bg-green-900/20 border-l-4 border-green-500' : 'bg-red-900/20 border-l-4 border-red-500'}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">${item.passed ? '✅' : '❌'}</span>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">${item.label}</div>
+                                <div class="text-xs ${item.passed ? 'text-green-400' : 'text-red-400'} font-semibold mt-1">${item.value}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
+            if (checklist.passed === checklist.total) {
+                document.getElementById('checklistResult').innerHTML = `
+                    <div class="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-bold text-center">
+                        🎯 Tous les critères validés - GO TRADE!
+                    </div>
+                `;
+            } else if (checklist.passed >= checklist.total * 0.6) {
+                document.getElementById('checklistResult').innerHTML = `
+                    <div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm text-center">
+                        ⚠️ Entry possible mais prudent
+                    </div>
+                `;
+            } else {
+                document.getElementById('checklistResult').innerHTML = `
+                    <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">
+                        🔴 Critères insuffisants - SKIP
+                    </div>
+                `;
+            }
+
+            // ===== PATTERNS =====
+            if (zoneCheck && zoneCheck.isOptimal) {
+                document.getElementById('optimalZone').innerHTML = `
+                    <div class="p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xl">🎯</span>
+                            <span class="font-bold text-green-400">${zoneCheck.name}</span>
+                        </div>
+                        <div class="text-xs text-gray-300 space-y-1">
+                            <div>• Win rate: ${zoneCheck.winRate}</div>
+                            <div>• Gain moyen: ${zoneCheck.avgGain}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const patterns = [];
+            if (alertHistory.length >= 3) {
+                const retracement = detectRetracement(previousAlerts);
+                if (retracement && retracement.detected) {
+                    patterns.push(`<span class="badge badge-success">⚡ Pattern Retracement (+${retracement.expectedGain}%)</span>`);
+                }
+            }
+            if (alertHistory.length >= 5) {
+                patterns.push(`<span class="badge badge-warning">🔥 Alertes Multiples (×${alertHistory.length})</span>`);
+            }
+            if (patterns.length > 0) {
+                document.getElementById('patterns').innerHTML = `<div class="flex flex-wrap gap-2">${patterns.join('')}</div>`;
+            }
+
+            const bullishSignals = detectUltraBullishSignals(alert, alertHistory.length);
+            if (bullishSignals.length >= 3) {
+                document.getElementById('bullishSignals').innerHTML = `
+                    <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/30">
+                        <div class="font-bold text-purple-400 mb-2">🚀 Signaux Ultra-Bullish (${bullishSignals.length})</div>
+                        <div class="text-xs text-gray-300 space-y-1">
+                            ${bullishSignals.map(s => `<div>• ${s}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Score breakdown
+            document.getElementById('autoScore').textContent = autoScore;
+            document.getElementById('breakdownList').innerHTML = breakdown.map(item => `
+                <div class="flex items-center justify-between p-2 rounded ${item.highlight ? 'bg-purple-900/20' : 'bg-gray-900/20'}">
+                    <span class="text-sm">${item.label}</span>
+                    <span class="font-bold text-purple-400">+${item.points}</span>
+                </div>
+            `).join('');
+
+            // ===== CHART =====
+            const poolAddress = fullData.token_address || alert.pool_address;
+            if (network && poolAddress) {
+                const chartUrl = `https://www.geckoterminal.com/${network.toLowerCase()}/pools/${poolAddress}?embed=1&info=0&swaps=0`;
+                document.getElementById('chartContainer').innerHTML = `
+                    <iframe src="${chartUrl}" width="100%" height="500" frameborder="0" allow="clipboard-write" allowfullscreen></iframe>
+                `;
+                document.getElementById('geckoLink').href = `https://www.geckoterminal.com/${network.toLowerCase()}/pools/${poolAddress}`;
+            } else {
+                document.getElementById('chartContainer').innerHTML = `
+                    <div class="text-center text-gray-400 py-12">Graphique non disponible</div>
+                `;
+            }
+
+            // ===== KEY METRICS =====
+            document.getElementById('liquidity').textContent = (alert.liquidity || fullData.liquidity) ? '$' + formatNumber(alert.liquidity || fullData.liquidity) : 'N/A';
+            document.getElementById('volume24h').textContent = fullData.volume_24h ? '$' + formatNumber(fullData.volume_24h) : 'N/A';
+
+            const volLiqRatio = (fullData.volume_24h && alert.liquidity) ? ((fullData.volume_24h / alert.liquidity) * 100).toFixed(0) + '%' : 'N/A';
+            document.getElementById('volLiqRatio').textContent = volLiqRatio;
+
+            document.getElementById('velocity').textContent = (fullData.velocite_pump || 0).toFixed(1) + 'x';
+            document.getElementById('accel1h').textContent = fullData.volume_acceleration_1h_vs_6h ? fullData.volume_acceleration_1h_vs_6h.toFixed(2) + 'x' : 'N/A';
+            document.getElementById('accel6h').textContent = fullData.volume_acceleration_6h_vs_24h ? fullData.volume_acceleration_6h_vs_24h.toFixed(2) + 'x' : 'N/A';
+
+            document.getElementById('buys').textContent = fullData.buys_24h || 'N/A';
+            document.getElementById('sells').textContent = fullData.sells_24h || 'N/A';
+            document.getElementById('buyRatio').textContent = fullData.buy_ratio ? (fullData.buy_ratio * 100).toFixed(1) + '%' : 'N/A';
+
+            // ===== RAW DATA =====
+            document.getElementById('rawData').textContent = JSON.stringify({ alert, fullData }, null, 2);
+        }
+
+        function renderTimeline(alerts) {
+            const sorted = [...alerts].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            document.getElementById('timelineList').innerHTML = sorted.map((alert, idx) => {
+                const fullData = alert.full_data || {};
+                const isLatest = idx === 0;
+
+                return `
+                    <div class="p-4 rounded-lg border ${isLatest ? 'border-orange-500 bg-orange-500/5' : 'border-gray-700'} hover:bg-white/5 transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold ${getScoreColor(alert.score)}">${alert.score}</span>
+                                <span class="badge badge-info">${alert.tier}</span>
+                                ${isLatest ? '<span class="badge badge-warning">DERNIÈRE</span>' : ''}
+                            </div>
+                            <span class="text-sm text-gray-400">${formatDate(alert.created_at)}</span>
+                        </div>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                             <div>
-                                <div class="text-gray-500 text-xs">Prix</div>
-                                <div class="font-semibold text-blue-400">${fullData.entry_price ? '$' + fullData.entry_price.toFixed(8) : 'N/A'}</div>
-                            </div>
-                            <div>
                                 <div class="text-gray-500 text-xs">Liquidité</div>
-                                <div class="font-semibold text-green-400">${(alert.liquidity || fullData.liquidity) ? '$' + formatNumber(alert.liquidity || fullData.liquidity) : 'N/A'}</div>
+                                <div class="font-semibold text-green-400">${alert.liquidity ? '$' + formatNumber(alert.liquidity) : 'N/A'}</div>
                             </div>
                             <div>
                                 <div class="text-gray-500 text-xs">Volume 24h</div>
-                                <div class="font-semibold">${(alert.volume_24h || fullData.volume_24h) ? '$' + formatNumber(alert.volume_24h || fullData.volume_24h) : 'N/A'}</div>
+                                <div class="font-semibold">${alert.volume_24h ? '$' + formatNumber(alert.volume_24h) : 'N/A'}</div>
                             </div>
                             <div>
-                                <div class="text-gray-500 text-xs">TP1</div>
-                                <div class="font-semibold text-green-400">${fullData.tp1_price ? '$' + fullData.tp1_price.toFixed(8) : 'N/A'}</div>
+                                <div class="text-gray-500 text-xs">Prix</div>
+                                <div class="font-semibold text-blue-400">${fullData.entry_price ? formatPrice(fullData.entry_price) : 'N/A'}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500 text-xs">Age</div>
+                                <div class="font-semibold">${getFreshnessDisplay(alert.age_hours || 0)}</div>
                             </div>
                         </div>
                     </div>
@@ -702,29 +698,38 @@
             }).join('');
         }
 
-        function renderEvolutionCharts(alerts) {
-            // Sort by date ascending (oldest first for charts)
-            const sortedAlerts = [...alerts].sort((a, b) =>
-                new Date(a.created_at) - new Date(b.created_at)
-            );
+        function renderCharts(alerts) {
+            const sorted = [...alerts].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-            // Format labels to be more compact
-            const labels = sortedAlerts.map(a => {
+            const labels = sorted.map(a => {
                 const date = new Date(a.created_at);
-                return date.toLocaleDateString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
             });
 
-            const scores = sortedAlerts.map(a => a.score);
-            const liquidities = sortedAlerts.map(a => (a.liquidity || a.full_data?.liquidity || 0));
-            const volumes = sortedAlerts.map(a => (a.volume_24h || a.full_data?.volume_24h || 0));
+            // Liquidity Chart
+            const liqCtx = document.getElementById('liquidityChart');
+            if (liquidityChart) liquidityChart.destroy();
 
-            // Score Evolution Chart
-            const scoreCtx = document.getElementById('scoreEvolutionChart');
+            liquidityChart = new Chart(liqCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Liquidité',
+                        data: sorted.map(a => a.liquidity || 0),
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: getChartOptions('$')
+            });
+
+            // Score Chart
+            const scoreCtx = document.getElementById('scoreChart');
             if (scoreChart) scoreChart.destroy();
 
             scoreChart = new Chart(scoreCtx, {
@@ -733,313 +738,126 @@
                     labels: labels,
                     datasets: [{
                         label: 'Score',
-                        data: scores,
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        data: sorted.map(a => a.score || 0),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: scores.map(s => getScoreColorRGBA(s)),
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: 'rgba(255,255,255,0.9)',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 50,
-                            max: 100,
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: {
-                                color: 'rgba(255,255,255,0.8)',
-                                font: { size: 12 }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Score',
-                                color: 'rgba(255,255,255,0.9)',
-                                font: { size: 13, weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: 'rgba(255,255,255,0.8)',
-                                font: { size: 11 },
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
+                options: getChartOptions('')
+            });
+        }
+
+        function getChartOptions(prefix = '') {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 12,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            label: (context) => prefix + formatNumber(context.parsed.y)
                         }
                     }
-                }
-            });
-
-            // Liquidity & Volume Evolution Chart
-            const liquidityCtx = document.getElementById('liquidityEvolutionChart');
-            if (liquidityChart) liquidityChart.destroy();
-
-            liquidityChart = new Chart(liquidityCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Liquidité',
-                            data: liquidities,
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            fill: true,
-                            tension: 0.4,
-                            yAxisID: 'y',
-                            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            borderWidth: 3
-                        },
-                        {
-                            label: 'Volume 24h',
-                            data: volumes,
-                            borderColor: 'rgba(168, 85, 247, 1)',
-                            backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                            fill: true,
-                            tension: 0.4,
-                            yAxisID: 'y',
-                            pointBackgroundColor: 'rgba(168, 85, 247, 1)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            borderWidth: 3
-                        }
-                    ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: 'rgba(255,255,255,0.9)',
-                                font: { size: 14, weight: 'bold' },
-                                padding: 15,
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 },
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += '$' + formatNumber(context.parsed.y);
-                                    return label;
-                                }
-                            }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: {
+                            color: 'rgba(255,255,255,0.8)',
+                            callback: (value) => prefix + formatNumber(value)
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: {
-                                color: 'rgba(255,255,255,0.8)',
-                                font: { size: 12 },
-                                callback: function(value) {
-                                    return '$' + formatNumber(value);
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Montant (USD)',
-                                color: 'rgba(255,255,255,0.9)',
-                                font: { size: 13, weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: 'rgba(255,255,255,0.8)',
-                                font: { size: 11 },
-                                maxRotation: 45,
-                                minRotation: 45
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date',
-                                color: 'rgba(255,255,255,0.9)',
-                                font: { size: 13, weight: 'bold' }
-                            }
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: 'rgba(255,255,255,0.8)',
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
                 }
-            });
-        }
-
-        function getScoreColorRGBA(score) {
-            if (score >= 95) return 'rgba(168, 85, 247, 1)'; // purple
-            if (score >= 85) return 'rgba(59, 130, 246, 1)'; // blue
-            if (score >= 75) return 'rgba(34, 197, 94, 1)'; // green
-            if (score >= 60) return 'rgba(234, 179, 8, 1)'; // yellow
-            return 'rgba(239, 68, 68, 1)'; // red
-        }
-
-        function getTierBadgeClass(tier) {
-            const badges = {
-                'ULTRA_HIGH': 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
-                'HIGH': 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-                'MEDIUM': 'bg-green-500/20 text-green-400 border border-green-500/30',
-                'LOW': 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
             };
-            return badges[tier] || 'bg-gray-500/20 text-gray-400';
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+        // ===== ADD TO PORTFOLIO =====
+        async function addToPortfolio() {
+            if (!currentAlert) {
+                showMessage('Erreur: Données non chargées', 'error');
+                return;
+            }
 
-        function renderToken(data) {
-            // Store alert data globally
-            currentAlert = data;
-            currentAlertData = data;
+            const btn = document.getElementById('addToPortfolioBtn');
+            btn.disabled = true;
+            btn.textContent = 'Ajout en cours...';
 
-            // Hide loading, show content
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
+            try {
+                const fullData = currentAlert.full_data || {};
 
-            // Header
-            document.getElementById('tokenSymbol').textContent = currentAlert.token_symbol || 'N/A';
-            document.getElementById('tokenName').textContent = currentAlert.token_name || 'N/A';
-            document.getElementById('score').textContent = currentAlert.score || 0;
-            document.getElementById('score').className = `text-4xl font-bold ${getScoreColor(currentAlert.score || 0)}`;
-            document.getElementById('tier').textContent = currentAlert.tier || 'N/A';
+                const response = await fetch(`${API_URL}/portfolio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        alert_id: parseInt(alertId),
+                        pool_address: currentAlert.pool_address,
+                        network: currentAlert.network,
+                        token_symbol: currentAlert.token_symbol,
+                        token_name: currentAlert.token_name,
+                        entry_price: fullData.entry_price || currentAlert.price,
+                        tp1_price: fullData.tp1_price,
+                        tp2_price: fullData.tp2_price,
+                        tp3_price: fullData.tp3_price,
+                        stop_loss_price: fullData.stop_loss_price,
+                        notes: `Score: ${currentAlert.score} | Tier: ${currentAlert.tier}`
+                    })
+                });
 
-            // Get full data from alert_data JSON
-            const fullData = currentAlert.full_data || currentAlert || {};
+                const result = await response.json();
 
-            // Prix & Targets
-            document.getElementById('entry_price').textContent = fullData.entry_price ? `$${fullData.entry_price.toFixed(8)}` : 'N/A';
-            document.getElementById('stop_loss').textContent = fullData.stop_loss_price ? `$${fullData.stop_loss_price.toFixed(8)}` : 'N/A';
-            document.getElementById('tp1').textContent = fullData.tp1_price ? `$${fullData.tp1_price.toFixed(8)}` : 'N/A';
-            document.getElementById('tp2').textContent = fullData.tp2_price ? `$${fullData.tp2_price.toFixed(8)}` : 'N/A';
-            document.getElementById('tp3').textContent = fullData.tp3_price ? `$${fullData.tp3_price.toFixed(8)}` : 'N/A';
-
-            // Volume
-            document.getElementById('volume_24h').textContent = fullData.volume_24h ? `$${formatNumber(fullData.volume_24h)}` : 'N/A';
-            document.getElementById('volume_6h').textContent = fullData.volume_6h ? `$${formatNumber(fullData.volume_6h)}` : 'N/A';
-            document.getElementById('volume_1h').textContent = fullData.volume_1h ? `$${formatNumber(fullData.volume_1h)}` : 'N/A';
-            document.getElementById('accel_1h').textContent = fullData.volume_acceleration_1h_vs_6h ? `${fullData.volume_acceleration_1h_vs_6h.toFixed(2)}x` : 'N/A';
-            document.getElementById('accel_6h').textContent = fullData.volume_acceleration_6h_vs_24h ? `${fullData.volume_acceleration_6h_vs_24h.toFixed(2)}x` : 'N/A';
-
-            // Transactions
-            document.getElementById('buys').textContent = fullData.buys_24h || 'N/A';
-            document.getElementById('sells').textContent = fullData.sells_24h || 'N/A';
-            document.getElementById('buy_ratio').textContent = fullData.buy_ratio ? `${(fullData.buy_ratio * 100).toFixed(1)}%` : 'N/A';
-            document.getElementById('total_txns').textContent = fullData.total_txns || 'N/A';
-
-            // Scoring
-            document.getElementById('score_total').textContent = fullData.score || currentAlert.score || 'N/A';
-            document.getElementById('base_score').textContent = fullData.base_score || 'N/A';
-            document.getElementById('momentum_bonus').textContent = fullData.momentum_bonus ? `+${fullData.momentum_bonus}` : 'N/A';
-            document.getElementById('security_score').textContent = fullData.confidence_score ? `${fullData.confidence_score}/100` : 'N/A';
-
-            // Risques
-            const ageHours = fullData.age_hours || currentAlert.age_hours || 0;
-            document.getElementById('age').innerHTML = getFreshnessDisplay(ageHours);
-            document.getElementById('liquidity').textContent = (currentAlert.liquidity || fullData.liquidity) ? `$${formatNumber(currentAlert.liquidity || fullData.liquidity)}` : 'N/A';
-            document.getElementById('network').textContent = (fullData.network || currentAlert.network || '').toUpperCase();
-
-            // Pump Analysis
-            document.getElementById('velocite_pump').textContent = fullData.velocite_pump || 'N/A';
-            document.getElementById('type_pump').textContent = fullData.type_pump || 'N/A';
-            document.getElementById('tp_tracking').textContent = fullData.decision_tp_tracking || 'N/A';
-
-            // Alert Message
-            document.getElementById('alert_message').textContent = fullData.alert_message || 'Message non disponible';
-
-            // GeckoTerminal Chart
-            const network = (fullData.network || currentAlert.network || '').toLowerCase();
-            const poolAddress = fullData.token_address || currentAlert.pool_address;
-
-            if (network && poolAddress) {
-                const chartUrl = `https://www.geckoterminal.com/${network}/pools/${poolAddress}?embed=1&info=0&swaps=0`;
-                document.getElementById('chartContainer').innerHTML = `
-                    <iframe
-                        src="${chartUrl}"
-                        width="100%"
-                        height="500"
-                        frameborder="0"
-                        allow="clipboard-write"
-                        allowfullscreen
-                        style="border-radius: 12px;"
-                    ></iframe>
-                `;
-
-                // Link
-                document.getElementById('geckoLink').href = `https://www.geckoterminal.com/${network}/pools/${poolAddress}`;
-            } else {
-                document.getElementById('chartContainer').innerHTML = `
-                    <div class="text-center text-gray-400 py-12">Graphique non disponible (adresse manquante)</div>
-                `;
+                if (response.ok) {
+                    showMessage('Position ajoutée au portfolio!', 'success');
+                    btn.textContent = '✓ Ajouté';
+                    btn.className = 'px-6 py-3 bg-green-500/20 text-green-400 rounded-lg border border-green-500/30 font-semibold cursor-not-allowed';
+                } else {
+                    showMessage(`Erreur: ${result.error}`, 'error');
+                    btn.disabled = false;
+                    btn.textContent = '+ Ajouter au Portfolio';
+                }
+            } catch (error) {
+                showMessage('Erreur réseau', 'error');
+                btn.disabled = false;
+                btn.textContent = '+ Ajouter au Portfolio';
             }
         }
 
-        // Utility functions
+        function showMessage(message, type) {
+            const msgEl = document.getElementById('portfolioMessage');
+            msgEl.className = `mt-4 p-3 rounded-lg ${type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`;
+            msgEl.textContent = message;
+            msgEl.classList.remove('hidden');
+            setTimeout(() => msgEl.classList.add('hidden'), 5000);
+        }
+
+        // ===== UTILITIES =====
         function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            if (num >= 1_000_000) return (num / 1_000_000).toFixed(2) + 'M';
+            if (num >= 1_000) return (num / 1_000).toFixed(2) + 'K';
             return num.toFixed(0);
+        }
+
+        function formatPrice(price) {
+            if (!price) return 'N/A';
+            if (price >= 1) return '$' + price.toFixed(4);
+            if (price >= 0.01) return '$' + price.toFixed(6);
+            return '$' + price.toFixed(8);
         }
 
         function getFreshnessDisplay(ageHours) {
@@ -1048,23 +866,23 @@
 
             if (ageMinutes < 5) {
                 emoji = '🔴';
-                cssClass = 'freshness-fresh';
+                cssClass = 'badge-danger';
                 text = Math.floor(ageMinutes) + 'min';
             } else if (ageMinutes < 30) {
                 emoji = '🟡';
-                cssClass = 'freshness-recent';
+                cssClass = 'badge-warning';
                 text = Math.floor(ageMinutes) + 'min';
             } else if (ageHours < 6) {
                 emoji = '🟢';
-                cssClass = 'freshness-active';
+                cssClass = 'badge-success';
                 text = ageHours.toFixed(1) + 'h';
             } else {
                 emoji = '⚪';
-                cssClass = 'freshness-old';
+                cssClass = 'badge-info';
                 text = ageHours.toFixed(1) + 'h';
             }
 
-            return `<span class="${cssClass}">${emoji} ${text}</span>`;
+            return `<span class="badge ${cssClass}">${emoji} ${text}</span>`;
         }
 
         function getScoreColor(score) {
@@ -1075,93 +893,20 @@
             return 'text-red-400';
         }
 
-        // Global variable to store current alert data
-        let currentAlertData = null;
-
-        // Add to Portfolio function
-        async function addToPortfolio() {
-            if (!currentAlertData) {
-                showPortfolioMessage('Erreur: Données non chargées', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('addToPortfolioBtn');
-            btn.disabled = true;
-            btn.textContent = 'Ajout en cours...';
-
-            try {
-                const fullData = currentAlertData.full_data || {};
-
-                const portfolioData = {
-                    alert_id: parseInt(alertId),
-                    pool_address: currentAlertData.pool_address,
-                    network: currentAlertData.network,
-                    token_symbol: currentAlertData.token_symbol,
-                    token_name: currentAlertData.token_name,
-                    entry_price: fullData.entry_price || currentAlertData.price,
-                    tp1_price: fullData.tp1_price,
-                    tp2_price: fullData.tp2_price,
-                    tp3_price: fullData.tp3_price,
-                    stop_loss_price: fullData.stop_loss_price,
-                    notes: `Score: ${currentAlertData.score} | Tier: ${currentAlertData.tier}`
-                };
-
-                const response = await fetch(`${API_URL}/portfolio`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(portfolioData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    showPortfolioMessage('Position ajoutée au portfolio!', 'success');
-                    btn.textContent = '✓ Ajouté au Portfolio';
-                    btn.classList.remove('bg-purple-500/20', 'text-purple-400', 'border-purple-500/30');
-                    btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30');
-                } else {
-                    showPortfolioMessage(`Erreur: ${result.error}`, 'error');
-                    btn.disabled = false;
-                    btn.textContent = '+ Ajouter au Portfolio';
-                }
-
-            } catch (error) {
-                console.error('Error adding to portfolio:', error);
-                showPortfolioMessage('Erreur réseau', 'error');
-                btn.disabled = false;
-                btn.textContent = '+ Ajouter au Portfolio';
-            }
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
-        // Show portfolio message
-        function showPortfolioMessage(message, type) {
-            const msgEl = document.getElementById('portfolioMessage');
-            msgEl.className = `mt-4 p-3 rounded ${type === 'success' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`;
-            msgEl.textContent = message;
-            msgEl.classList.remove('hidden');
-
-            setTimeout(() => {
-                msgEl.classList.add('hidden');
-            }, 5000);
-        }
-
-        // ============================================================================
-        // NETWORK STRATEGIES - Règles par réseau
-        // ============================================================================
-
+        // ===== NETWORK STRATEGIES =====
         const NETWORK_STRATEGIES = {
             'eth': {
-                min_score: 90,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 5000000,
-                min_volume: 30000,
-                min_age: 1,
-                max_age: 48,
-                min_buy_ratio: 0.55,
-                bonus_score: 98,
                 rules: [
                     { name: 'Score', target: '≥ 90', check: (a) => a.score >= 90 },
                     { name: 'Liquidité', target: '$30K-$5M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 5000000 },
@@ -1172,406 +917,81 @@
                 ]
             },
             'solana': {
-                min_score: 95,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 2000000,
-                min_volume: 30000,
-                min_age: 1,
-                max_age: 48,
-                min_buy_ratio: 0.55,
-                bonus_score: 98,
                 rules: [
-                    { name: 'Score', target: '≥ 95 (STRICT!)', check: (a) => a.score >= 95 },
+                    { name: 'Score', target: '≥ 95', check: (a) => a.score >= 95 },
                     { name: 'Liquidité', target: '$30K-$2M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 2000000 },
                     { name: 'Volume 24h', target: '≥ $30K', check: (a) => a.volume_24h >= 30000 },
                     { name: 'Vélocité', target: '≥ 5x', check: (a) => (a.velocite_pump || 0) >= 5 },
-                    { name: 'Buy Ratio', target: '≥ 55%', check: (a) => (a.buy_ratio || 0) >= 0.55 },
                     { name: 'Age', target: '1-48h', check: (a) => a.age_hours >= 1 && a.age_hours <= 48 },
                     { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
                 ]
             },
             'bsc': {
-                min_score: 95,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 50000000,
-                min_volume: 50000,
-                min_age: 1,
-                max_age: 48,
-                min_buy_ratio: 0.6,
-                bonus_score: 98,
                 rules: [
                     { name: 'Score', target: '≥ 95', check: (a) => a.score >= 95 },
-                    { name: 'Tier', target: 'ULTRA_HIGH/HIGH', check: (a) => ['ULTRA_HIGH', 'HIGH'].includes(a.tier) },
                     { name: 'Liquidité', target: '$30K-$50M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 50000000 },
                     { name: 'Volume 24h', target: '≥ $50K', check: (a) => a.volume_24h >= 50000 },
                     { name: 'Vélocité', target: '≥ 5x', check: (a) => (a.velocite_pump || 0) >= 5 },
-                    { name: 'Buy Ratio', target: '≥ 60%', check: (a) => (a.buy_ratio || 0) >= 0.6 },
                     { name: 'Age', target: '1-48h', check: (a) => a.age_hours >= 1 && a.age_hours <= 48 },
                     { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
                 ]
             },
             'base': {
-                min_score: 90,
-                min_velocity: 7,
-                min_liq: 30000,
-                max_liq: 5000000,
-                min_volume: 30000,
-                min_age: 1,
-                max_age: 48,
-                bonus_score: 98,
                 rules: [
                     { name: 'Score', target: '≥ 90', check: (a) => a.score >= 90 },
                     { name: 'Liquidité', target: '$30K-$5M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 5000000 },
                     { name: 'Volume 24h', target: '≥ $30K', check: (a) => a.volume_24h >= 30000 },
-                    { name: 'Vélocité', target: '≥ 7x (STRICT)', check: (a) => (a.velocite_pump || 0) >= 7 },
+                    { name: 'Vélocité', target: '≥ 7x', check: (a) => (a.velocite_pump || 0) >= 7 },
                     { name: 'Age', target: '1-48h', check: (a) => a.age_hours >= 1 && a.age_hours <= 48 },
                     { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
                 ]
             },
             'arbitrum': {
-                min_score: 98,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 5000000,
-                min_volume: 30000,
-                min_age: 1,
-                max_age: 48,
-                bonus_score: 98,
                 rules: [
-                    { name: 'Score', target: '≥ 98 (TRÈS STRICT!)', check: (a) => a.score >= 98 },
+                    { name: 'Score', target: '≥ 98', check: (a) => a.score >= 98 },
                     { name: 'Liquidité', target: '$30K-$5M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 5000000 },
                     { name: 'Volume 24h', target: '≥ $30K', check: (a) => a.volume_24h >= 30000 },
                     { name: 'Vélocité', target: '≥ 5x', check: (a) => (a.velocite_pump || 0) >= 5 },
                     { name: 'Age', target: '1-48h', check: (a) => a.age_hours >= 1 && a.age_hours <= 48 },
                     { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
                 ]
-            },
-            'polygon_pos': {
-                min_score: 90,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 5000000,
-                min_volume: 30000,
-                bonus_score: 98,
-                rules: [
-                    { name: 'Score', target: '≥ 90', check: (a) => a.score >= 90 },
-                    { name: 'Liquidité', target: '$30K-$5M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 5000000 },
-                    { name: 'Volume 24h', target: '≥ $30K', check: (a) => a.volume_24h >= 30000 },
-                    { name: 'Vélocité', target: '≥ 5x', check: (a) => (a.velocite_pump || 0) >= 5 },
-                    { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
-                ]
-            },
-            'avax': {
-                min_score: 90,
-                min_velocity: 5,
-                min_liq: 30000,
-                max_liq: 5000000,
-                min_volume: 30000,
-                bonus_score: 98,
-                rules: [
-                    { name: 'Score', target: '≥ 90', check: (a) => a.score >= 90 },
-                    { name: 'Liquidité', target: '$30K-$5M', check: (a) => a.liquidity >= 30000 && a.liquidity <= 5000000 },
-                    { name: 'Volume 24h', target: '≥ $30K', check: (a) => a.volume_24h >= 30000 },
-                    { name: 'Vélocité', target: '≥ 5x', check: (a) => (a.velocite_pump || 0) >= 5 },
-                    { name: 'BONUS', target: 'Score 98-100', check: (a) => a.score >= 98, bonus: true }
-                ]
             }
         };
-
-        // ============================================================================
-        // STRATEGY INTEGRATION
-        // ============================================================================
-
-        function populateStrategyAnalysis(alert, previousAlerts = []) {
-            // Calculate auto score
-            const { score, breakdown } = calculateAutoScore(alert);
-
-            // Check optimal zone and checklist FIRST
-            const zoneCheck = checkOptimalZone(alert);
-            const checklist = generateChecklist(alert, zoneCheck);
-
-            // Get recommendation based on BOTH score AND checklist
-            const checklistRatio = checklist.passed / checklist.total;
-            const recommendation = getFinalRecommendation(score, checklistRatio, checklist.passed, checklist.total);
-
-            // Update Score & Recommendation
-            const scoreEl = document.getElementById('autoScore');
-            scoreEl.textContent = `${score}/100`;
-            scoreEl.className = 'score-badge ' + (score >= 85 ? 'excellent' : score >= 70 ? 'good' : score >= 55 ? 'medium' : 'low');
-
-            document.getElementById('recommendation').textContent = recommendation.action;
-            document.getElementById('positionRec').textContent = recommendation.position;
-            document.getElementById('confidence').textContent = recommendation.confidence;
-
-            // Style signal card based on score
-            const signalCard = document.getElementById('signalCard');
-            if (score >= 85) {
-                signalCard.classList.add('strong-buy');
-            } else if (score < 55) {
-                signalCard.classList.add('warning');
-            }
-
-            // Populate breakdown (collapsible)
-            const breakdownList = document.getElementById('breakdownList');
-            breakdownList.innerHTML = breakdown.map(item => `
-                <div class="breakdown-item ${item.highlight ? 'highlight' : ''}">
-                    <span>${item.label}</span>
-                    <span class="ml-auto font-bold text-purple-400">+${item.points}</span>
-                </div>
-            `).join('');
-
-            // Optimal Zone Detection (already calculated above)
-            const optimalZoneEl = document.getElementById('optimalZone');
-
-            if (zoneCheck && zoneCheck.isOptimal) {
-                optimalZoneEl.innerHTML = `
-                    <div class="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xl">🎯</span>
-                            <span class="font-bold text-green-400">${zoneCheck.name}</span>
-                        </div>
-                        <div class="text-xs text-gray-400 space-y-1">
-                            <div>• Performance: ${zoneCheck.performance}</div>
-                            <div>• Win rate: ${zoneCheck.winRate}</div>
-                            <div>• Gain moyen: ${zoneCheck.avgGain}</div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('patternsCard').classList.add('optimal');
-            } else if (zoneCheck) {
-                optimalZoneEl.innerHTML = `
-                    <div class="text-sm text-gray-400">
-                        <div class="mb-2">${zoneCheck.name} (${zoneCheck.passedCount}/${zoneCheck.totalCount} critères)</div>
-                        <div class="text-xs">Manque: ${zoneCheck.criteriaResults.filter(c => !c.passed).map(c => c.criterion).join(', ')}</div>
-                    </div>
-                `;
-            }
-
-            // Pattern Detection
-            const patternsList = document.getElementById('patternsList');
-            const patterns = [];
-
-            // Retracement pattern
-            if (previousAlerts.length >= 3) {
-                const retracement = detectRetracement(previousAlerts);
-                if (retracement && retracement.detected) {
-                    patterns.push(`
-                        <div class="pattern-badge detected">
-                            ⚡ Pattern Retracement (${retracement.retracePct}% → +${retracement.expectedGain}% attendu)
-                        </div>
-                    `);
-                }
-            }
-
-            // Multiple alerts pattern
-            if (previousAlerts.length >= 5) {
-                patterns.push(`
-                    <div class="pattern-badge detected">
-                        🔥 Alertes Multiples (×${previousAlerts.length})
-                    </div>
-                `);
-            }
-
-            patternsList.innerHTML = patterns.join('');
-
-            // Ultra-bullish signals
-            const bullishSignals = detectUltraBullishSignals(alert, previousAlerts.length);
-            if (bullishSignals.length >= 3) {
-                document.getElementById('bullishSignals').innerHTML = `
-                    <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
-                        <div class="font-bold text-purple-400 mb-2">🚀 Signaux Ultra-Bullish (${bullishSignals.length}/5)</div>
-                        <div class="text-xs text-gray-300 space-y-1">
-                            ${bullishSignals.map(s => `<div>• ${s}</div>`).join('')}
-                        </div>
-                        ${bullishSignals.length >= 5 ? '<div class="mt-2 text-xs font-bold text-purple-400">→ ALL-IN 10% capital recommandé</div>' : ''}
-                    </div>
-                `;
-            }
-
-            // Dynamic Targets
-            const targets = calculateDynamicTargets(alert, previousAlerts);
-
-            document.getElementById('dynamicEntry').textContent = formatPrice(targets.entry);
-            document.getElementById('dynamicSL').textContent = `${formatPrice(targets.stopLoss.price)} (${targets.stopLoss.percent}%)`;
-            document.getElementById('dynamicTP1').textContent = `${formatPrice(targets.tp1.price)} (+${targets.tp1.percent.toFixed(1)}%) → Exit ${targets.tp1.exitAmount}%`;
-            document.getElementById('dynamicTP2').textContent = `${formatPrice(targets.tp2.price)} (+${targets.tp2.percent.toFixed(1)}%) → Exit ${targets.tp2.exitAmount}%`;
-            document.getElementById('dynamicTP3').textContent = `${formatPrice(targets.tp3.price)} (+${targets.tp3.percent.toFixed(1)}%) → Exit ${targets.tp3.exitAmount}%`;
-            document.getElementById('dynamicTS').textContent = `${targets.trailStop.percent}% ${targets.trailStop.activation}`;
-
-            // Reasoning
-            document.getElementById('targetReasoning').innerHTML = targets.reasoning.map(r => `
-                <div class="text-xs">${r}</div>
-            `).join('');
-
-            document.getElementById('multiplierValue').textContent = `×${targets.multiplier}`;
-
-            const riskEl = document.getElementById('riskLevel');
-            riskEl.textContent = targets.riskLevel;
-            riskEl.className = `text-sm font-bold ${targets.riskLevel === 'LOW' ? 'text-green-400' : targets.riskLevel === 'HIGH' ? 'text-red-400' : 'text-yellow-400'}`;
-
-            // Update Checklist Title with Network Name
-            const network = (alert.network || '').toUpperCase();
-            document.getElementById('checklistNetworkTitle').textContent = `Stratégie ${network}`;
-
-            // Determine strategy stage based on checklist results
-            let stage, stageColor, stageIcon, stageBg;
-            if (checklist.passed === checklist.total) {
-                if (checklist.hasBonus) {
-                    stage = 'PRIORITÉ MAXIMALE - BONUS ACTIVÉ!';
-                    stageColor = 'text-purple-400';
-                    stageIcon = '🚀';
-                    stageBg = 'border-purple-500 bg-purple-900/30';
-                } else {
-                    stage = 'READY TO TRADE';
-                    stageColor = 'text-green-400';
-                    stageIcon = '✓';
-                    stageBg = 'border-green-500 bg-green-900/20';
-                }
-            } else if (checklist.passed >= checklist.total * 0.7) {
-                stage = 'CAUTION - VÉRIFIER CONDITIONS';
-                stageColor = 'text-yellow-400';
-                stageIcon = '⚠';
-                stageBg = 'border-yellow-500 bg-yellow-900/20';
-            } else {
-                stage = 'NE PAS TRADER';
-                stageColor = 'text-red-400';
-                stageIcon = '✗';
-                stageBg = 'border-red-500 bg-red-900/20';
-            }
-
-            // Display Strategy Status Banner
-            const statusBanner = document.getElementById('strategyStatusBanner');
-            statusBanner.innerHTML = `
-                <div class="p-4 rounded-lg border-2 ${stageBg}">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">${stageIcon}</span>
-                            <span class="font-bold text-lg ${stageColor}">${stage}</span>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-400">Progression</div>
-                            <div class="font-bold text-xl ${stageColor}">${checklist.passed}/${checklist.total}</div>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-700 rounded-full h-2">
-                        <div class="${stageColor.replace('text-', 'bg-')} h-2 rounded-full transition-all" style="width: ${(checklist.passed / checklist.total * 100).toFixed(0)}%"></div>
-                    </div>
-                </div>
-            `;
-
-            // Checklist (already calculated above)
-            const checklistEl = document.getElementById('checklistCriteria');
-
-            checklistEl.innerHTML = checklist.items.map(item => {
-                if (item.isBonus) {
-                    // Bonus rule styling
-                    const bonusBg = item.passed ? 'bg-purple-900/30 border-l-4 border-purple-500' : 'bg-gray-900/30 border-l-4 border-gray-600';
-                    const bonusIcon = item.passed ? '🚀' : '○';
-                    return `
-                        <div class="p-3 rounded-lg ${bonusBg} mb-2">
-                            <div class="flex items-center gap-3">
-                                <span class="text-2xl">${bonusIcon}</span>
-                                <div class="flex-1">
-                                    <div class="text-sm font-semibold flex items-center gap-2">
-                                        ${item.label}
-                                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">BONUS</span>
-                                    </div>
-                                    <div class="text-xs ${item.passed ? 'text-purple-400' : 'text-gray-500'} font-bold mt-1">${item.value}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Regular rule styling
-                    return `
-                        <div class="checklist-item ${item.passed ? 'passed' : 'failed'}">
-                            <span class="text-xl">${item.passed ? '✅' : '❌'}</span>
-                            <div class="flex-1">
-                                <div class="text-sm font-semibold">${item.label}</div>
-                                <div class="text-xs ${item.passed ? 'text-green-400' : 'text-red-400'} font-bold mt-1">${item.value}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }).join('');
-
-            document.getElementById('checklistScore').textContent = `${checklist.passed}/${checklist.total}`;
-            document.getElementById('checklistScore').className = `font-bold text-lg ${checklist.passed === checklist.total ? 'text-green-400' : checklist.passed >= checklist.total * 0.7 ? 'text-yellow-400' : 'text-red-400'}`;
-
-            // Result message
-            const resultEl = document.getElementById('checklistResult');
-            if (checklist.passed === checklist.total) {
-                resultEl.innerHTML = `
-                    <div class="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-bold">
-                        🎯 Tous les critères validés - GO TRADE!
-                    </div>
-                `;
-            } else if (checklist.passed >= checklist.total * 0.7) {
-                resultEl.innerHTML = `
-                    <div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm">
-                        ⚠️ Entry possible mais prudent
-                    </div>
-                `;
-            } else {
-                resultEl.innerHTML = `
-                    <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-                        🔴 Critères insuffisants - SKIP
-                    </div>
-                `;
-            }
-        }
 
         function generateChecklist(alert, zoneCheck) {
             const network = (alert.network || '').toLowerCase();
             const strategy = NETWORK_STRATEGIES[network] || NETWORK_STRATEGIES['eth'];
 
-            // Validate each rule from the network strategy
             const ruleResults = strategy.rules.map(rule => ({
                 ...rule,
                 passed: rule.check(alert)
             }));
 
-            // Separate critical rules from bonus rules
             const criticalRules = ruleResults.filter(r => !r.bonus);
             const bonusRules = ruleResults.filter(r => r.bonus);
 
             const items = [];
 
-            // Add critical rules to checklist
             for (const rule of criticalRules) {
                 let currentValue = '';
 
-                // Get current value for each metric
-                if (rule.name === 'Score') {
-                    currentValue = `${alert.score}/100`;
-                } else if (rule.name === 'Vélocité') {
-                    currentValue = `${(alert.velocite_pump || 0).toFixed(1)}x`;
-                } else if (rule.name === 'Liquidité') {
-                    currentValue = `$${formatNumber(alert.liquidity || 0)}`;
-                } else if (rule.name === 'Volume 24h') {
-                    currentValue = `$${formatNumber(alert.volume_24h || 0)}`;
-                } else if (rule.name === 'Age') {
+                if (rule.name === 'Score') currentValue = `${alert.score}/100`;
+                else if (rule.name === 'Vélocité') currentValue = `${(alert.velocite_pump || 0).toFixed(1)}x`;
+                else if (rule.name === 'Liquidité') currentValue = `$${formatNumber(alert.liquidity || 0)}`;
+                else if (rule.name === 'Volume 24h') currentValue = `$${formatNumber(alert.volume_24h || 0)}`;
+                else if (rule.name === 'Age') {
                     const ageH = alert.age_hours || 0;
                     currentValue = ageH < 1 ? `${Math.floor(ageH * 60)}min` : `${ageH.toFixed(1)}h`;
-                } else if (rule.name === 'Buy Ratio') {
-                    currentValue = `${((alert.buy_ratio || 0) * 100).toFixed(1)}%`;
-                } else if (rule.name === 'Tier') {
-                    currentValue = alert.tier || 'N/A';
-                } else {
-                    currentValue = 'N/A';
                 }
 
                 items.push({
                     label: `${rule.name}: ${rule.target}`,
-                    value: `Actuel: ${currentValue} ${rule.passed ? '✓ ATTEINTE' : '✗ NON ATTEINTE'}`,
+                    value: `Actuel: ${currentValue} ${rule.passed ? '✓' : '✗'}`,
                     passed: rule.passed,
                     isBonus: false
                 });
             }
 
-            // Add bonus rules
             for (const rule of bonusRules) {
                 items.push({
                     label: `${rule.name}: ${rule.target}`,
@@ -1581,49 +1001,36 @@
                 });
             }
 
-            const passed = criticalRules.filter(r => r.passed).length;
-            const total = criticalRules.length;
-            const hasBonus = bonusRules.length > 0 && bonusRules[0].passed;
-
-            return { items, passed, total, hasBonus };
+            return {
+                items,
+                passed: criticalRules.filter(r => r.passed).length,
+                total: criticalRules.length,
+                hasBonus: bonusRules.length > 0 && bonusRules[0].passed
+            };
         }
 
         function getFinalRecommendation(score, checklistRatio, checklistPassed, checklistTotal) {
-            // La checklist a la priorité finale
-            // Si checklist < 60% (moins de 3/5) → SKIP peu importe le score
-            // Si checklist 60-80% (3-4/5) → PRUDENT (sauf si score très élevé)
-            // Si checklist 100% (5/5) → Suivre le score
-
             if (checklistRatio < 0.6) {
-                // Moins de 60% des critères → SKIP
                 return {
                     action: '🔴 SKIP',
                     position: '0% capital',
                     confidence: 'Critères insuffisants'
                 };
             } else if (checklistRatio < 1.0) {
-                // 60-99% des critères → PRUDENT ou BUY selon score
                 if (score >= 85) {
                     return {
                         action: '🟡 BUY (Prudent)',
                         position: '3-5% capital',
                         confidence: `${Math.round(checklistRatio * 100)}% critères (${checklistPassed}/${checklistTotal})`
                     };
-                } else if (score >= 70) {
+                } else {
                     return {
                         action: '⚠️ PRUDENT',
                         position: '3% capital max',
                         confidence: `${Math.round(checklistRatio * 100)}% critères (${checklistPassed}/${checklistTotal})`
                     };
-                } else {
-                    return {
-                        action: '🔴 SKIP',
-                        position: '0% capital',
-                        confidence: 'Score + critères insuffisants'
-                    };
                 }
             } else {
-                // 100% des critères → Suivre le score
                 if (score >= 95) {
                     return {
                         action: '🟢 STRONG BUY',
@@ -1642,12 +1049,6 @@
                         position: '5% capital',
                         confidence: '70%+'
                     };
-                } else if (score >= 55) {
-                    return {
-                        action: '⚠️ HOLD',
-                        position: '3% capital',
-                        confidence: '55%+'
-                    };
                 } else {
                     return {
                         action: '🔴 SKIP',
@@ -1658,20 +1059,7 @@
             }
         }
 
-        function toggleBreakdown() {
-            const list = document.getElementById('breakdownList');
-            const icon = document.getElementById('breakdownIcon');
-
-            if (list.style.display === 'none') {
-                list.style.display = 'block';
-                icon.textContent = '▼';
-            } else {
-                list.style.display = 'none';
-                icon.textContent = '▶';
-            }
-        }
-
-        // Init
+        // ===== INIT =====
         document.addEventListener('DOMContentLoaded', loadToken);
     </script>
 </body>
