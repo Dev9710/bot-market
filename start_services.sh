@@ -23,9 +23,30 @@ monitor_scanner() {
     done
 }
 
+# Cron job - Price Tracker (toutes les heures)
+price_tracker_cron() {
+    while true; do
+        # Attendre 1 heure (3600 secondes)
+        sleep 3600
+
+        echo "[PRICE TRACKER] Démarrage du tracking des prix..."
+        python price_tracker_cron_railway.py
+
+        if [ $? -eq 0 ]; then
+            echo "[PRICE TRACKER] ✅ Tracking terminé avec succès"
+        else
+            echo "[PRICE TRACKER] ⚠️ Erreur lors du tracking (code: $?)"
+        fi
+    done
+}
+
 # Démarrer le scanner avec surveillance en arrière-plan
 echo "🔍 Démarrage du Scanner V3 avec surveillance auto-restart..."
 monitor_scanner &
+
+# Démarrer le price tracker cron job en arrière-plan
+echo "⏰ Démarrage du Price Tracker (cron toutes les heures)..."
+price_tracker_cron &
 
 # Attendre 5 secondes pour que le scanner démarre
 sleep 5
