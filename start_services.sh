@@ -5,10 +5,10 @@ echo "🔧 Création de la table alerts dans PostgreSQL..."
 python create_alerts_table_postgres.py
 echo ""
 
-# Exécuter la migration de la base de données (déjà fait si table créée ci-dessus)
-# echo "🔧 Vérification et migration de la base de données..."
-# python migrate_railway_db.py
-# echo ""
+# Migration SQLite - Ajouter les colonnes de tracking prix
+echo "🔧 Migration SQLite - Ajout colonnes de tracking..."
+python migrate_sqlite_db.py
+echo ""
 
 # Script de surveillance qui redémarre le scanner s'il crash
 monitor_scanner() {
