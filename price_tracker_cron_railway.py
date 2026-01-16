@@ -1,41 +1,37 @@
 """
-PRICE TRACKER - Script CRON pour tracker les prix apres alerte (VERSION RAILWAY)
+PRICE TRACKER - Script CRON pour tracker les prix apres alerte
 Execute toutes les heures pour mettre a jour price_1h/2h/4h/24h_after
 et calculer les resultats finaux (TP/SL atteints)
 
-VERSION: Railway (PostgreSQL)
+VERSION: SQLite (Railway + Local)
 USAGE:
-  - Via Railway cron: Configure dans railway.toml
+  - Via cron dans start_services.sh
   - Ou lancer manuellement: python price_tracker_cron_railway.py
 """
 
 import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import sqlite3
 import requests
 import time
 from datetime import datetime, timedelta
 
-# Detecter l'environnement (Railway ou local)
-DATABASE_URL = os.getenv('DATABASE_URL')
-if not DATABASE_URL:
-    print("[WARNING] DATABASE_URL non trouve - Mode local SQLite")
-    import sqlite3
-    DB_PATH = r"c:\Users\ludo_\Documents\projets\owner\bot-market\alerts_history.db"
-    USE_POSTGRES = False
+# Determiner le chemin de la base SQLite
+if os.path.exists('/data/alerts_history.db'):
+    # Railway: volume monté à /data/
+    DB_PATH = '/data/alerts_history.db'
+    print(f"[INFO] Mode Railway - SQLite: {DB_PATH}")
 else:
-    USE_POSTGRES = True
+    # Local development
+    DB_PATH = os.path.join(os.path.dirname(__file__), 'alerts_history.db')
+    print(f"[INFO] Mode Local - SQLite: {DB_PATH}")
 
 GECKOTERMINAL_API = "https://api.geckoterminal.com/api/v2"
 
 def get_db_connection():
-    """Retourne une connexion a la DB (PostgreSQL ou SQLite)"""
-    if USE_POSTGRES:
-        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
-    else:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        return conn
+    """Retourne une connexion SQLite"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def fetch_current_price(network, pool_address):
     """Fetch prix actuel via GeckoTerminal API"""
@@ -67,8 +63,8 @@ def fetch_current_price(network, pool_address):
 def get_alerts_to_track():
     """
     Recupere les alertes a tracker:
-    - Alertes non cloturees (is_closed = 0 ou NULL ou FALSE)
-    - Avec pool_address
+    - Alertes non cloturees
+    - Avec token_address (pool_address)
     - Creees dans les dernieres 48h
     """
     conn = get_db_connection()
@@ -80,53 +76,38 @@ def get_alerts_to_track():
     cursor = conn.cursor()
 
     # Debug: compter les alertes par condition
-    if USE_POSTGRES:
-        try:
-            cursor.execute("SELECT COUNT(*) as cnt FROM alerts")
-            row = cursor.fetchone()
-            total = row['cnt'] if isinstance(row, dict) else row[0]
-            print(f"      DEBUG: Total alertes = {total}")
+    try:
+        cursor.execute("SELECT COUNT(*) FROM alerts")
+        total = cursor.fetchone()[0]
+        print(f"      DEBUG: Total alertes = {total}")
 
-            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE created_at >= %s", [cutoff_date])
-            row = cursor.fetchone()
-            recent = row['cnt'] if isinstance(row, dict) else row[0]
-            print(f"      DEBUG: Alertes recentes (48h) = {recent}")
+        cursor.execute("SELECT COUNT(*) FROM alerts WHERE timestamp >= ?", [cutoff_date])
+        recent = cursor.fetchone()[0]
+        print(f"      DEBUG: Alertes recentes (48h) = {recent}")
 
-            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE pool_address IS NOT NULL AND pool_address != ''")
-            row = cursor.fetchone()
-            with_pool = row['cnt'] if isinstance(row, dict) else row[0]
-            print(f"      DEBUG: Alertes avec pool_address = {with_pool}")
+        cursor.execute("SELECT COUNT(*) FROM alerts WHERE token_address IS NOT NULL AND token_address != ''")
+        with_pool = cursor.fetchone()[0]
+        print(f"      DEBUG: Alertes avec token_address = {with_pool}")
 
-            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE is_closed = true")
-            row = cursor.fetchone()
-            closed = row['cnt'] if isinstance(row, dict) else row[0]
-            print(f"      DEBUG: Alertes fermees (is_closed=true) = {closed}")
-        except Exception as e:
-            print(f"      DEBUG ERROR: {e}")
+        cursor.execute("SELECT COUNT(*) FROM alerts WHERE is_closed = 1")
+        closed = cursor.fetchone()[0]
+        print(f"      DEBUG: Alertes fermees = {closed}")
+    except Exception as e:
+        print(f"      DEBUG ERROR: {e}")
 
-    # Requete principale - SANS le filtre is_closed pour debug
+    # Requete principale - Alertes des dernieres 48h non fermees
     cursor.execute("""
         SELECT
-            id, network, pool_address, created_at,
+            id, network, token_address as pool_address, timestamp as created_at,
             entry_price, tp1_price, tp2_price, tp3_price, stop_loss_price,
             price_1h_after, price_2h_after, price_4h_after, price_24h_after,
             price_max_reached, price_min_reached,
             highest_tp_reached, sl_hit, is_closed
         FROM alerts
-        WHERE pool_address IS NOT NULL
-          AND pool_address != ''
-          AND created_at >= %s
-    """ if USE_POSTGRES else """
-        SELECT
-            id, network, pool_address, created_at,
-            entry_price, tp1_price, tp2_price, tp3_price, stop_loss_price,
-            price_1h_after, price_2h_after, price_4h_after, price_24h_after,
-            price_max_reached, price_min_reached,
-            highest_tp_reached, sl_hit, is_closed
-        FROM alerts
-        WHERE pool_address IS NOT NULL
-          AND pool_address != ''
-          AND created_at >= ?
+        WHERE token_address IS NOT NULL
+          AND token_address != ''
+          AND timestamp >= ?
+          AND (is_closed IS NULL OR is_closed = 0)
     """, [cutoff_date])
 
     alerts = [dict(row) for row in cursor.fetchall()]
@@ -137,11 +118,15 @@ def get_alerts_to_track():
 def calculate_time_elapsed(created_at):
     """Calcule le temps ecoule depuis la creation en heures"""
     try:
-        alert_time = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-        now = datetime.now(alert_time.tzinfo) if alert_time.tzinfo else datetime.now()
-        elapsed = (now - alert_time).total_seconds() / 3600  # heures
+        if isinstance(created_at, str):
+            alert_time = datetime.fromisoformat(created_at.replace('Z', '+00:00').replace(' ', 'T'))
+        else:
+            alert_time = created_at
+        now = datetime.now()
+        elapsed = (now - alert_time.replace(tzinfo=None)).total_seconds() / 3600
         return elapsed
-    except:
+    except Exception as e:
+        print(f"      DEBUG: Error parsing date {created_at}: {e}")
         return 0
 
 def update_price_tracking(alert_id, hours_elapsed, current_price, alert):
@@ -169,20 +154,12 @@ def update_price_tracking(alert_id, hours_elapsed, current_price, alert):
 
     # Construire la requete SQL
     if updates:
-        if USE_POSTGRES:
-            set_clause = ', '.join([f"{k} = %s" for k in updates.keys()])
-            values = list(updates.values()) + [alert_id]
-            cursor = conn.cursor()
-            cursor.execute(f"UPDATE alerts SET {set_clause} WHERE id = %s", values)
-        else:
-            set_clause = ', '.join([f"{k} = ?" for k in updates.keys()])
-            values = list(updates.values()) + [alert_id]
-            conn.execute(f"UPDATE alerts SET {set_clause} WHERE id = ?", values)
-
+        set_clause = ', '.join([f"{k} = ?" for k in updates.keys()])
+        values = list(updates.values()) + [alert_id]
+        conn.execute(f"UPDATE alerts SET {set_clause} WHERE id = ?", values)
         conn.commit()
 
     conn.close()
-
     return updates
 
 def check_tp_sl_hit(alert, current_price):
@@ -193,107 +170,70 @@ def check_tp_sl_hit(alert, current_price):
     tp3 = alert['tp3_price']
     sl = alert['stop_loss_price']
 
+    if not entry or entry == 0:
+        return 'ONGOING'
+
     price_max = alert['price_max_reached'] or current_price
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # Verifier SL
-    if current_price <= sl and alert['sl_hit'] != 1:
+    if sl and current_price <= sl and alert['sl_hit'] != 1:
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
-        if USE_POSTGRES:
-            cursor.execute("""
-                UPDATE alerts
-                SET sl_hit = 1,
-                    time_to_sl = %s,
-                    final_outcome = 'LOSS_SL',
-                    final_gain_percent = %s,
-                    is_closed = 1,
-                    closed_at = %s
-                WHERE id = %s
-            """, [hours_elapsed, ((current_price - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
-        else:
-            cursor.execute("""
-                UPDATE alerts
-                SET sl_hit = 1,
-                    time_to_sl = ?,
-                    final_outcome = 'LOSS_SL',
-                    final_gain_percent = ?,
-                    is_closed = 1,
-                    closed_at = ?
-                WHERE id = ?
-            """, [hours_elapsed, ((current_price - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
+        cursor.execute("""
+            UPDATE alerts
+            SET sl_hit = 1,
+                time_to_sl = ?,
+                final_outcome = 'LOSS_SL',
+                final_gain_percent = ?,
+                is_closed = 1,
+                closed_at = ?
+            WHERE id = ?
+        """, [hours_elapsed, ((current_price - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
         conn.commit()
         conn.close()
         return 'SL'
 
     # Verifier TP3
-    if price_max >= tp3 and alert['highest_tp_reached'] != 'TP3':
+    if tp3 and price_max >= tp3 and alert['highest_tp_reached'] != 'TP3':
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
-        if USE_POSTGRES:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP3',
-                    time_to_tp3 = %s,
-                    final_outcome = 'WIN_TP3',
-                    final_gain_percent = %s,
-                    is_closed = 1,
-                    closed_at = %s
-                WHERE id = %s
-            """, [hours_elapsed, ((tp3 - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
-        else:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP3',
-                    time_to_tp3 = ?,
-                    final_outcome = 'WIN_TP3',
-                    final_gain_percent = ?,
-                    is_closed = 1,
-                    closed_at = ?
-                WHERE id = ?
-            """, [hours_elapsed, ((tp3 - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
+        cursor.execute("""
+            UPDATE alerts
+            SET highest_tp_reached = 'TP3',
+                time_to_tp3 = ?,
+                final_outcome = 'WIN_TP3',
+                final_gain_percent = ?,
+                is_closed = 1,
+                closed_at = ?
+            WHERE id = ?
+        """, [hours_elapsed, ((tp3 - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
         conn.commit()
         conn.close()
         return 'TP3'
 
     # Verifier TP2
-    elif price_max >= tp2 and alert['highest_tp_reached'] not in ['TP2', 'TP3']:
+    if tp2 and price_max >= tp2 and alert['highest_tp_reached'] not in ['TP2', 'TP3']:
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
-        if USE_POSTGRES:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP2',
-                    time_to_tp2 = %s
-                WHERE id = %s
-            """, [hours_elapsed, alert['id']])
-        else:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP2',
-                    time_to_tp2 = ?
-                WHERE id = ?
-            """, [hours_elapsed, alert['id']])
+        cursor.execute("""
+            UPDATE alerts
+            SET highest_tp_reached = 'TP2',
+                time_to_tp2 = ?
+            WHERE id = ?
+        """, [hours_elapsed, alert['id']])
         conn.commit()
         conn.close()
         return 'TP2'
 
     # Verifier TP1
-    elif price_max >= tp1 and alert['highest_tp_reached'] not in ['TP1', 'TP2', 'TP3']:
+    if tp1 and price_max >= tp1 and alert['highest_tp_reached'] not in ['TP1', 'TP2', 'TP3']:
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
-        if USE_POSTGRES:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP1',
-                    time_to_tp1 = %s
-                WHERE id = %s
-            """, [hours_elapsed, alert['id']])
-        else:
-            cursor.execute("""
-                UPDATE alerts
-                SET highest_tp_reached = 'TP1',
-                    time_to_tp1 = ?
-                WHERE id = ?
-            """, [hours_elapsed, alert['id']])
+        cursor.execute("""
+            UPDATE alerts
+            SET highest_tp_reached = 'TP1',
+                time_to_tp1 = ?
+            WHERE id = ?
+        """, [hours_elapsed, alert['id']])
         conn.commit()
         conn.close()
         return 'TP1'
@@ -308,50 +248,27 @@ def close_old_alerts():
     cutoff_date = (datetime.now() - timedelta(hours=48)).strftime('%Y-%m-%d %H:%M:%S')
 
     cursor = conn.cursor()
-    if USE_POSTGRES:
-        cursor.execute("""
-            UPDATE alerts
-            SET is_closed = 1,
-                closed_at = %s,
-                final_outcome = CASE
-                    WHEN highest_tp_reached = 'TP3' THEN 'WIN_TP3'
-                    WHEN highest_tp_reached = 'TP2' THEN 'WIN_TP2'
-                    WHEN highest_tp_reached = 'TP1' THEN 'WIN_TP1'
-                    WHEN sl_hit = 1 THEN 'LOSS_SL'
-                    ELSE 'TIMEOUT'
-                END,
-                final_gain_percent = CASE
-                    WHEN highest_tp_reached = 'TP3' THEN tp3_percent
-                    WHEN highest_tp_reached = 'TP2' THEN tp2_percent
-                    WHEN highest_tp_reached = 'TP1' THEN tp1_percent
-                    WHEN sl_hit = 1 THEN stop_loss_percent
-                    ELSE ((price_24h_after - entry_price) / entry_price * 100)
-                END
-            WHERE created_at < %s
-              AND (is_closed IS NULL OR is_closed = 0)
-        """, [datetime.now().isoformat(), cutoff_date])
-    else:
-        cursor.execute("""
-            UPDATE alerts
-            SET is_closed = 1,
-                closed_at = ?,
-                final_outcome = CASE
-                    WHEN highest_tp_reached = 'TP3' THEN 'WIN_TP3'
-                    WHEN highest_tp_reached = 'TP2' THEN 'WIN_TP2'
-                    WHEN highest_tp_reached = 'TP1' THEN 'WIN_TP1'
-                    WHEN sl_hit = 1 THEN 'LOSS_SL'
-                    ELSE 'TIMEOUT'
-                END,
-                final_gain_percent = CASE
-                    WHEN highest_tp_reached = 'TP3' THEN tp3_percent
-                    WHEN highest_tp_reached = 'TP2' THEN tp2_percent
-                    WHEN highest_tp_reached = 'TP1' THEN tp1_percent
-                    WHEN sl_hit = 1 THEN stop_loss_percent
-                    ELSE ((price_24h_after - entry_price) / entry_price * 100)
-                END
-            WHERE created_at < ?
-              AND (is_closed IS NULL OR is_closed = 0)
-        """, [datetime.now().isoformat(), cutoff_date])
+    cursor.execute("""
+        UPDATE alerts
+        SET is_closed = 1,
+            closed_at = ?,
+            final_outcome = CASE
+                WHEN highest_tp_reached = 'TP3' THEN 'WIN_TP3'
+                WHEN highest_tp_reached = 'TP2' THEN 'WIN_TP2'
+                WHEN highest_tp_reached = 'TP1' THEN 'WIN_TP1'
+                WHEN sl_hit = 1 THEN 'LOSS_SL'
+                ELSE 'TIMEOUT'
+            END,
+            final_gain_percent = CASE
+                WHEN highest_tp_reached = 'TP3' THEN tp3_percent
+                WHEN highest_tp_reached = 'TP2' THEN tp2_percent
+                WHEN highest_tp_reached = 'TP1' THEN tp1_percent
+                WHEN sl_hit = 1 THEN stop_loss_percent
+                ELSE 0
+            END
+        WHERE timestamp < ?
+          AND (is_closed IS NULL OR is_closed = 0)
+    """, [datetime.now().isoformat(), cutoff_date])
 
     updated = cursor.rowcount
     conn.commit()
@@ -362,7 +279,7 @@ def close_old_alerts():
 if __name__ == '__main__':
     print("=" * 80)
     print(f"PRICE TRACKER - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Environment: {'PostgreSQL (Railway)' if USE_POSTGRES else 'SQLite (Local)'}")
+    print(f"Database: {DB_PATH}")
     print("=" * 80)
     print()
 
