@@ -81,21 +81,28 @@ def get_alerts_to_track():
 
     # Debug: compter les alertes par condition
     if USE_POSTGRES:
-        cursor.execute("SELECT COUNT(*) FROM alerts")
-        total = cursor.fetchone()[0] if isinstance(cursor.fetchone(), tuple) else cursor.fetchone()['count']
-        print(f"      DEBUG: Total alertes = {total}")
+        try:
+            cursor.execute("SELECT COUNT(*) as cnt FROM alerts")
+            row = cursor.fetchone()
+            total = row['cnt'] if isinstance(row, dict) else row[0]
+            print(f"      DEBUG: Total alertes = {total}")
 
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE created_at >= %s", [cutoff_date])
-        recent = cursor.fetchone()[0] if isinstance(cursor.fetchone(), tuple) else cursor.fetchone()['count']
-        print(f"      DEBUG: Alertes recentes (48h) = {recent}")
+            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE created_at >= %s", [cutoff_date])
+            row = cursor.fetchone()
+            recent = row['cnt'] if isinstance(row, dict) else row[0]
+            print(f"      DEBUG: Alertes recentes (48h) = {recent}")
 
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE pool_address IS NOT NULL AND pool_address != ''")
-        with_pool = cursor.fetchone()[0] if isinstance(cursor.fetchone(), tuple) else cursor.fetchone()['count']
-        print(f"      DEBUG: Alertes avec pool_address = {with_pool}")
+            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE pool_address IS NOT NULL AND pool_address != ''")
+            row = cursor.fetchone()
+            with_pool = row['cnt'] if isinstance(row, dict) else row[0]
+            print(f"      DEBUG: Alertes avec pool_address = {with_pool}")
 
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE is_closed = true")
-        closed = cursor.fetchone()[0] if isinstance(cursor.fetchone(), tuple) else cursor.fetchone()['count']
-        print(f"      DEBUG: Alertes fermees (is_closed=true) = {closed}")
+            cursor.execute("SELECT COUNT(*) as cnt FROM alerts WHERE is_closed = true")
+            row = cursor.fetchone()
+            closed = row['cnt'] if isinstance(row, dict) else row[0]
+            print(f"      DEBUG: Alertes fermees (is_closed=true) = {closed}")
+        except Exception as e:
+            print(f"      DEBUG ERROR: {e}")
 
     # Requete principale - SANS le filtre is_closed pour debug
     cursor.execute("""
