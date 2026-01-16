@@ -53,14 +53,33 @@ price_tracker_cron() {
 # Démarrer le scanner avec surveillance en arrière-plan
 echo "🔍 Démarrage du Scanner V3 avec surveillance auto-restart..."
 monitor_scanner &
+SCANNER_PID=$!
+echo "Scanner PID: $SCANNER_PID"
 
 # Démarrer le price tracker cron job en arrière-plan
 echo "⏰ Démarrage du Price Tracker (cron toutes les heures)..."
 price_tracker_cron &
+TRACKER_PID=$!
+echo "Price Tracker PID: $TRACKER_PID"
 
-# Attendre 5 secondes pour que le scanner démarre
+# Attendre 5 secondes pour que les processus démarrent
 sleep 5
 
+# Vérifier que les processus sont bien lancés
+echo "Vérification des processus..."
+if kill -0 $SCANNER_PID 2>/dev/null; then
+    echo "✅ Scanner actif (PID: $SCANNER_PID)"
+else
+    echo "❌ Scanner non démarré!"
+fi
+
+if kill -0 $TRACKER_PID 2>/dev/null; then
+    echo "✅ Price Tracker actif (PID: $TRACKER_PID)"
+else
+    echo "❌ Price Tracker non démarré!"
+fi
+
 # Démarrer Gunicorn en premier plan (bloque le script)
+# NOTE: Les processus background continuent de tourner car ils sont des enfants du shell
 echo "📊 Démarrage de l'API Dashboard avec Gunicorn..."
-exec gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level debug wsgi:app
+gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level debug wsgi:app
