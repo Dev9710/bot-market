@@ -401,6 +401,151 @@ def get_recent_alerts():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/tracking-stats', methods=['GET'])
+def get_tracking_stats():
+    """
+    Statistiques du price tracking.
+    Montre les TP/SL atteints, alertes cloturees, etc.
+    """
+    try:
+        days = request.args.get('days', type=int, default=7)
+        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+
+        conn = get_db_connection()
+
+        stats = {
+            'period_days': days,
+            'total_alerts': 0,
+            'tracking_coverage': {
+                'price_1h_after': 0,
+                'price_2h_after': 0,
+                'price_4h_after': 0,
+                'price_24h_after': 0,
+                'price_max_reached': 0,
+            },
+            'outcomes': {
+                'WIN_TP1': 0,
+                'WIN_TP2': 0,
+                'WIN_TP3': 0,
+                'LOSS_SL': 0,
+                'TIMEOUT': 0,
+                'ONGOING': 0,
+            },
+            'tp_distribution': {
+                'TP1': 0,
+                'TP2': 0,
+                'TP3': 0,
+                'NONE': 0,
+            },
+            'closed_alerts': 0,
+            'open_alerts': 0,
+            'sl_hit_count': 0,
+            'win_rate': 0,
+        }
+
+        # Total alerts in period
+        cursor = conn.execute("""
+            SELECT COUNT(*) FROM alerts WHERE created_at >= ?
+        """, [cutoff_date])
+        stats['total_alerts'] = cursor.fetchone()[0]
+
+        if stats['total_alerts'] == 0:
+            conn.close()
+            return jsonify(stats)
+
+        # Tracking coverage - count non-null values for each tracking column
+        tracking_columns = ['price_1h_after', 'price_2h_after', 'price_4h_after',
+                           'price_24h_after', 'price_max_reached']
+
+        for col in tracking_columns:
+            try:
+                cursor = conn.execute(f"""
+                    SELECT COUNT(*) FROM alerts
+                    WHERE created_at >= ? AND {col} IS NOT NULL
+                """, [cutoff_date])
+                stats['tracking_coverage'][col] = cursor.fetchone()[0]
+            except Exception:
+                stats['tracking_coverage'][col] = 0
+
+        # Outcomes distribution
+        try:
+            cursor = conn.execute("""
+                SELECT final_outcome, COUNT(*) as count
+                FROM alerts
+                WHERE created_at >= ? AND final_outcome IS NOT NULL
+                GROUP BY final_outcome
+            """, [cutoff_date])
+            for row in cursor.fetchall():
+                if row[0] in stats['outcomes']:
+                    stats['outcomes'][row[0]] = row[1]
+        except Exception:
+            pass
+
+        # Count ongoing (no final_outcome)
+        try:
+            cursor = conn.execute("""
+                SELECT COUNT(*) FROM alerts
+                WHERE created_at >= ? AND (final_outcome IS NULL OR final_outcome = '')
+            """, [cutoff_date])
+            stats['outcomes']['ONGOING'] = cursor.fetchone()[0]
+        except Exception:
+            pass
+
+        # TP distribution (highest_tp_reached)
+        try:
+            cursor = conn.execute("""
+                SELECT highest_tp_reached, COUNT(*) as count
+                FROM alerts
+                WHERE created_at >= ? AND highest_tp_reached IS NOT NULL
+                GROUP BY highest_tp_reached
+            """, [cutoff_date])
+            for row in cursor.fetchall():
+                if row[0] in stats['tp_distribution']:
+                    stats['tp_distribution'][row[0]] = row[1]
+        except Exception:
+            pass
+
+        # Closed vs Open alerts
+        try:
+            cursor = conn.execute("""
+                SELECT COUNT(*) FROM alerts
+                WHERE created_at >= ? AND is_closed = 1
+            """, [cutoff_date])
+            stats['closed_alerts'] = cursor.fetchone()[0]
+            stats['open_alerts'] = stats['total_alerts'] - stats['closed_alerts']
+        except Exception:
+            stats['open_alerts'] = stats['total_alerts']
+
+        # SL hit count
+        try:
+            cursor = conn.execute("""
+                SELECT COUNT(*) FROM alerts
+                WHERE created_at >= ? AND sl_hit = 1
+            """, [cutoff_date])
+            stats['sl_hit_count'] = cursor.fetchone()[0]
+        except Exception:
+            pass
+
+        # Calculate win rate
+        wins = stats['outcomes']['WIN_TP1'] + stats['outcomes']['WIN_TP2'] + stats['outcomes']['WIN_TP3']
+        losses = stats['outcomes']['LOSS_SL']
+        total_closed = wins + losses + stats['outcomes']['TIMEOUT']
+
+        if total_closed > 0:
+            stats['win_rate'] = round((wins / total_closed) * 100, 2)
+
+        # Add percentage for tracking coverage
+        for col in tracking_columns:
+            pct = round((stats['tracking_coverage'][col] / stats['total_alerts']) * 100, 1)
+            stats['tracking_coverage'][f'{col}_pct'] = pct
+
+        conn.close()
+
+        return jsonify(stats)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Vérifier que la DB existe
     if not os.path.exists(DB_PATH):
@@ -421,6 +566,7 @@ if __name__ == '__main__':
     print("  GET /api/networks")
     print("  GET /api/alerts/:id")
     print("  GET /api/recent")
+    print("  GET /api/tracking-stats")
 
     # Port from environment variable (Railway) or default 5000
     port = int(os.environ.get('PORT', 5000))
