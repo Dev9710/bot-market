@@ -25,18 +25,28 @@ monitor_scanner() {
 
 # Cron job - Price Tracker (toutes les heures)
 price_tracker_cron() {
+    echo "[PRICE TRACKER] Process demarré - PID: $$"
+
+    # Premier run après 5 minutes (pour laisser le scanner démarrer)
+    echo "[PRICE TRACKER] Premier run dans 5 minutes..."
+    sleep 300
+
     while true; do
-        # Attendre 1 heure (3600 secondes)
-        sleep 3600
+        echo "[PRICE TRACKER] ======================================"
+        echo "[PRICE TRACKER] Démarrage du tracking - $(date)"
+        echo "[PRICE TRACKER] ======================================"
 
-        echo "[PRICE TRACKER] Démarrage du tracking des prix..."
         python price_tracker_cron_railway.py
+        EXIT_CODE=$?
 
-        if [ $? -eq 0 ]; then
-            echo "[PRICE TRACKER] ✅ Tracking terminé avec succès"
+        if [ $EXIT_CODE -eq 0 ]; then
+            echo "[PRICE TRACKER] Tracking terminé avec succès"
         else
-            echo "[PRICE TRACKER] ⚠️ Erreur lors du tracking (code: $?)"
+            echo "[PRICE TRACKER] ERREUR lors du tracking (code: $EXIT_CODE)"
         fi
+
+        echo "[PRICE TRACKER] Prochain run dans 1 heure..."
+        sleep 3600
     done
 }
 
