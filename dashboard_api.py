@@ -82,6 +82,20 @@ def parse_alert_data(alert_row):
         'volume_acceleration_6h_vs_24h': alert_row.get('volume_acceleration_6h_vs_24h', 0),
         'timestamp': alert_row.get('timestamp', ''),
         'created_at': alert_row.get('created_at', ''),
+        # Price tracking fields
+        'price_1h_after': alert_row.get('price_1h_after'),
+        'price_2h_after': alert_row.get('price_2h_after'),
+        'price_4h_after': alert_row.get('price_4h_after'),
+        'price_24h_after': alert_row.get('price_24h_after'),
+        'price_max_reached': alert_row.get('price_max_reached'),
+        'price_min_reached': alert_row.get('price_min_reached'),
+        # TP/SL tracking
+        'highest_tp_reached': alert_row.get('highest_tp_reached'),
+        'sl_hit': alert_row.get('sl_hit'),
+        'is_closed': alert_row.get('is_closed'),
+        'final_outcome': alert_row.get('final_outcome'),
+        'final_gain_percent': alert_row.get('final_gain_percent'),
+        'closed_at': alert_row.get('closed_at'),
     }
 
 @app.route('/')
