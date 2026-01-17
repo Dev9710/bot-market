@@ -45,8 +45,8 @@ price_tracker_cron() {
             echo "[PRICE TRACKER] ERREUR lors du tracking (code: $EXIT_CODE)"
         fi
 
-        echo "[PRICE TRACKER] Prochain run dans 1 heure..."
-        sleep 3600
+        echo "[PRICE TRACKER] Prochain run dans 30 minutes..."
+        sleep 1800
     done
 }
 

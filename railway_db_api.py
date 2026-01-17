@@ -110,6 +110,16 @@ def serve_compare():
     except Exception as e:
         return f"Compare page not found: {str(e)}", 404
 
+@app.route('/glossary.html')
+@app.route('/glossary')
+@app.route('/glossaire')
+def glossary():
+    """Serve the glossary page."""
+    try:
+        return send_file('glossary.html')
+    except Exception as e:
+        return f"Glossary page not found: {str(e)}", 404
+
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check."""
