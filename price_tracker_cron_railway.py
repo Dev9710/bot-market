@@ -62,40 +62,32 @@ def fetch_current_price(network, pool_address):
 
 def get_alerts_to_track():
     """
-    Recupere les alertes a tracker:
-    - Alertes non cloturees
+    Recupere TOUTES les alertes a tracker:
     - Avec token_address (pool_address)
     - Creees dans les dernieres 48h
+    - INCLUT les alertes fermees pour continuer a tracker price_max/min
     """
     conn = get_db_connection()
 
     # Date limite: 48h
     cutoff_date = (datetime.now() - timedelta(hours=48)).strftime('%Y-%m-%d %H:%M:%S')
-    print(f"      DEBUG: cutoff_date = {cutoff_date}")
 
     cursor = conn.cursor()
 
-    # Debug: compter les alertes par condition
+    # Debug: compter les alertes
     try:
-        cursor.execute("SELECT COUNT(*) FROM alerts")
-        total = cursor.fetchone()[0]
-        print(f"      DEBUG: Total alertes = {total}")
-
         cursor.execute("SELECT COUNT(*) FROM alerts WHERE timestamp >= ?", [cutoff_date])
         recent = cursor.fetchone()[0]
-        print(f"      DEBUG: Alertes recentes (48h) = {recent}")
+        print(f"      DEBUG: Alertes 48h = {recent}")
 
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE token_address IS NOT NULL AND token_address != ''")
-        with_pool = cursor.fetchone()[0]
-        print(f"      DEBUG: Alertes avec token_address = {with_pool}")
-
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE is_closed = 1")
-        closed = cursor.fetchone()[0]
-        print(f"      DEBUG: Alertes fermees = {closed}")
+        cursor.execute("""SELECT COUNT(*) FROM alerts
+                         WHERE timestamp >= ? AND (is_closed IS NULL OR is_closed = 0)""", [cutoff_date])
+        open_alerts = cursor.fetchone()[0]
+        print(f"      DEBUG: Dont ouvertes = {open_alerts}")
     except Exception as e:
         print(f"      DEBUG ERROR: {e}")
 
-    # Requete principale - Alertes des dernieres 48h non fermees
+    # Requete principale - TOUTES les alertes des dernieres 48h (fermees ou non)
     cursor.execute("""
         SELECT
             id, network, token_address as pool_address, timestamp as created_at,
@@ -107,7 +99,7 @@ def get_alerts_to_track():
         WHERE token_address IS NOT NULL
           AND token_address != ''
           AND timestamp >= ?
-          AND (is_closed IS NULL OR is_closed = 0)
+        ORDER BY id DESC
     """, [cutoff_date])
 
     alerts = [dict(row) for row in cursor.fetchall()]
@@ -163,7 +155,11 @@ def update_price_tracking(alert_id, hours_elapsed, current_price, alert):
     return updates
 
 def check_tp_sl_hit(alert, current_price):
-    """Verifie si TP ou SL atteint et met a jour"""
+    """Verifie si TP ou SL atteint et met a jour (seulement si non ferme)"""
+    # Si deja ferme, ne pas re-evaluer TP/SL
+    if alert.get('is_closed') == 1:
+        return 'ALREADY_CLOSED'
+
     entry = alert['entry_price']
     tp1 = alert['tp1_price']
     tp2 = alert['tp2_price']
@@ -296,7 +292,7 @@ if __name__ == '__main__':
     # 2. Tracker les prix
     print("[2/4] Tracking des prix...")
     tracked = 0
-    tp_hit = {'TP1': 0, 'TP2': 0, 'TP3': 0, 'SL': 0, 'ONGOING': 0}
+    tp_hit = {'TP1': 0, 'TP2': 0, 'TP3': 0, 'SL': 0, 'ONGOING': 0, 'ALREADY_CLOSED': 0}
 
     for i, alert in enumerate(alerts, 1):
         if i % 10 == 0:
@@ -340,6 +336,7 @@ if __name__ == '__main__':
     print(f"      TP1 atteint: {tp_hit['TP1']}")
     print(f"      SL atteint:  {tp_hit['SL']}")
     print(f"      En cours:    {tp_hit['ONGOING']}")
+    print(f"      Deja ferme:  {tp_hit['ALREADY_CLOSED']} (price_max mis a jour)")
     print()
 
     print("=" * 80)
