@@ -128,13 +128,18 @@ def update_price_tracking(alert_id, hours_elapsed, current_price, alert):
     updates = {}
 
     # Determiner quelle colonne mettre a jour
-    if 0.5 <= hours_elapsed < 1.5 and alert['price_1h_after'] is None:
+    # BUG FIX: Fenetres elargies pour capturer les prix meme si le cron est en retard
+    # price_1h_after: entre 0.5h et 2h (avant: 0.5-1.5h)
+    # price_2h_after: entre 1.5h et 4h (avant: 1.5-3h)
+    # price_4h_after: entre 3h et 8h (avant: 3-6h)
+    # price_24h_after: >= 20h (avant: >= 23h)
+    if 0.5 <= hours_elapsed < 2 and alert['price_1h_after'] is None:
         updates['price_1h_after'] = current_price
-    elif 1.5 <= hours_elapsed < 3 and alert['price_2h_after'] is None:
+    if 1.5 <= hours_elapsed < 4 and alert['price_2h_after'] is None:
         updates['price_2h_after'] = current_price
-    elif 3 <= hours_elapsed < 6 and alert['price_4h_after'] is None:
+    if 3 <= hours_elapsed < 8 and alert['price_4h_after'] is None:
         updates['price_4h_after'] = current_price
-    elif hours_elapsed >= 23 and alert['price_24h_after'] is None:
+    if hours_elapsed >= 20 and alert['price_24h_after'] is None:
         updates['price_24h_after'] = current_price
 
     # Mettre a jour prix max/min
@@ -209,27 +214,37 @@ def check_tp_sl_hit(alert, current_price):
         return 'TP3'
 
     # Verifier TP2
+    # BUG FIX: Ajout de is_closed=1 et final_outcome pour TP2
     if tp2 and price_max >= tp2 and alert['highest_tp_reached'] not in ['TP2', 'TP3']:
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
         cursor.execute("""
             UPDATE alerts
             SET highest_tp_reached = 'TP2',
-                time_to_tp2 = ?
+                time_to_tp2 = ?,
+                final_outcome = 'WIN_TP2',
+                final_gain_percent = ?,
+                is_closed = 1,
+                closed_at = ?
             WHERE id = ?
-        """, [hours_elapsed, alert['id']])
+        """, [hours_elapsed, ((tp2 - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
         conn.commit()
         conn.close()
         return 'TP2'
 
     # Verifier TP1
+    # BUG FIX: Ajout de is_closed=1 et final_outcome pour TP1
     if tp1 and price_max >= tp1 and alert['highest_tp_reached'] not in ['TP1', 'TP2', 'TP3']:
         hours_elapsed = calculate_time_elapsed(alert['created_at'])
         cursor.execute("""
             UPDATE alerts
             SET highest_tp_reached = 'TP1',
-                time_to_tp1 = ?
+                time_to_tp1 = ?,
+                final_outcome = 'WIN_TP1',
+                final_gain_percent = ?,
+                is_closed = 1,
+                closed_at = ?
             WHERE id = ?
-        """, [hours_elapsed, alert['id']])
+        """, [hours_elapsed, ((tp1 - entry) / entry * 100), datetime.now().isoformat(), alert['id']])
         conn.commit()
         conn.close()
         return 'TP1'
