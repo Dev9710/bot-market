@@ -26,6 +26,10 @@ else:
     print(f"[INFO] Mode Local - SQLite: {DB_PATH}")
 
 GECKOTERMINAL_API = "https://api.geckoterminal.com/api/v2"
+DEXSCREENER_API = "https://api.dexscreener.com/latest/dex"
+
+# Compteurs pour statistiques de source
+price_source_stats = {'dexscreener': 0, 'geckoterminal': 0, 'failed': 0}
 
 def get_db_connection():
     """Retourne une connexion SQLite"""
@@ -33,8 +37,45 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def fetch_current_price(network, pool_address):
-    """Fetch prix actuel via GeckoTerminal API"""
+def fetch_dexscreener_price(network, pool_address):
+    """
+    Fetch prix via DexScreener API (PRIORITAIRE)
+    Avantages:
+    - Temps reel (pas de delai d'indexation)
+    - Gratuit, sans API key
+    - Rate limit genereux
+    - Multi-chain support
+    """
+    # Mapping network names to DexScreener chain IDs
+    chain_map = {
+        'eth': 'ethereum',
+        'bsc': 'bsc',
+        'base': 'base',
+        'solana': 'solana',
+        'polygon_pos': 'polygon',
+        'avax': 'avalanche',
+        'arbitrum': 'arbitrum'
+    }
+
+    chain = chain_map.get(network.lower(), network)
+    url = f"{DEXSCREENER_API}/pairs/{chain}/{pool_address}"
+
+    try:
+        response = requests.get(url, timeout=8)
+        if response.status_code == 200:
+            data = response.json()
+            # DexScreener peut retourner 'pair' ou 'pairs'
+            pair = data.get('pair') or (data.get('pairs', [{}])[0] if data.get('pairs') else None)
+            if pair and pair.get('priceUsd'):
+                price_usd = float(pair['priceUsd'])
+                return price_usd
+        return None
+    except Exception:
+        return None
+
+
+def fetch_geckoterminal_price(network, pool_address):
+    """Fetch prix via GeckoTerminal API (FALLBACK)"""
     network_map = {
         'eth': 'eth',
         'bsc': 'bsc',
@@ -54,11 +95,34 @@ def fetch_current_price(network, pool_address):
             data = response.json()
             price_usd = float(data['data']['attributes']['base_token_price_usd'])
             return price_usd
-        else:
-            return None
-    except Exception as e:
-        print(f"  [ERROR] Failed to fetch price for {pool_address}: {e}")
         return None
+    except Exception:
+        return None
+
+
+def fetch_current_price(network, pool_address):
+    """
+    Fetch prix actuel avec strategie multi-source:
+    1. DexScreener (prioritaire - temps reel, pas de delai)
+    2. GeckoTerminal (fallback - peut avoir 1-2h de delai)
+    """
+    global price_source_stats
+
+    # 1. Essayer DexScreener d'abord (temps reel)
+    price = fetch_dexscreener_price(network, pool_address)
+    if price is not None:
+        price_source_stats['dexscreener'] += 1
+        return price
+
+    # 2. Fallback sur GeckoTerminal
+    price = fetch_geckoterminal_price(network, pool_address)
+    if price is not None:
+        price_source_stats['geckoterminal'] += 1
+        return price
+
+    # 3. Echec total
+    price_source_stats['failed'] += 1
+    return None
 
 def get_alerts_to_track():
     """
@@ -352,6 +416,17 @@ if __name__ == '__main__':
     print(f"      SL atteint:  {tp_hit['SL']}")
     print(f"      En cours:    {tp_hit['ONGOING']}")
     print(f"      Deja ferme:  {tp_hit['ALREADY_CLOSED']} (price_max mis a jour)")
+    print()
+
+    # 5. Statistiques des sources de prix
+    print("[5/5] Sources de prix utilisees:")
+    total_fetched = price_source_stats['dexscreener'] + price_source_stats['geckoterminal']
+    if total_fetched > 0:
+        ds_pct = price_source_stats['dexscreener'] / total_fetched * 100
+        gt_pct = price_source_stats['geckoterminal'] / total_fetched * 100
+        print(f"      DexScreener:   {price_source_stats['dexscreener']:5} ({ds_pct:.1f}%) - temps reel")
+        print(f"      GeckoTerminal: {price_source_stats['geckoterminal']:5} ({gt_pct:.1f}%) - fallback")
+    print(f"      Echecs:        {price_source_stats['failed']:5}")
     print()
 
     print("=" * 80)
