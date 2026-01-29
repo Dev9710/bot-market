@@ -7,9 +7,14 @@ Fonctions de scoring basées sur backtest Phase 2:
 - Score final (base + momentum + whale)
 - Tiers de confiance (HIGH/MEDIUM/LOW)
 - Confidence score (fiabilité des données)
+
+V4 (Janvier 2026): Intégration stratégie SIGNAL optimisée ETH/SOLANA
+- Signal quality (A+, A, B, None)
+- Filtres d'exclusion basés sur backtest 15,922 alertes
+- SL/TP optimisés par réseau
 """
 
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Optional
 from utils.helpers import log
 from config.settings import (
     MIN_VELOCITE_PUMP,
@@ -22,6 +27,28 @@ from config.settings import (
 )
 from core.filters import check_watchlist_token
 from core.signals import analyze_whale_activity
+
+# Import de la nouvelle stratégie SIGNAL (architecture modulaire)
+try:
+    from core.strategies import (
+        get_strategy,
+        is_strategy_available,
+        get_supported_networks,
+        analyze_alert as analyze_signal_alert,
+        get_sltp_config,
+        calculate_sltp_prices,
+        get_position_size_percent,
+    )
+    from core.signal_strategy import (
+        get_signal_quality,
+        should_exclude,
+        calculate_signal_score,
+        analyze_signal,
+    )
+    SIGNAL_STRATEGY_AVAILABLE = True
+except ImportError:
+    SIGNAL_STRATEGY_AVAILABLE = False
+    log("signal_strategy.py non disponible - utilisation scoring V3 classique")
 
 
 def calculate_base_score(pool_data: Dict) -> int:
@@ -420,23 +447,51 @@ def analyze_whale_activity(pool_data: Dict) -> Dict:
 
 def calculate_confidence_tier(pool_data: Dict) -> str:
     """
-    Calcule le tier de confiance: HIGH, MEDIUM, ou LOW
-    Basé sur patterns gagnants du backtest
+    Calcule le tier de confiance basé sur la stratégie SIGNAL V4.
 
-    HIGH = 35-50% WR attendu
-    MEDIUM = 25-30% WR attendu
-    LOW = 15-20% WR attendu
+    Pour ETH/SOLANA: utilise la nomenclature SIGNAL
+    - SIGNAL_A+ : 88% WR (Solana) / 59% WR (ETH)
+    - SIGNAL_A  : 78% WR (Solana) / 56% WR (ETH)
+    - SIGNAL_B  : 62% WR (Solana) / 47% WR (ETH)
+
+    Pour autres réseaux: utilise l'ancienne logique V3
+    - HIGH = 35-50% WR attendu
+    - MEDIUM = 25-30% WR attendu
+    - LOW = 15-20% WR attendu
     """
+    network = pool_data.get('network', '').lower()
+
+    # Token watchlist = AUTO ULTRA_HIGH
+    if check_watchlist_token(pool_data):
+        return "ULTRA_HIGH"  # 77-100% WR historique!
+
+    # === V4: STRATÉGIE SIGNAL POUR ETH/SOLANA ===
+    if SIGNAL_STRATEGY_AVAILABLE and network in ['eth', 'solana']:
+        try:
+            signal_quality = get_signal_quality(pool_data, network)
+
+            if signal_quality == 'A+':
+                return "SIGNAL_A+"  # 88% WR (Solana) / 59% WR (ETH)
+            elif signal_quality == 'A':
+                return "SIGNAL_A"   # 78% WR (Solana) / 56% WR (ETH)
+            elif signal_quality == 'B':
+                return "SIGNAL_B"   # 62% WR (Solana) / 47% WR (ETH)
+            else:
+                # Vérifié mais exclu ou pas de signal
+                excluded, reason = should_exclude(pool_data, network)
+                if excluded:
+                    return "EXCLUDED"
+                return "NO_SIGNAL"
+        except Exception as e:
+            log(f"⚠️ Erreur calcul tier SIGNAL: {e}")
+            # Fallback vers logique V3
+
+    # === V3: LOGIQUE CLASSIQUE POUR AUTRES RÉSEAUX ===
     score = pool_data.get('score', 0)
     velocite = pool_data.get('velocite_pump', 0)
     type_pump = pool_data.get('type_pump', '')
-    network = pool_data.get('network', '')
     age_hours = pool_data.get('age_hours', 0)
     liquidity = pool_data.get('liquidity', 0)
-
-    # Token watchlist = AUTO HIGH
-    if check_watchlist_token(pool_data):
-        return "ULTRA_HIGH"  # 77-100% WR historique!
 
     # HIGH CONFIDENCE (attendu: 35-50% WR)
     high_conditions = [
@@ -526,3 +581,121 @@ def calculate_confidence_score(pool_data: Dict) -> int:
         confidence -= 10  # Peu de transactions = données peu représentatives
 
     return max(confidence, 0)
+
+
+# ============================================
+# V4: INTÉGRATION STRATÉGIE SIGNAL (ETH/SOLANA)
+# ============================================
+
+def get_signal_analysis(pool_data: Dict) -> Optional[Dict]:
+    """
+    Analyse complète avec la stratégie SIGNAL V4 (ETH/SOLANA uniquement).
+
+    Args:
+        pool_data: Données du pool
+
+    Returns:
+        Dict avec signal_quality, is_excluded, adjusted_score, etc.
+        ou None si stratégie non disponible ou réseau non supporté
+    """
+    if not SIGNAL_STRATEGY_AVAILABLE:
+        return None
+
+    network = pool_data.get('network', '').lower()
+
+    # Stratégie SIGNAL uniquement pour ETH et SOLANA
+    if network not in ['eth', 'solana']:
+        return None
+
+    try:
+        return analyze_signal(pool_data)
+    except Exception as e:
+        log(f"⚠️ Erreur analyse signal: {e}")
+        return None
+
+
+def calculate_final_score_v4(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Tuple[int, int, int, Dict, Optional[Dict]]:
+    """
+    Score final V4 = base + momentum + whale + ajustements SIGNAL.
+
+    Returns:
+        (final_score, base_score, momentum_bonus, whale_analysis, signal_analysis)
+    """
+    # Calcul V3 classique
+    base = calculate_base_score(pool_data)
+    momentum_bonus = calculate_momentum_bonus(pool_data, momentum, multi_pool_data)
+    whale_analysis = analyze_whale_activity(pool_data)
+    whale_score = whale_analysis['whale_score']
+
+    # Score V3
+    final_v3 = base + momentum_bonus + whale_score
+    final_v3 = max(min(final_v3, 100), 0)
+
+    # Analyse SIGNAL V4 (ETH/SOLANA uniquement)
+    signal_analysis = get_signal_analysis(pool_data)
+
+    if signal_analysis and SIGNAL_STRATEGY_AVAILABLE:
+        # Utiliser le score ajusté de la stratégie SIGNAL
+        final = signal_analysis['adjusted_score']
+
+        # Ajouter whale_score au score SIGNAL
+        final = final + whale_score
+        final = max(min(final, 100), 0)
+
+        # Log de la différence
+        network = pool_data.get('network', '').upper()
+        signal_quality = signal_analysis.get('signal_quality')
+        if signal_quality:
+            log(f"   📊 SIGNAL_{signal_quality} ({network}): Score V3={final_v3} → V4={final}")
+    else:
+        final = final_v3
+
+    return final, base, momentum_bonus, whale_analysis, signal_analysis
+
+
+def should_skip_alert(pool_data: Dict) -> Tuple[bool, str]:
+    """
+    Vérifie si une alerte doit être ignorée selon la stratégie SIGNAL.
+
+    Args:
+        pool_data: Données du pool
+
+    Returns:
+        (should_skip, reason)
+    """
+    if not SIGNAL_STRATEGY_AVAILABLE:
+        return False, ""
+
+    network = pool_data.get('network', '').lower()
+
+    # Stratégie SIGNAL uniquement pour ETH et SOLANA
+    if network not in ['eth', 'solana']:
+        return False, ""
+
+    return should_exclude(pool_data, network)
+
+
+def get_optimized_sltp(pool_data: Dict) -> Optional[Dict]:
+    """
+    Retourne les SL/TP optimisés selon le réseau.
+
+    Args:
+        pool_data: Données du pool
+
+    Returns:
+        Dict avec stop_loss_price, tp1_price, etc. ou None
+    """
+    if not SIGNAL_STRATEGY_AVAILABLE:
+        return None
+
+    network = pool_data.get('network', '').lower()
+
+    # SL/TP optimisés uniquement pour ETH et SOLANA
+    if network not in ['eth', 'solana']:
+        return None
+
+    entry_price = pool_data.get('price_usd', 0)
+    if not entry_price:
+        return None
+
+    return calculate_sltp_prices(entry_price, network)
