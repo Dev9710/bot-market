@@ -597,6 +597,28 @@ class AlertTracker:
         count = cursor.fetchone()[0]
         return count > 0
 
+    def count_alerts_for_token(self, token_address: str, hours: int = 24) -> int:
+        """
+        Compte le nombre d'alertes pour un token dans les dernières X heures.
+        Utilisé pour la protection anti-rug.
+
+        Args:
+            token_address: Adresse du token
+            hours: Fenêtre de temps en heures (défaut 24h)
+
+        Returns:
+            Nombre d'alertes récentes pour ce token
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT COUNT(*) FROM alerts
+            WHERE token_address = ?
+            AND datetime(created_at) >= datetime('now', ?)
+        """, (token_address, f'-{hours} hours'))
+
+        count = cursor.fetchone()[0]
+        return count
+
     def get_last_alert_for_token(self, token_address: str) -> Optional[Dict]:
         """
         Récupère la dernière alerte pour un token donné.

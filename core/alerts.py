@@ -3,6 +3,7 @@ Gestion des Alertes - Génération, analyse et décisions de trading
 
 Fonctions de gestion d'alertes:
 - Vérification cooldown et spam prevention
+- Protection anti-rug (limite alertes par token)
 - Évaluation conditions marché (BUY/WAIT/EXIT)
 - Analyse alertes suivantes (TP tracking)
 - Génération alertes complètes (Entry/SL/TP + analyse)
@@ -18,8 +19,46 @@ from config.settings import (
     MIN_TIME_HOURS_FOR_REALERT,
 )
 
+# ============================================
+# PROTECTION ANTI-RUG: Limite alertes par token
+# ============================================
+# Évite les cas comme MoltChain (27 alertes sur un rug)
+MAX_ALERTS_PER_TOKEN = 5  # Maximum 5 alertes par token sur 24h
+MAX_ALERTS_TIMEFRAME_HOURS = 24  # Fenêtre de temps pour le comptage
+
 
 # Note: This file provides pure functions for alert logic
+
+
+def check_anti_rug_protection(token_address: str, tracker) -> Tuple[bool, str]:
+    """
+    Protection anti-rug: Limite le nombre d'alertes par token.
+    Évite les cas comme MoltChain (27 alertes sur le même rug).
+
+    Returns:
+        (is_allowed, reason)
+    """
+    if tracker is None:
+        return True, "Pas de tracker disponible"
+
+    try:
+        # Compter les alertes récentes sur ce token
+        alert_count = tracker.count_alerts_for_token(
+            token_address,
+            hours=MAX_ALERTS_TIMEFRAME_HOURS
+        )
+
+        if alert_count >= MAX_ALERTS_PER_TOKEN:
+            return False, f"Anti-rug: {alert_count} alertes en {MAX_ALERTS_TIMEFRAME_HOURS}h (max: {MAX_ALERTS_PER_TOKEN})"
+
+        return True, f"OK ({alert_count}/{MAX_ALERTS_PER_TOKEN} alertes récentes)"
+
+    except Exception as e:
+        # En cas d'erreur, autoriser pour ne pas bloquer
+        log(f"⚠️ Erreur anti-rug check: {e}")
+        return True, f"Erreur check: {e}"
+
+
 def should_send_alert(token_address: str, current_price: float, tracker, regle5_data: Dict = None) -> Tuple[bool, str]:
     """
     Détermine si une alerte doit être envoyée pour un token (FIX BUG #1 - SPAM).
@@ -35,6 +74,11 @@ def should_send_alert(token_address: str, current_price: float, tracker, regle5_
     Returns:
         (should_send: bool, reason: str)
     """
+    # [ANTI-RUG] Vérifier si on a dépassé la limite d'alertes pour ce token
+    is_allowed, anti_rug_reason = check_anti_rug_protection(token_address, tracker)
+    if not is_allowed:
+        return False, anti_rug_reason
+
     # Vérifier si c'est la première alerte pour ce token
     if not tracker.token_already_alerted(token_address):
         return True, "Première alerte pour ce token"
