@@ -220,11 +220,34 @@ class SolanaStrategy(BaseStrategy):
         whale_score = self._safe_get(alert, 'whale_score', 0)
         whale_pattern = self._safe_get(alert, 'whale_pattern', '')
 
+        # === WHALE TRACKER: Wallets spécifiques ===
+        # Support both naming conventions (scoring.py vs whale_tracker.py)
+        tracker_whale_count = (
+            self._safe_get(alert, 'tracker_whale_count', 0) or
+            self._safe_get(alert, 'whale_tracker_count', 0)
+        )
+        tracker_is_strong = (
+            self._safe_get(alert, 'tracker_is_strong_signal', False) or
+            self._safe_get(alert, 'whale_tracker_strong_signal', False)
+        )
+
         # Extraction concentration_risk du message
         alert_msg = self._safe_get(alert, 'alert_message', '')
         has_low_concentration = 'concentration : LOW' in alert_msg or 'concentration: LOW' in alert_msg
         is_distributed_buying = whale_pattern == 'DISTRIBUTED_BUYING' or whale_score > self.WHALE_SCORE_POSITIVE
         is_strong_whale = whale_score >= self.WHALE_SCORE_STRONG
+
+        # ============================================
+        # SIGNAL_A++ : Whale Tracker = PRIORITE MAXIMALE
+        # ============================================
+
+        # [v3.2 TOP PRIORITY] 2+ tracked whales achètent = signal très fort
+        if tracker_whale_count >= 2:
+            return 'A++'
+
+        # [v3.2] 1 tracked whale + volume accel = signal fort
+        if tracker_whale_count >= 1 and vol_accel_1h > self.VOL_ACCEL_MODERATE:
+            return 'A++'
 
         # ============================================
         # SIGNAL_A++ : MC Favorable + Volume Accel Forte + Whale

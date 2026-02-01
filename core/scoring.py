@@ -28,6 +28,14 @@ from config.settings import (
 from core.filters import check_watchlist_token
 from core.signals import analyze_whale_activity
 
+# Import du whale tracker (wallets spécifiques)
+try:
+    from core.whale_tracker import check_whale_signal, enhance_alert_with_whale_data
+    WHALE_TRACKER_AVAILABLE = True
+except ImportError:
+    WHALE_TRACKER_AVAILABLE = False
+    log("⚠️ WhaleTracker non disponible - tracking wallets désactivé")
+
 # Import de la nouvelle stratégie SIGNAL (architecture modulaire)
 try:
     from core.strategies import (
@@ -616,7 +624,7 @@ def get_signal_analysis(pool_data: Dict) -> Optional[Dict]:
 
 def calculate_final_score_v4(pool_data: Dict, momentum: Dict, multi_pool_data: Dict) -> Tuple[int, int, int, Dict, Optional[Dict]]:
     """
-    Score final V4 = base + momentum + whale + ajustements SIGNAL.
+    Score final V4 = base + momentum + whale + whale_tracker + ajustements SIGNAL.
 
     Returns:
         (final_score, base_score, momentum_bonus, whale_analysis, signal_analysis)
@@ -627,8 +635,37 @@ def calculate_final_score_v4(pool_data: Dict, momentum: Dict, multi_pool_data: D
     whale_analysis = analyze_whale_activity(pool_data)
     whale_score = whale_analysis['whale_score']
 
-    # Score V3
-    final_v3 = base + momentum_bonus + whale_score
+    # === NOUVEAU: Whale Tracker (wallets spécifiques) ===
+    whale_tracker_bonus = 0
+    if WHALE_TRACKER_AVAILABLE and pool_data.get('network', '').lower() == 'solana':
+        try:
+            token_address = pool_data.get('pool_address', '') or pool_data.get('base_token', '')
+            if token_address:
+                tracker_result = check_whale_signal(token_address)
+                whale_count = tracker_result.get('whale_count', 0)
+                is_strong = tracker_result.get('is_strong_signal', False)
+
+                # Bonus si des whales trackés achètent
+                if whale_count >= 3:
+                    whale_tracker_bonus = 35  # Signal très fort
+                    log(f"   🐋🐋🐋 WHALE TRACKER: {whale_count} whales achètent! (+{whale_tracker_bonus}pts)")
+                elif whale_count == 2:
+                    whale_tracker_bonus = 25  # Signal fort
+                    log(f"   🐋🐋 WHALE TRACKER: 2 whales achètent! (+{whale_tracker_bonus}pts)")
+                elif whale_count == 1:
+                    whale_tracker_bonus = 10  # Signal modéré
+                    log(f"   🐋 WHALE TRACKER: 1 whale achète (+{whale_tracker_bonus}pts)")
+
+                # Ajouter les détails au whale_analysis
+                whale_analysis['tracker_whale_count'] = whale_count
+                whale_analysis['tracker_whale_buyers'] = tracker_result.get('whale_buyers', [])
+                whale_analysis['tracker_is_strong_signal'] = is_strong
+
+        except Exception as e:
+            log(f"   ⚠️ Whale tracker error: {e}")
+
+    # Score V3 avec whale tracker
+    final_v3 = base + momentum_bonus + whale_score + whale_tracker_bonus
     final_v3 = max(min(final_v3, 100), 0)
 
     # Analyse SIGNAL V4 (ETH/SOLANA uniquement)
@@ -638,8 +675,8 @@ def calculate_final_score_v4(pool_data: Dict, momentum: Dict, multi_pool_data: D
         # Utiliser le score ajusté de la stratégie SIGNAL
         final = signal_analysis['adjusted_score']
 
-        # Ajouter whale_score au score SIGNAL
-        final = final + whale_score
+        # Ajouter whale_score + whale_tracker_bonus au score SIGNAL
+        final = final + whale_score + whale_tracker_bonus
         final = max(min(final, 100), 0)
 
         # Log de la différence

@@ -1,0 +1,11 @@
+Les wallets partagés dans la vidéo :
+
+Gake : DNfuF1L62WWyW3pNakVkyGGFzVVhj4Yr52jSmdTyeBHm
+Cupsey : 2fg5QD1eD7rzNNCsvnhmXFm5hqNgwTTG8p7kQ6f3rx6f
+Jidn : 3h65MmPZksoKKyEpEjnWU2Yk2iYT5oZDNitGy5cTaxoE
+Soloxbt : FTg1gqW7vPm4kdU1LPM7JJnizbgPdRDy2PitKw6mY27j
+Pow : 8zFZHuSRuDpuAR7J6FzwyF3vKNx4CVW3DFHJerQhc7Zd
+Loopierr : 9yYya3F5EJoLnBNKW6z4bZvyQytMXzDcpU5D6yYr4jqL
+OGAntD : 215nhcAHjQQGgwpQSJQ7zR26etbjjtVdW74NLzwEgQjP
+Coyote : A4DCAjDwkq5jYhNoZ5Xn2NbkTLimARkerVv81w2dhXgL
+Marcell : ACHhRQMbTxuWqU3bmbBbgUNGsPsYnvB8KLcPkkXCY1C7 3zD1armVsd4UUDW4RvcaE4ve6oEkmGyHPEjtB7q5Q9LU
