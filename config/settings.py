@@ -557,3 +557,113 @@ ENABLE_SMART_REALERT = False  # DÉSACTIVÉ pour phase backtesting (collecte max
 ENABLE_ACTIVE_TRACKING = True  # Activer le tracking actif des pools alertés
 ACTIVE_TRACKING_MAX_AGE_HOURS = 24  # Suivre les alertes des dernières 24h
 ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES = 15  # Cooldown 15min entre mises à jour
+
+# ============================================
+# V4.2: SMART MONEY & WHALE TRACKING (NEW!)
+# ============================================
+# Basé sur méthodologie Modop_bot_crypto:
+# - Tracker les wallets qui achètent tôt les gagnants
+# - Détecter les whale buys comme signal supplémentaire
+# - Vente partielle pour sécuriser profits
+
+# Seuils pour whale buys par network (USD)
+WHALE_BUY_THRESHOLDS = {
+    'solana': 5000,      # $5K+ = whale sur Solana
+    'eth': 10000,        # $10K+ = whale sur ETH
+    'base': 5000,        # $5K+ = whale sur Base
+    'bsc': 3000,         # $3K+ = whale sur BSC
+    'polygon_pos': 2000, # $2K+ = whale sur Polygon
+    'avax': 3000,        # $3K+ = whale sur Avalanche
+}
+
+# Critères pour valider un "smart money" wallet
+SMART_MONEY_CRITERIA = {
+    'min_wallet_age_days': 30,        # Wallet doit exister depuis 30j+
+    'min_historical_trades': 10,       # Au moins 10 trades historiques
+    'min_win_rate': 55,                # Au moins 55% de trades gagnants
+    'min_avg_profit_percent': 10,      # Au moins +10% de profit moyen
+}
+
+# Bonus de score selon le tier du wallet smart money
+SMART_MONEY_TIER_BONUS = {
+    'LEGENDARY': 25,   # Win rate > 80%, 50+ trades
+    'ELITE': 20,       # Win rate > 70%, 30+ trades
+    'PROVEN': 15,      # Win rate > 60%, 20+ trades
+    'PROMISING': 10,   # Win rate > 50%, 10+ trades
+    'UNRANKED': 5,     # Whale mais pas dans watchlist
+}
+
+# Enable/disable smart money tracking
+ENABLE_SMART_MONEY_TRACKING = True
+
+# ============================================
+# V4.2: PARTIAL PROFIT TAKING STRATEGY (NEW!)
+# ============================================
+# Stratégie de vente partielle pour sécuriser profits:
+# - TP1: Vendre 50%, garder 50% pour laisser courir
+# - TP2: Vendre 30% du restant (15% total)
+# - TP3: Vendre tout le reste (35%)
+#
+# Avantage: Sécurise profits tout en gardant exposition aux gros moves
+
+PARTIAL_PROFIT_STRATEGY = {
+    'enabled': True,
+    'TP1_sell_percent': 50,   # Vendre 50% au TP1
+    'TP2_sell_percent': 30,   # Vendre 30% du restant au TP2
+    'TP3_sell_percent': 100,  # Vendre tout au TP3
+
+    # Trailing stop après TP2 (optionnel)
+    'trailing_after_tp2': True,
+    'trailing_stop_percent': 15,  # -15% du high après TP2
+}
+
+def calculate_partial_profit_result(tp1_gain: float, tp2_gain: float, tp3_gain: float, exit_at: str) -> dict:
+    """
+    Calcule le profit avec vente partielle.
+
+    Args:
+        tp1_gain: % gain au TP1
+        tp2_gain: % gain au TP2
+        tp3_gain: % gain au TP3
+        exit_at: 'TP1', 'TP2', 'TP3'
+
+    Returns:
+        dict: {total_profit, breakdown}
+    """
+    if not PARTIAL_PROFIT_STRATEGY['enabled']:
+        # Mode classique: tout vendre au point de sortie
+        gains = {'TP1': tp1_gain, 'TP2': tp2_gain, 'TP3': tp3_gain}
+        return {'total_profit': gains.get(exit_at, 0), 'breakdown': []}
+
+    if exit_at == 'TP1':
+        profit = tp1_gain * 0.5  # 50% vendu au TP1
+        return {
+            'total_profit': profit,
+            'breakdown': [{'at': 'TP1', 'sold': 50, 'gain': tp1_gain}]
+        }
+
+    elif exit_at == 'TP2':
+        profit_tp1 = tp1_gain * 0.5
+        profit_tp2 = tp2_gain * 0.15  # 30% of 50% = 15%
+        return {
+            'total_profit': profit_tp1 + profit_tp2,
+            'breakdown': [
+                {'at': 'TP1', 'sold': 50, 'gain': tp1_gain},
+                {'at': 'TP2', 'sold': 15, 'gain': tp2_gain}
+            ]
+        }
+
+    elif exit_at == 'TP3':
+        profit_tp1 = tp1_gain * 0.5
+        profit_tp2 = tp2_gain * 0.15
+        profit_tp3 = tp3_gain * 0.35  # Remaining 35%
+        return {
+            'total_profit': profit_tp1 + profit_tp2 + profit_tp3,
+            'breakdown': [
+                {'at': 'TP1', 'sold': 50, 'gain': tp1_gain},
+                {'at': 'TP2', 'sold': 15, 'gain': tp2_gain},
+                {'at': 'TP3', 'sold': 35, 'gain': tp3_gain}
+            ]
+        }
+
+    return {'total_profit': 0, 'breakdown': []}
