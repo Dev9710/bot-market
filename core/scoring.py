@@ -34,7 +34,7 @@ try:
     WHALE_TRACKER_AVAILABLE = True
 except ImportError:
     WHALE_TRACKER_AVAILABLE = False
-    log("⚠️ WhaleTracker non disponible - tracking wallets désactivé")
+    log("[WARNING] WhaleTracker non disponible - tracking wallets desactive")
 
 # Import de la nouvelle stratégie SIGNAL (architecture modulaire)
 try:
