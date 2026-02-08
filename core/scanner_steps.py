@@ -22,6 +22,17 @@ from config.settings import (
     ENABLE_ACTIVE_TRACKING,
     ACTIVE_TRACKING_MAX_AGE_HOURS,
     ACTIVE_TRACKING_UPDATE_COOLDOWN_MINUTES,
+    # V4.x Optimizations
+    calculate_dynamic_tps,
+    calculate_vol_liq_ratio,
+    is_optimal_vol_liq,
+    is_in_age_danger_zone,
+    is_optimal_time,
+    get_alert_quality_score,
+    STOP_LOSS_PERCENT,
+    ENABLE_TIME_FILTERING,
+    ENABLE_SMART_MONEY_TRACKING,
+    calculate_partial_profit_result,
 )
 from utils.helpers import log
 from utils.api_client import get_trending_pools, get_new_pools, get_pool_by_address, parse_pool_data
@@ -156,6 +167,36 @@ def analyze_and_filter_tokens(
                 tokens_rejected += 1
                 continue
 
+            # ============================================
+            # V4.1: VOL/LIQ RATIO FILTER (CRITICAL!)
+            # ============================================
+            volume_24h = pool_data.get('volume_24h', 0)
+            liquidity = pool_data.get('liquidity', 0)
+            if liquidity > 0 and volume_24h > 0:
+                vol_liq_ratio = calculate_vol_liq_ratio(volume_24h, liquidity)
+                is_good_vol_liq, vol_liq_reason = is_optimal_vol_liq(network, vol_liq_ratio)
+                if not is_good_vol_liq:
+                    log(f"   ⏭️  {pool_data['name']}: [V4.1 REJECT] {vol_liq_reason}")
+                    tokens_rejected += 1
+                    continue
+
+            # V4.1: AGE DANGER ZONE FILTER
+            age_hours = pool_data.get('age_hours', 0)
+            if is_in_age_danger_zone(network, age_hours):
+                log(f"   ⏭️  {pool_data['name']}: [V4.1 REJECT] Age {age_hours:.1f}h in danger zone for {network}")
+                tokens_rejected += 1
+                continue
+
+            # V4.1: TIME FILTER (optional - can be disabled)
+            if ENABLE_TIME_FILTERING:
+                from datetime import datetime, timezone
+                current_hour = datetime.now(timezone.utc).hour
+                is_good_time, time_reason = is_optimal_time(current_hour)
+                if not is_good_time:
+                    log(f"   ⏭️  {pool_data['name']}: [V4.1 REJECT] {time_reason}")
+                    tokens_rejected += 1
+                    continue
+
             # Validation sécurité
             token_address = pool_data["pool_address"]
             network = pool_data["network"]
@@ -191,6 +232,28 @@ def analyze_and_filter_tokens(
             if whale_analysis['signals']:
                 signals.extend(whale_analysis['signals'])
 
+            # ============================================
+            # V4.1: Calculate Quality Score & Tier
+            # ============================================
+            volume_24h = pool_data.get('volume_24h', 0)
+            liquidity = pool_data.get('liquidity', 0)
+            vol_liq_ratio = calculate_vol_liq_ratio(volume_24h, liquidity) if liquidity > 0 else 0
+            buy_ratio = pool_data.get('buy_ratio', 1.0)
+
+            from datetime import datetime, timezone
+            current_hour = datetime.now(timezone.utc).hour
+
+            quality_result = get_alert_quality_score(
+                network=network,
+                score=score,
+                velocite=pool_data.get('volume_acceleration_1h_vs_6h', 10),  # Use as velocite proxy
+                buy_ratio=buy_ratio,
+                vol_liq_ratio=vol_liq_ratio,
+                hour_utc=current_hour
+            )
+
+            log(f"   🏆 Quality: {quality_result['quality_score']}/100 ({quality_result['tier']})")
+
             opportunities.append({
                 "pool_data": pool_data,
                 "score": score,
@@ -201,7 +264,12 @@ def analyze_and_filter_tokens(
                 "multi_pool_data": multi_pool_data,
                 "signals": signals,
                 "resistance_data": resistance_data,
-                "security_result": security_result,  # Ajouter pour process_and_send_alerts
+                "security_result": security_result,
+                # V4.1: Quality scoring
+                "quality_score": quality_result['quality_score'],
+                "quality_tier": quality_result['tier'],
+                "quality_factors": quality_result['factors'],
+                "vol_liq_ratio": vol_liq_ratio,
             })
 
             log(f"   ✅ Opportunité: {pool_data['name']} (Score: {score})")
@@ -284,10 +352,25 @@ def process_and_send_alerts(
                 # Préparer les données pour la DB
                 price = opp["pool_data"].get("price_usd", 0)
                 entry_price = price
-                stop_loss_price = price * 0.90  # -10%
-                tp1_price = price * 1.05  # +5%
-                tp2_price = price * 1.10  # +10%
-                tp3_price = price * 1.15  # +15%
+
+                # ============================================
+                # V4.0: DYNAMIC TPs based on velocite_pump
+                # ============================================
+                velocite_pump = regle5_data.get('velocite_pump', 10)
+                dynamic_tps = calculate_dynamic_tps(velocite_pump)
+
+                # Use dynamic TPs instead of fixed percentages
+                tp1_percent = dynamic_tps['TP1']
+                tp2_percent = dynamic_tps['TP2']
+                tp3_percent = dynamic_tps['TP3']
+                sl_percent = dynamic_tps['SL']  # Now -12% instead of -10%
+
+                stop_loss_price = price * (1 + sl_percent / 100)
+                tp1_price = price * (1 + tp1_percent / 100)
+                tp2_price = price * (1 + tp2_percent / 100)
+                tp3_price = price * (1 + tp3_percent / 100)
+
+                log(f"   📊 Dynamic TPs (vel={velocite_pump:.1f}): TP1=+{tp1_percent}%, TP2=+{tp2_percent}%, TP3=+{tp3_percent}%, SL={sl_percent}%")
 
                 # Calculate tier for confidence level (CRITICAL for dashboard display)
                 tier = calculate_confidence_tier(opp["pool_data"])
@@ -315,20 +398,41 @@ def process_and_send_alerts(
                     'volume_acceleration_6h_vs_24h': opp["pool_data"].get("volume_acceleration_6h_vs_24h", 0),
                     'entry_price': entry_price,
                     'stop_loss_price': stop_loss_price,
-                    'stop_loss_percent': -10,
+                    'stop_loss_percent': sl_percent,  # V4.0: Dynamic SL
                     'tp1_price': tp1_price,
-                    'tp1_percent': 5,
+                    'tp1_percent': tp1_percent,  # V4.0: Dynamic TP1
                     'tp2_price': tp2_price,
-                    'tp2_percent': 10,
+                    'tp2_percent': tp2_percent,  # V4.0: Dynamic TP2
                     'tp3_price': tp3_price,
-                    'tp3_percent': 15,
+                    'tp3_percent': tp3_percent,  # V4.0: Dynamic TP3
                     'alert_message': alert_msg,
                     # RÈGLE 5: Données de vélocité du pump
                     'velocite_pump': regle5_data['velocite_pump'],
                     'type_pump': regle5_data['type_pump'],
                     'decision_tp_tracking': regle5_data['decision_tp_tracking'],
                     'temps_depuis_alerte_precedente': regle5_data['temps_depuis_alerte_precedente'],
-                    'is_alerte_suivante': regle5_data['is_alerte_suivante']
+                    'is_alerte_suivante': regle5_data['is_alerte_suivante'],
+                    'whale_score': (whale_analysis or {}).get('whale_score', 0),
+                    'whale_pattern': (whale_analysis or {}).get('pattern', 'NORMAL'),
+                    'concentration_risk': (whale_analysis or {}).get('concentration_risk', 'MEDIUM'),
+                    'buyers_1h': (whale_analysis or {}).get('buyers_1h', 0),
+                    'sellers_1h': (whale_analysis or {}).get('sellers_1h', 0),
+                    'avg_buys_per_buyer': (whale_analysis or {}).get('avg_buys_per_buyer', 0),
+                    'avg_sells_per_seller': (whale_analysis or {}).get('avg_sells_per_seller', 0),
+                    'unique_wallet_ratio': (whale_analysis or {}).get('unique_wallet_ratio', 1.0),
+                    'market_cap_usd': opp["pool_data"].get("market_cap_usd", 0),
+                    'fdv_usd': opp["pool_data"].get("fdv_usd", 0),
+                    # V4.1: Quality scoring
+                    'quality_score': opp.get("quality_score", 0),
+                    'quality_tier': opp.get("quality_tier", "STANDARD"),
+                    'vol_liq_ratio': opp.get("vol_liq_ratio", 0),
+                    'security_score': security_result.get('security_score', 0),
+                    'lp_lock_percentage': security_result.get('lp_lock_percentage', 0),
+                    'buy_tax': security_result.get('buy_tax', 0),
+                    'sell_tax': security_result.get('sell_tax', 0),
+                    'is_renounced': security_result.get('is_renounced', False),
+                    'has_mint_function': security_result.get('has_mint_function', False),
+                    'contract_verified': security_result.get('contract_verified', False),
                 }
 
                 alert_id = alert_tracker.save_alert(alert_data)
